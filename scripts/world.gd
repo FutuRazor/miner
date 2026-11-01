@@ -143,6 +143,8 @@ func _ready() -> void:
 	drone_collisions = preload("res://scripts/drone_collisions.gd").new()
 	drone_collisions.world = self
 	add_child(drone_collisions)
+	get_viewport().size_changed.connect(_update_camera_limits)
+	_update_camera_limits()
 
 
 func _physics_process(delta: float) -> void:
@@ -152,6 +154,7 @@ func _physics_process(delta: float) -> void:
 		combat_assignment_time = 0.25
 		_assign_combat_targets()
 	_update_mouse_navigation(delta)
+	_clamp_camera_position()
 	var in_base := BASE_AREA.has_point($Player.position)
 	if in_base and not was_in_base and collected_count > 0:
 		money += collected_count * money_per_block
@@ -248,7 +251,35 @@ func _unhandled_input(event: InputEvent) -> void:
 			camera.position -= mouse_travel / camera.zoom
 		elif mouse_dragging:
 			camera.position -= event.relative / camera.zoom
+		_clamp_camera_position()
 		get_viewport().set_input_as_handled()
+
+
+func _camera_center_bounds() -> Rect2:
+	var edge := (RADIUS + 0.5) * CELL
+	var half_view: Vector2 = get_viewport_rect().size / ($Player/Camera2D.zoom * 2.0)
+	var extent := Vector2(edge if half_view.x < edge else 0.0, edge if half_view.y < edge else 0.0)
+	return Rect2(-extent, extent * 2.0)
+
+
+func _clamp_camera_position() -> void:
+	var camera: Camera2D = $Player/Camera2D
+	var bounds := _camera_center_bounds()
+	camera.global_position = camera.global_position.clamp(bounds.position, bounds.end)
+
+
+func _update_camera_limits() -> void:
+	var camera: Camera2D = $Player/Camera2D
+	var bounds := _camera_center_bounds()
+	var half_view := get_viewport_rect().size / (camera.zoom * 2.0)
+	# Camera2D limits describe viewport edges, while our allowed centers reach
+	# the outer block edge (at most half a screen of empty space).
+	camera.limit_left = floori(bounds.position.x - half_view.x)
+	camera.limit_right = ceili(bounds.end.x + half_view.x)
+	camera.limit_top = floori(bounds.position.y - half_view.y)
+	camera.limit_bottom = ceili(bounds.end.y + half_view.y)
+	_clamp_camera_position()
+	camera.force_update_scroll()
 
 
 func _zoom_camera(steps: float, screen_position: Vector2) -> void:
@@ -260,10 +291,12 @@ func _zoom_camera(steps: float, screen_position: Vector2) -> void:
 	# Preserve the visible center even while camera follow smoothing is active.
 	camera.global_position = camera.get_screen_center_position()
 	camera.zoom = Vector2.ONE * zoom_value
+	_update_camera_limits()
 	camera.reset_smoothing()
 	camera.force_update_scroll()
 	var world_after := get_canvas_transform().affine_inverse() * screen_position
 	camera.global_position += world_before - world_after
+	_clamp_camera_position()
 	camera.reset_smoothing()
 	camera.force_update_scroll()
 	if build_mode == BuildMode.PLACE:
