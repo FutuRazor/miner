@@ -1,0 +1,1061 @@
+extends Node2D
+
+const Block = preload("res://scripts/block.gd")
+const Drone = preload("res://scripts/drone.gd")
+const CELL := 48
+const RADIUS := 22
+const BASE_AREA := Rect2(-72, -72, 144, 144)
+const BASE_COLOR := Color("66e5db")
+var base_drone_settings: Dictionary = {"anchor": Vector2i(-1, -1)}
+@export var money_per_block: int = 1
+@export_range(1, 100000, 1) var base_max_health: int = 100
+var base_health := 100
+var base_health_label: Label
+var is_game_over := false
+var game_over_screen: CanvasLayer
+var play_button: Button
+var pause_button: Button
+var main_menu_button: Button
+var return_dialog_open := false
+@export_range(0, 100000, 1) var collector_cost: int = 10
+@export_range(0, 100000, 1) var barracks_cost: int = 10
+@export_range(0, 100000, 1) var tower_cost: int = 10
+var collected_count := 0
+var money := 10
+var money_label: Label
+var drone_count_label: Label
+var enemy_count_label: Label
+var wave_timer: ProgressBar
+var wave_pause_button: Button
+var combat_assignment_time := 0.0
+var was_in_base := true
+enum BuildMode { PLAY, MENU, PLACE, SKILLS }
+const SKILLS := [
+	{"id": "base_health", "group": "Basis", "name": "Lebenspunkte", "cost": 10, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 50."},
+	{"id": "mining_level", "group": "Basis", "name": "Abbaustufe", "cost": 10, "icon": "res://assets/icons/build.svg", "description": "Erhöht die Abbaustufe der Spielfigur und aller bestehenden und zukünftigen Abbaudrohnen."},
+	{"id": "cash_drone", "group": "Basis", "name": "Geld-Sammeldrohne", "cost": 10, "icon": "res://assets/icons/drone.svg", "description": "Holt Geld beim Sammler mit dem höchsten Guthaben.\nAbholung: 0,6 Sekunden\nAbgabe an Spielfigur oder Basis: sofort."},
+	{"id": "collector_drones", "group": "Sammler", "name": "Drohne", "cost": 10, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Drohne für jeden bestehenden und zukünftigen Sammler."},
+	{"id": "collector_speed", "group": "Sammler", "name": "Schneller sammeln", "cost": 10, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Bewegungsgeschwindigkeit um 10 Pixel/s und die Abbaugeschwindigkeit um 10 Prozentpunkte. Gilt für alle Sammlerdrohnen."},
+	{"id": "collector_capacity", "group": "Sammler", "name": "Kapazität erhöhen", "cost": 10, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 10."},
+	{"id": "barracks_drones", "group": "Kaserne", "name": "Drohne", "cost": 10, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."},
+	{"id": "barracks_health", "group": "Kaserne", "name": "Lebenspunkte", "cost": 10, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."},
+	{"group": "Kaserne", "name": "Angriff", "placeholder": true, "icon": "res://assets/icons/skills.svg", "description": "Geplant: Angriff verbessern."},
+	{"group": "Kaserne", "name": "Verteidigung", "placeholder": true, "icon": "res://assets/icons/skills.svg", "description": "Geplant: Verteidigung verbessern."},
+	{"id": "tower_health", "group": "Turm", "name": "Lebenspunkte", "cost": 10, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 10."},
+	{"id": "tower_shots", "group": "Turm", "name": "Anzahl Schüsse", "cost": 10, "icon": "res://assets/icons/tower.svg", "description": "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."},
+	{"id": "tower_rate", "group": "Turm", "name": "Schussrate", "cost": 10, "icon": "res://assets/icons/tower.svg", "description": "Verkürzt die Zeit zwischen den Salven aller Türme um 20 %. Millisekunden werden auf ganze Zahlen abgerundet."},
+]
+var selected_skill := 0
+var skill_levels: Dictionary = {"cash_drone": 0}
+var collector_drone_count := 1
+var collector_move_speed: int = 100
+var collector_mining_speed: int = 100
+var collector_capacity: int = 10
+var barracks_drone_count := 1
+var barracks_drone_health := 30
+var tower_health := 100
+var tower_shots := 1
+var tower_interval_ms := 1000
+var mining_level := 1
+const BASE_HOME := -1
+const BUILDINGS := ["Sammler", "Kaserne", "Turm"]
+const BUILDING_COLORS := [Color("e0ac65"), Color("9e94ed"), Color("7eb7ff")]
+var build_mode := BuildMode.PLAY
+var selected_building := 0
+var block_cells: Dictionary = {}
+var occupied_cells: Dictionary = {}
+var buildings: Array[Dictionary] = []
+var build_panel: PanelContainer
+var build_options: VBoxContainer
+var build_status: Label
+var build_preview: Node2D
+const DRAG_THRESHOLD := 8.0
+@export_range(0.1, 1.0, 0.05) var mouse_hold_threshold: float = 0.3
+const WALK_DIRECTIONS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
+var mouse_held := false
+var camera_drag_held := false
+var mouse_dragging := false
+var mouse_travel := Vector2.ZERO
+var mouse_placement := false
+var suppress_left_release := false
+var mouse_goal_active := false
+var mouse_goal := Vector2.ZERO
+var mouse_repath_timer := 0.0
+var navigation_revision := 0
+var mouse_path_revision := -1
+var mouse_direct_follow := false
+var mouse_hold_time := 0.0
+
+
+func _ready() -> void:
+	base_health = base_max_health
+	RenderingServer.set_default_clear_color(Color("151e28"))
+	# The existing base occupies all nine central cells, but stays walkable.
+	for y in range(-1, 2):
+		for x in range(-1, 2):
+			occupied_cells[Vector2i(x, y)] = true
+	for y in range(-RADIUS, RADIUS + 1):
+		for x in range(-RADIUS, RADIUS + 1):
+			if absi(x) <= 2 and absi(y) <= 2:
+				continue
+			var block := Block.new()
+			block.position = Vector2(x, y) * CELL
+			# Block rings begin just outside the existing 5 x 5 clearing.
+			block.hardness = 1 + floori(float(maxi(absi(x), absi(y)) - 3) / 2.0)
+			block_cells[Vector2i(x, y)] = block
+			var shade := float(posmod(x * 73 + y * 31, 9)) / 80.0
+			block.tint = Color("79644f").lightened(shade)
+			block.collected.connect(_on_block_collected)
+			add_child(block)
+	_create_boundary()
+	build_preview = preload("res://scripts/build_preview.gd").new()
+	build_preview.name = "BuildPreview"
+	build_preview.z_as_relative = false
+	build_preview.z_index = 50
+	add_child(build_preview)
+	_create_hud()
+
+
+func _physics_process(delta: float) -> void:
+	combat_assignment_time -= delta
+	if combat_assignment_time <= 0.0:
+		combat_assignment_time = 0.25
+		_assign_combat_targets()
+	_update_mouse_navigation(delta)
+	var in_base := BASE_AREA.has_point($Player.position)
+	if in_base and not was_in_base and collected_count > 0:
+		money += collected_count * money_per_block
+		collected_count = 0
+		_update_counters()
+	was_in_base = in_base
+	_collect_sampler_money()
+	if build_mode == BuildMode.PLACE:
+		_update_build_ui()
+		build_preview.queue_redraw()
+
+
+func _collect_sampler_money() -> void:
+	var player_position: Vector2 = $Player.position
+	var player_radius: float = $Player/CollisionShape2D.shape.radius
+	var transferred := false
+	for index in buildings.size():
+		var building := buildings[index]
+		if building.kind != 0 or building.money <= 0:
+			continue
+		var rect := Rect2(Vector2(building.anchor) * CELL - Vector2.ONE * CELL / 2, Vector2.ONE * CELL * 2)
+		var nearest := player_position.clamp(rect.position, rect.end)
+		if player_position.distance_squared_to(nearest) <= player_radius * player_radius:
+			money += building.money
+			building.money = 0
+			update_collector_label(index)
+			transferred = true
+	if transferred:
+		_update_counters()
+		_update_build_ui()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if is_game_over or return_dialog_open:
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if not event.pressed and suppress_left_release:
+			suppress_left_release = false
+			get_viewport().set_input_as_handled()
+			return
+		if build_mode == BuildMode.PLACE and mouse_placement:
+			if event.pressed:
+				suppress_left_release = true
+				_place_building()
+			get_viewport().set_input_as_handled()
+			return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		if event.pressed:
+			mouse_held = true
+			mouse_direct_follow = false
+			mouse_hold_time = 0.0
+			_set_mouse_goal(get_global_mouse_position())
+		elif mouse_held:
+			if not mouse_dragging:
+				_set_mouse_goal(get_global_mouse_position())
+			mouse_held = false
+			mouse_dragging = false
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		var close_menu: bool = not event.pressed and camera_drag_held and not mouse_dragging and build_mode != BuildMode.PLAY
+		camera_drag_held = event.pressed
+		mouse_held = false
+		mouse_dragging = false
+		mouse_travel = Vector2.ZERO
+		if close_menu:
+			_set_build_mode(BuildMode.PLAY)
+		get_viewport().set_input_as_handled()
+	elif event is InputEventMouseMotion and camera_drag_held:
+		mouse_travel += event.relative
+		var camera: Camera2D = $Player/Camera2D
+		if not mouse_dragging and mouse_travel.length() >= DRAG_THRESHOLD:
+			mouse_dragging = true
+			camera.position -= mouse_travel / camera.zoom
+		elif mouse_dragging:
+			camera.position -= event.relative / camera.zoom
+		get_viewport().set_input_as_handled()
+
+
+func _set_mouse_goal(goal: Vector2) -> void:
+	mouse_goal = goal
+	mouse_goal_active = true
+	mouse_repath_timer = 0.1
+	mouse_path_revision = navigation_revision
+	$Player.movement_enabled = true
+	$Player.mining_enabled = true
+	if mouse_direct_follow:
+		$Player.navigation_path.assign([goal])
+		return
+	var path := _walk_path(goal)
+	var old_path: Array[Vector2] = $Player.navigation_path
+	# Keep an already traversed straight segment instead of returning to its cell center.
+	if path.size() >= 2 and (path.size() == 2 or (not old_path.is_empty() and path[1].is_equal_approx(old_path[0]))):
+		path.pop_front()
+	$Player.navigation_path = path
+
+
+func _update_mouse_navigation(delta: float) -> void:
+	if not mouse_goal_active or (build_mode == BuildMode.PLACE and mouse_placement):
+		return
+	if $Player.keyboard_movement_enabled and Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down") != Vector2.ZERO:
+		mouse_goal_active = false
+		mouse_held = false
+		return
+	if mouse_held:
+		mouse_hold_time += delta
+		var current_goal := get_global_mouse_position()
+		if not mouse_direct_follow and mouse_hold_time >= mouse_hold_threshold:
+			mouse_direct_follow = true
+			_set_mouse_goal(current_goal)
+	mouse_repath_timer -= delta
+	if mouse_repath_timer > 0.0:
+		return
+	mouse_repath_timer = 0.1
+	var goal := get_global_mouse_position() if mouse_held else mouse_goal
+	if goal.distance_squared_to(mouse_goal) >= 16.0 or mouse_path_revision != navigation_revision:
+		_set_mouse_goal(goal)
+	if not mouse_held and $Player.position.distance_to(mouse_goal) <= 1.0:
+		mouse_goal_active = false
+
+
+func _walk_path(requested: Vector2) -> Array[Vector2]:
+	# Search only the connected free cells, never through a block.
+	var start := Vector2i(($Player.position / CELL).round())
+	var previous: Dictionary = {start: start}
+	var frontier: Array[Vector2i] = [start]
+	var cursor := 0
+	var destination := start
+	var nearest := $Player.position as Vector2
+	var best_distance := INF
+	while cursor < frontier.size():
+		var cell := frontier[cursor]
+		cursor += 1
+		var candidate := _walk_target_in_cell(cell, requested)
+		var distance := candidate.distance_squared_to(requested)
+		if distance < best_distance:
+			best_distance = distance
+			destination = cell
+			nearest = candidate
+		for direction in WALK_DIRECTIONS:
+			var next: Vector2i = cell + direction
+			if previous.has(next) or not _walkable_cell(next):
+				continue
+			previous[next] = cell
+			frontier.append(next)
+	var result: Array[Vector2] = [nearest]
+	var step := destination
+	while step != start:
+		result.push_front(Vector2(step) * CELL)
+		step = previous[step]
+	result.push_front(Vector2(start) * CELL)
+	return result
+
+
+func _walkable_cell(cell: Vector2i) -> bool:
+	if absi(cell.x) > RADIUS or absi(cell.y) > RADIUS:
+		return false
+	return not (block_cells.has(cell) and is_instance_valid(block_cells[cell]) and not block_cells[cell].is_queued_for_deletion())
+
+
+func _walk_target_in_cell(cell: Vector2i, requested: Vector2) -> Vector2:
+	var center := Vector2(cell) * CELL
+	var minimum := center - Vector2.ONE * CELL / 2.0
+	var maximum := center + Vector2.ONE * CELL / 2.0
+	var clearance: float = $Player/CollisionShape2D.shape.radius + 1.0
+	if not _walkable_cell(cell + Vector2i.LEFT):
+		minimum.x += clearance
+	if not _walkable_cell(cell + Vector2i.RIGHT):
+		maximum.x -= clearance
+	if not _walkable_cell(cell + Vector2i.UP):
+		minimum.y += clearance
+	if not _walkable_cell(cell + Vector2i.DOWN):
+		maximum.y -= clearance
+	var candidate := requested.clamp(minimum, maximum)
+	for diagonal in [Vector2i(-1, -1), Vector2i(1, -1), Vector2i(-1, 1), Vector2i(1, 1)]:
+		if not _walkable_cell(cell + diagonal):
+			var corner := center + Vector2(diagonal) * CELL / 2.0
+			var away := candidate - corner
+			if away.length() < clearance:
+				if away.is_zero_approx():
+					away = -Vector2(diagonal)
+				candidate = (corner + away.normalized() * clearance).clamp(minimum, maximum)
+	return candidate
+
+
+func _input(event: InputEvent) -> void:
+	if is_game_over or return_dialog_open:
+		return
+	# Capture the release of a map gesture even if the pointer is now over a menu.
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and mouse_held:
+		_unhandled_input(event)
+		return
+	# Finish an active right-button gesture even when released over the UI.
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT and not event.pressed and camera_drag_held:
+		_unhandled_input(event)
+		return
+	if not event is InputEventKey or not event.pressed or event.echo:
+		return
+	if event.keycode == KEY_B:
+		_on_build_button_pressed()
+	elif event.keycode == KEY_ESCAPE and build_mode != BuildMode.PLAY:
+		_set_build_mode(BuildMode.PLAY)
+	elif event.keycode == KEY_J:
+		_on_skills_button_pressed()
+	elif build_mode == BuildMode.SKILLS:
+		if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_right"):
+			selected_skill = (selected_skill + 1) % SKILLS.size()
+		elif event.is_action_pressed("ui_up") or event.is_action_pressed("ui_left"):
+			selected_skill = posmod(selected_skill - 1, SKILLS.size())
+		elif event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_E]:
+			_confirm_skill()
+		_update_build_ui()
+	elif build_mode == BuildMode.MENU:
+		if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_right"):
+			selected_building = (selected_building + 1) % BUILDINGS.size()
+		elif event.is_action_pressed("ui_up") or event.is_action_pressed("ui_left"):
+			selected_building = posmod(selected_building - 1, BUILDINGS.size())
+		elif event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_E]:
+			_set_build_mode(BuildMode.PLACE)
+		_update_build_ui()
+	elif build_mode == BuildMode.PLACE and event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_E]:
+		_place_building()
+
+
+func _set_build_mode(mode: BuildMode) -> void:
+	build_mode = mode
+	build_options.clear_hover()
+	if mode != BuildMode.PLACE:
+		mouse_placement = false
+	$Player.movement_enabled = mode not in [BuildMode.MENU, BuildMode.SKILLS]
+	$Player.mining_enabled = mode not in [BuildMode.MENU, BuildMode.SKILLS]
+	$Player.keyboard_movement_enabled = mode not in [BuildMode.MENU, BuildMode.SKILLS]
+	$Player.stop_mining()
+	mouse_held = false
+	camera_drag_held = false
+	mouse_dragging = false
+	if mode in [BuildMode.MENU, BuildMode.SKILLS]:
+		$Player.navigation_path.clear()
+		mouse_goal_active = false
+	if mode == BuildMode.PLACE and mouse_placement:
+		mouse_goal_active = false
+	_update_build_ui()
+	queue_redraw()
+
+
+func _build_anchor() -> Vector2i:
+	if mouse_placement:
+		return Vector2i((get_global_mouse_position() / CELL).round())
+	return Vector2i(($Player.position / CELL).round())
+
+
+func _confirm_skill() -> void:
+	var skill: Dictionary = SKILLS[selected_skill]
+	var money_before := money
+	if skill.get("id", "") == "base_health" and money >= skill.cost:
+		money -= skill.cost
+		base_max_health += 50
+		base_health += 50
+		_update_base_health()
+		_update_counters()
+	elif skill.get("id", "") == "collector_drones" and money >= skill.cost:
+		money -= skill.cost
+		collector_drone_count += 1
+		for index in buildings.size():
+			if buildings[index].kind == 0:
+				_spawn_collector_drone(index)
+		_update_counters()
+	elif skill.get("id", "") == "cash_drone" and money >= skill.cost:
+		money -= skill.cost
+		_spawn_collector_drone(BASE_HOME)
+		_update_counters()
+	elif skill.get("id", "") == "barracks_drones" and money >= skill.cost:
+		money -= skill.cost
+		barracks_drone_count += 1
+		for index in buildings.size():
+			if buildings[index].kind == 1:
+				_spawn_collector_drone(index)
+		_update_counters()
+	elif skill.get("id", "") == "mining_level" and money >= skill.cost:
+		money -= skill.cost
+		mining_level += 1
+		$Player.mining_power = mining_level
+		for child in get_children():
+			if child.get_script() == Drone and not child.hostile:
+				child.mining_power = mining_level
+				child.retry_time = 0.0
+		navigation_revision += 1
+		_update_counters()
+	elif skill.get("id", "") == "collector_speed" and money >= skill.cost:
+		money -= skill.cost
+		collector_move_speed += 10
+		collector_mining_speed += 10
+		_refresh_collector_stats()
+		_update_counters()
+	elif skill.get("id", "") == "collector_capacity" and money >= skill.cost:
+		money -= skill.cost
+		collector_capacity += 10
+		_refresh_collector_stats()
+		_update_counters()
+	elif skill.get("id", "") == "barracks_health" and money >= skill.cost:
+		money -= skill.cost
+		barracks_drone_health += 10
+		for child in get_children():
+			if child.get_script() == Drone and child.passive and not child.is_queued_for_deletion():
+				child.max_health = barracks_drone_health
+				child.health = mini(child.health + 10, child.max_health)
+				child._update_status()
+		_update_counters()
+	elif skill.get("id", "") in ["tower_health", "tower_shots", "tower_rate"] and money >= skill.cost:
+		money -= skill.cost
+		var health_bonus := 0
+		match skill.id:
+			"tower_health":
+				tower_health += 10
+				health_bonus = 10
+			"tower_shots": tower_shots += 1
+			"tower_rate": tower_interval_ms = maxi(1, floori(tower_interval_ms * 0.8))
+		for tower in _live_combat_drones("towers"):
+			tower.max_health = tower_health
+			tower.health = mini(tower.health + health_bonus, tower.max_health)
+			tower.shots = tower_shots
+			tower.fire_interval_ms = tower_interval_ms
+			tower.update_health()
+		_update_counters()
+	if money < money_before:
+		var id: String = skill.id
+		skill_levels[id] = int(skill_levels.get(id, 1)) + 1
+	_update_build_ui()
+
+
+func _set_collector_stats(drone: Node2D) -> void:
+	drone.speed = collector_move_speed
+	drone.mining_speed = collector_mining_speed
+	drone.capacity = collector_capacity
+	if drone.is_inside_tree():
+		drone._update_status()
+
+
+func _refresh_collector_stats() -> void:
+	for child in get_children():
+		if child.get_script() == Drone and child.collector_index >= 0 and buildings[child.collector_index].kind == 0:
+			_set_collector_stats(child)
+
+
+func _spawn_collector_drone(index: int) -> void:
+	var building: Dictionary = base_drone_settings if index == BASE_HOME else buildings[index]
+	var drone := Drone.new()
+	drone.world = self
+	drone.collector_index = index
+	drone.position = Vector2(building.anchor) * CELL
+	if index == BASE_HOME:
+		drone.position = Vector2.ZERO
+		drone.tint = BASE_COLOR
+		drone.collects_money = true
+	elif building.kind == 1:
+		drone.passive = true
+		drone.tint = BUILDING_COLORS[1]
+		drone.max_health = barracks_drone_health
+	if building.has("main_drone") and is_instance_valid(building.main_drone) and not building.main_drone.is_queued_for_deletion():
+		var main: Node2D = building.main_drone
+		drone.speed = main.speed
+		drone.capacity = main.capacity
+		drone.deposit_duration = main.deposit_duration
+		drone.pickup_duration = main.pickup_duration
+		drone.mining_power = main.mining_power
+	else:
+		building["main_drone"] = drone
+	drone.mining_power = mining_level
+	if index != BASE_HOME and building.kind == 0:
+		_set_collector_stats(drone)
+	add_child(drone)
+	if drone.passive:
+		drone.destroyed.connect(_on_barracks_drone_destroyed.bind(index))
+		_assign_combat_targets()
+	_update_drone_count()
+	drone.tree_exited.connect(_update_drone_count)
+
+
+func _on_barracks_drone_destroyed(index: int) -> void:
+	_restore_barracks_drones.call_deferred(index)
+
+
+func _restore_barracks_drones(index: int) -> void:
+	if not is_inside_tree() or is_queued_for_deletion() or is_game_over:
+		return
+	if index < 0 or index >= buildings.size() or buildings[index].kind != 1:
+		return
+	var alive := 0
+	for child in get_children():
+		if child.get_script() == Drone and child.collector_index == index and not child.is_queued_for_deletion():
+			alive += 1
+	for missing in maxi(0, barracks_drone_count - alive):
+		_spawn_collector_drone(index)
+
+
+func _update_drone_count() -> void:
+	if not is_instance_valid(drone_count_label) or not is_inside_tree():
+		return
+	var count := 0
+	for child in get_children():
+		if child.get_script() == Drone and not child.hostile and child.is_inside_tree() and not child.is_queued_for_deletion():
+			count += 1
+	drone_count_label.text = "Drohnen: %d" % count
+	if is_instance_valid(enemy_count_label):
+		enemy_count_label.text = "Gegner: %d" % _live_combat_drones("enemy_drones").size()
+
+
+func _live_combat_drones(group: String) -> Array[Node2D]:
+	var result: Array[Node2D] = []
+	if not is_inside_tree():
+		return result
+	for node in get_tree().get_nodes_in_group(group):
+		if node.world == self and not node.dead and not node.is_queued_for_deletion():
+			result.append(node)
+	return result
+
+
+func spawn_enemy_wave() -> void:
+	if is_game_over or get_tree().paused:
+		return
+	var edge := (RADIUS + 0.5) * CELL
+	for index in 10:
+		var enemy := Drone.new()
+		enemy.world = self
+		enemy.collector_index = -2
+		enemy.hostile = true
+		enemy.max_health = 3
+		enemy.tint = Color("ff7373")
+		var along := randf_range(-edge + 12, edge - 12)
+		match randi_range(0, 3):
+			0: enemy.position = Vector2(-edge, along)
+			1: enemy.position = Vector2(edge, along)
+			2: enemy.position = Vector2(along, -edge)
+			3: enemy.position = Vector2(along, edge)
+		add_child(enemy)
+		enemy.destroyed.connect(_on_enemy_destroyed)
+		enemy.tree_exited.connect(_update_drone_count)
+	_update_drone_count()
+	_assign_combat_targets()
+
+
+func _on_enemy_destroyed() -> void:
+	_update_drone_count()
+	_assign_combat_targets.call_deferred()
+
+
+func _base_distance(point: Vector2) -> float:
+	return point.distance_to(point.clamp(BASE_AREA.position, BASE_AREA.end))
+
+
+func _assign_combat_targets() -> void:
+	if is_game_over or not is_inside_tree():
+		return
+	var enemies := _live_combat_drones("enemy_drones")
+	var defenders := _live_combat_drones("barracks_drones")
+	enemies.sort_custom(func(a: Node2D, b: Node2D) -> bool: return _base_distance(a.position) < _base_distance(b.position))
+	var assigned: Dictionary = {}
+	var sectors: Dictionary = {}
+	for defender in defenders:
+		var best: Node2D = null
+		var best_score := INF
+		for enemy in enemies:
+			var sector := posmod(floori((enemy.position.angle() + PI) / TAU * 8.0), 8)
+			# Prefer urgent threats, spreading additional defenders across approach directions.
+			var score: float = _base_distance(enemy.position) + int(assigned.get(enemy.get_instance_id(), 0)) * CELL * 4 + int(sectors.get(sector, 0)) * CELL * 2
+			if score < best_score:
+				best_score = score
+				best = enemy
+		defender.combat_ai.set_target(best)
+		if best != null:
+			assigned[best.get_instance_id()] = int(assigned.get(best.get_instance_id(), 0)) + 1
+			var sector := posmod(floori((best.position.angle() + PI) / TAU * 8.0), 8)
+			sectors[sector] = int(sectors.get(sector, 0)) + 1
+
+
+func _can_build(anchor: Vector2i) -> bool:
+	for y in 2:
+		for x in 2:
+			var cell := anchor + Vector2i(x, y)
+			if absi(cell.x) > RADIUS or absi(cell.y) > RADIUS or occupied_cells.has(cell):
+				return false
+			if block_cells.has(cell) and is_instance_valid(block_cells[cell]):
+				if not block_cells[cell].is_queued_for_deletion():
+					return false
+	return true
+
+
+func _place_building() -> void:
+	var anchor := _build_anchor()
+	var cost := _building_cost(selected_building)
+	if not _can_build(anchor) or money < cost:
+		return
+	buildings.append({"anchor": anchor, "kind": selected_building, "money": 0})
+	if selected_building == 0:
+		var label := Label.new()
+		label.position = Vector2(anchor) * CELL + Vector2(-20, -48)
+		label.z_as_relative = false
+		label.z_index = 100
+		label.add_theme_font_size_override("font_size", 15)
+		add_child(label)
+		buildings[-1]["label"] = label
+		update_collector_label(buildings.size() - 1)
+		for drone in collector_drone_count:
+			_spawn_collector_drone(buildings.size() - 1)
+	elif selected_building == 1:
+		for drone in barracks_drone_count:
+			_spawn_collector_drone(buildings.size() - 1)
+	elif selected_building == 2:
+		var tower := preload("res://scripts/tower.gd").new()
+		tower.world = self
+		tower.building_index = buildings.size() - 1
+		tower.position = (Vector2(anchor) + Vector2(0.5, 0.5)) * CELL
+		tower.max_health = tower_health
+		tower.shots = tower_shots
+		tower.fire_interval_ms = tower_interval_ms
+		buildings[-1]["tower"] = tower
+		add_child(tower)
+		tower.destroyed.connect(_on_tower_destroyed.bind(tower.building_index))
+	for y in 2:
+		for x in 2:
+			occupied_cells[anchor + Vector2i(x, y)] = true
+	money -= cost
+	_update_counters()
+	_set_build_mode(BuildMode.PLAY)
+
+
+func _on_tower_destroyed(index: int) -> void:
+	buildings[index]["destroyed"] = true
+	var anchor: Vector2i = buildings[index].anchor
+	for y in 2:
+		for x in 2:
+			occupied_cells.erase(anchor + Vector2i(x, y))
+	queue_redraw()
+
+
+func update_collector_label(index: int) -> void:
+	var building := buildings[index]
+	building.label.text = "Sammler: %d Geld" % building.money
+
+
+func deposit_drone_blocks(index: int, amount: int) -> void:
+	var value := amount * money_per_block
+	if index == BASE_HOME:
+		money += value
+		_update_counters()
+		_update_build_ui()
+	else:
+		buildings[index]["money"] += value
+		update_collector_label(index)
+
+
+func _building_cost(kind: int) -> int:
+	return maxi(0, [collector_cost, barracks_cost, tower_cost][kind])
+
+
+func _update_build_ui() -> void:
+	build_preview.visible = build_mode == BuildMode.PLACE
+	if build_preview.visible:
+		build_preview.queue_redraw()
+	build_panel.visible = build_mode in [BuildMode.MENU, BuildMode.SKILLS]
+	build_options.refresh_info()
+	build_status.visible = build_mode == BuildMode.PLACE
+	if build_mode == BuildMode.SKILLS:
+		var skills: Array = SKILLS.duplicate(true)
+		for skill in skills:
+			skill.level = int(skill_levels.get(skill.get("id", ""), 1))
+			if skill.get("id", "") == "base_health":
+				skill.current_effect = "%d maximale Lebenspunkte" % base_max_health
+				skill.next_effect = "%d maximale Lebenspunkte" % (base_max_health + 50)
+			elif skill.get("id", "") == "cash_drone":
+				skill.description = "-sammelt Geld ein-"
+				var count: int = skill_levels.get("cash_drone", 0)
+				skill.current_effect = "%d %s" % [count, "Geld-Sammeldrohne" if count == 1 else "Geld-Sammeldrohnen"]
+				skill.next_effect = "%d %s" % [count + 1, "Geld-Sammeldrohne" if count == 0 else "Geld-Sammeldrohnen"]
+			elif skill.get("id", "") == "collector_drones":
+				skill.description = "-baut Blöcke ab-"
+				skill.current_effect = "%d %s je Sammler" % [collector_drone_count, "Drohne" if collector_drone_count == 1 else "Drohnen"]
+				skill.next_effect = "%d Drohnen je Sammler" % (collector_drone_count + 1)
+			elif skill.get("id", "") == "barracks_drones":
+				skill.current_effect = "%d %s je Kaserne" % [barracks_drone_count, "Drohne" if barracks_drone_count == 1 else "Drohnen"]
+				skill.next_effect = "%d Drohnen je Kaserne" % (barracks_drone_count + 1)
+			elif skill.get("id", "") == "mining_level":
+				skill.current_effect = "Abbaustufe %d" % mining_level
+				skill.next_effect = "Abbaustufe %d" % (mining_level + 1)
+			elif skill.get("id", "") == "collector_speed":
+				skill.current_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed, collector_mining_speed]
+				skill.next_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed + 10, collector_mining_speed + 10]
+			elif skill.get("id", "") == "collector_capacity":
+				skill.current_effect = "%d Einheiten Tragkapazität" % collector_capacity
+				skill.next_effect = "%d Einheiten Tragkapazität" % (collector_capacity + 10)
+			elif skill.get("id", "") == "barracks_health":
+				skill.current_effect = "%d maximale Lebenspunkte" % barracks_drone_health
+				skill.next_effect = "%d maximale Lebenspunkte" % (barracks_drone_health + 10)
+			elif skill.get("id", "") == "tower_health":
+				skill.current_effect = "%d maximale Lebenspunkte" % tower_health
+				skill.next_effect = "%d maximale Lebenspunkte" % (tower_health + 10)
+			elif skill.get("id", "") == "tower_shots":
+				skill.current_effect = "%d gleichzeitige Schüsse" % tower_shots
+				skill.next_effect = "%d gleichzeitige Schüsse" % (tower_shots + 1)
+			elif skill.get("id", "") == "tower_rate":
+				skill.current_effect = "Schussintervall: %d ms" % tower_interval_ms
+				skill.next_effect = "Schussintervall: %d ms" % maxi(1, floori(tower_interval_ms * 0.8))
+		build_options.configure("SKILL-TREE", skills, selected_skill, money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nWeitere Einträge sind Platzhalter · J / Esc: schließen")
+		return
+	if build_mode == BuildMode.MENU:
+		var items: Array = []
+		for index in BUILDINGS.size():
+			var description := "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab." % collector_drone_count if index == 0 else "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner." % barracks_drone_count
+			if index == 2:
+				description = "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer." % [tower_health, tower_shots, tower_interval_ms]
+			items.append({"name": BUILDINGS[index], "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg"][index], "description": description})
+		build_options.configure("BAUEN / 2 × 2", items, selected_building, money, "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen")
+	if build_mode == BuildMode.PLACE:
+		var valid := _can_build(_build_anchor())
+		var cost := _building_cost(selected_building)
+		var affordable := money >= cost
+		var status := "Fläche frei" if valid else "Fläche blockiert (Basis, Gebäude oder Blöcke)"
+		if not affordable:
+			status += " · Zu wenig Geld"
+		var controls := "Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen" if mouse_placement else "Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
+		build_status.text = "%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s" % [BUILDINGS[selected_building], cost, money, controls, status]
+		build_status.modulate = Color("8ef0b0") if valid and affordable else Color("ff9393")
+
+
+func _create_boundary() -> void:
+	# Invisible bedrock keeps the finite prototype map enclosed.
+	var edge := (RADIUS + 0.5) * CELL
+	for side in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
+		var body := StaticBody2D.new()
+		body.position = side * (edge + CELL / 2.0)
+		var collision := CollisionShape2D.new()
+		var shape := RectangleShape2D.new()
+		shape.size = Vector2(CELL, edge * 2 + CELL * 2) if side.x != 0 else Vector2(edge * 2 + CELL * 2, CELL)
+		collision.shape = shape
+		body.add_child(collision)
+		add_child(body)
+
+
+func _create_hud() -> void:
+	var layer := preload("res://scripts/game_ui.gd").new()
+	layer.name = "GameUI"
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(layer)
+	var playback := HBoxContainer.new()
+	playback.name = "PlaybackControls"
+	playback.position = Vector2(20, 20)
+	playback.process_mode = Node.PROCESS_MODE_ALWAYS
+	playback.add_theme_constant_override("separation", 6)
+	layer.add_child(playback)
+	play_button = Button.new()
+	play_button.name = "Play"
+	play_button.icon = preload("res://assets/icons/play.svg")
+	play_button.tooltip_text = "Fortsetzen"
+	play_button.custom_minimum_size = Vector2(44, 40)
+	play_button.focus_mode = Control.FOCUS_NONE
+	playback.add_child(play_button)
+	play_button.pressed.connect(_set_paused.bind(false))
+	pause_button = Button.new()
+	pause_button.name = "Pause"
+	pause_button.icon = preload("res://assets/icons/pause.svg")
+	pause_button.tooltip_text = "Pausieren"
+	pause_button.custom_minimum_size = Vector2(44, 40)
+	pause_button.focus_mode = Control.FOCUS_NONE
+	playback.add_child(pause_button)
+	pause_button.pressed.connect(_set_paused.bind(true))
+	_update_pause_controls()
+	wave_timer = preload("res://scripts/wave_timer.gd").new()
+	wave_timer.name = "WaveTimer"
+	wave_timer.anchor_left = 0.5
+	wave_timer.anchor_right = 0.5
+	wave_timer.offset_left = -180.0
+	wave_timer.offset_right = 180.0
+	wave_timer.offset_top = 20.0
+	wave_timer.offset_bottom = 60.0
+	layer.add_child(wave_timer)
+	wave_timer.wave_due.connect(func(_number: int) -> void: spawn_enemy_wave())
+	var panel := PanelContainer.new()
+	panel.name = "MinerInfo"
+	panel.anchor_left = 1.0
+	panel.anchor_right = 1.0
+	panel.offset_left = -20.0
+	panel.offset_right = -20.0
+	panel.offset_top = 176.0
+	panel.offset_bottom = 176.0
+	panel.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	layer.add_child(panel)
+	panel.hide()
+	main_menu_button = Button.new()
+	main_menu_button.name = "MainMenuButton"
+	main_menu_button.icon = preload("res://assets/icons/home.svg")
+	main_menu_button.tooltip_text = "Zurück zum Hauptmenü"
+	main_menu_button.anchor_left = 1.0
+	main_menu_button.anchor_right = 1.0
+	main_menu_button.offset_left = -64.0
+	main_menu_button.offset_right = -20.0
+	main_menu_button.offset_top = 20.0
+	main_menu_button.offset_bottom = 64.0
+	main_menu_button.focus_mode = Control.FOCUS_NONE
+	layer.add_child(main_menu_button)
+	main_menu_button.pressed.connect(layer.open_return_dialog)
+	var info_button := Button.new()
+	info_button.name = "InfoButton"
+	info_button.text = "i"
+	info_button.tooltip_text = "Spielinformationen öffnen"
+	info_button.custom_minimum_size = Vector2(44, 44)
+	info_button.anchor_left = 1.0
+	info_button.anchor_right = 1.0
+	info_button.offset_left = -64.0
+	info_button.offset_right = -20.0
+	info_button.offset_top = 72.0
+	info_button.offset_bottom = 116.0
+	info_button.focus_mode = Control.FOCUS_NONE
+	info_button.toggle_mode = true
+	layer.add_child(info_button)
+	info_button.toggled.connect(func(open: bool) -> void:
+		panel.visible = open
+		info_button.tooltip_text = "Spielinformationen schließen" if open else "Spielinformationen öffnen"
+	)
+	wave_pause_button = Button.new()
+	wave_pause_button.name = "WavePauseButton"
+	wave_pause_button.icon = preload("res://assets/icons/pause.svg")
+	wave_pause_button.tooltip_text = "Wellentimer anhalten"
+	wave_pause_button.toggle_mode = true
+	wave_pause_button.focus_mode = Control.FOCUS_NONE
+	wave_pause_button.anchor_left = 1.0
+	wave_pause_button.anchor_right = 1.0
+	wave_pause_button.offset_left = -64.0
+	wave_pause_button.offset_right = -20.0
+	wave_pause_button.offset_top = 124.0
+	wave_pause_button.offset_bottom = 168.0
+	layer.add_child(wave_pause_button)
+	wave_pause_button.toggled.connect(_set_wave_timer_paused)
+	var margin := MarginContainer.new()
+	for side in ["left", "top", "right", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 14)
+	panel.add_child(margin)
+	var rows := VBoxContainer.new()
+	rows.add_theme_constant_override("separation", 6)
+	margin.add_child(rows)
+	var title := Label.new()
+	title.text = "MINER / PROTOTYP"
+	title.add_theme_color_override("font_color", Color("66e5db"))
+	rows.add_child(title)
+	drone_count_label = Label.new()
+	rows.add_child(drone_count_label)
+	enemy_count_label = Label.new()
+	rows.add_child(enemy_count_label)
+	_update_drone_count()
+	money_label = Label.new()
+	money_label.position = Vector2(-68, -100)
+	money_label.z_as_relative = false
+	money_label.z_index = 100
+	money_label.add_theme_font_size_override("font_size", 15)
+	add_child(money_label)
+	base_health_label = Label.new()
+	base_health_label.name = "BaseHealth"
+	base_health_label.position = Vector2(-72, -24)
+	base_health_label.size = Vector2(144, 48)
+	base_health_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	base_health_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	base_health_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	base_health_label.z_as_relative = false
+	base_health_label.z_index = 100
+	base_health_label.add_theme_font_size_override("font_size", 16)
+	base_health_label.add_theme_constant_override("outline_size", 3)
+	base_health_label.add_theme_color_override("font_outline_color", Color("172332"))
+	add_child(base_health_label)
+	_update_base_health()
+	_update_counters()
+	var help := Label.new()
+	help.text = "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und halten.\nLoslassen oder Ziel wechseln setzt den Fortschritt zurück."
+	rows.add_child(help)
+	var deposit_help := Label.new()
+	deposit_help.text = "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
+	rows.add_child(deposit_help)
+	var build_help := Label.new()
+	build_help.text = "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben"
+	rows.add_child(build_help)
+	build_panel = PanelContainer.new()
+	layer.add_child(build_panel)
+	var build_margin := MarginContainer.new()
+	for side in ["left", "top", "right", "bottom"]:
+		build_margin.add_theme_constant_override("margin_" + side, 8)
+	build_panel.add_child(build_margin)
+	build_options = preload("res://scripts/option_menu.gd").new()
+	build_margin.add_child(build_options)
+	build_options.option_activated.connect(_on_option_clicked)
+	build_status = Label.new()
+	build_status.position = Vector2(20, 240)
+	layer.add_child(build_status)
+	var action_menu := preload("res://scenes/action_menu.tscn").instantiate()
+	# A shared bottom-left container keeps both panels docked as widths change.
+	var menu_dock := HBoxContainer.new()
+	menu_dock.name = "MenuDock"
+	menu_dock.anchor_top = 1.0
+	menu_dock.anchor_bottom = 1.0
+	menu_dock.offset_left = 20.0
+	menu_dock.offset_right = 20.0
+	menu_dock.offset_top = -20.0
+	menu_dock.offset_bottom = -20.0
+	menu_dock.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	menu_dock.add_theme_constant_override("separation", 8)
+	layer.add_child(menu_dock)
+	action_menu.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	action_menu.size_flags_vertical = Control.SIZE_SHRINK_END
+	menu_dock.add_child(action_menu)
+	build_panel.size_flags_vertical = Control.SIZE_SHRINK_END
+	build_panel.reparent(menu_dock)
+	var item_info := preload("res://scripts/menu_info.gd").new()
+	item_info.name = "ItemInfo"
+	menu_dock.add_child(item_info)
+	build_options.info_panel = item_info
+	_update_pause_controls()
+	action_menu.build_requested.connect(_on_build_button_pressed)
+	action_menu.skills_requested.connect(_on_skills_button_pressed)
+	_update_build_ui()
+
+
+func _on_build_button_pressed() -> void:
+	_set_build_mode(BuildMode.PLAY if build_mode == BuildMode.MENU else BuildMode.MENU)
+
+
+func _on_skills_button_pressed() -> void:
+	_set_build_mode(BuildMode.PLAY if build_mode == BuildMode.SKILLS else BuildMode.SKILLS)
+
+
+func _on_option_clicked(index: int) -> void:
+	if build_mode == BuildMode.SKILLS:
+		selected_skill = index
+		_confirm_skill()
+	elif build_mode == BuildMode.MENU:
+		selected_building = index
+		mouse_placement = true
+		$Player.navigation_path.clear()
+		_set_build_mode(BuildMode.PLACE)
+
+
+func _on_block_collected(by_player: bool = true) -> void:
+	navigation_revision += 1
+	if not by_player:
+		return
+	collected_count += 1
+	_update_counters()
+
+
+func _set_wave_timer_paused(value: bool) -> void:
+	if is_game_over:
+		return
+	wave_timer.set_timer_paused(value)
+	wave_pause_button.icon = preload("res://assets/icons/play.svg") if value else preload("res://assets/icons/pause.svg")
+	wave_pause_button.tooltip_text = "Wellentimer fortsetzen" if value else "Wellentimer anhalten"
+
+
+func _set_paused(value: bool) -> void:
+	if is_game_over or (return_dialog_open and not value):
+		return
+	mouse_held = false
+	camera_drag_held = false
+	mouse_dragging = false
+	suppress_left_release = false
+	get_tree().paused = value
+	get_node("GameUI").show_pause_badge(value and not return_dialog_open)
+	_update_pause_controls()
+
+
+func _update_pause_controls() -> void:
+	play_button.disabled = is_game_over or return_dialog_open or not get_tree().paused
+	pause_button.disabled = is_game_over or return_dialog_open or get_tree().paused
+	if is_instance_valid(main_menu_button):
+		main_menu_button.disabled = is_game_over or return_dialog_open
+	if is_instance_valid(wave_pause_button):
+		wave_pause_button.disabled = is_game_over or return_dialog_open
+
+
+func damage_base(amount: int) -> void:
+	if amount <= 0 or is_game_over:
+		return
+	base_health = maxi(0, base_health - amount)
+	_update_base_health()
+	if base_health == 0:
+		_end_game()
+
+
+func _end_game() -> void:
+	if is_game_over:
+		return
+	is_game_over = true
+	get_node("/root/MetaStats").save_now()
+	get_node("GameUI").show_pause_badge(false)
+	_set_build_mode(BuildMode.PLAY)
+	mouse_goal_active = false
+	$Player.navigation_path.clear()
+	$Player.velocity = Vector2.ZERO
+	$Player.movement_enabled = false
+	$Player.mining_enabled = false
+	game_over_screen = preload("res://scenes/game_over.tscn").instantiate()
+	add_child(game_over_screen)
+	get_tree().paused = true
+	_update_pause_controls()
+
+
+func _update_base_health() -> void:
+	base_health_label.text = "Lebenspunkte\n%d/%d" % [base_health, base_max_health]
+
+
+func _update_counters() -> void:
+	$Player.update_load(collected_count)
+	money_label.text = "Basis: %d Geld" % money
+
+
+func _draw() -> void:
+	draw_rect(Rect2(-120, -120, 240, 240), Color("293c49"))
+	for line in range(-2, 4):
+		var offset := line * CELL - CELL / 2
+		draw_line(Vector2(offset, -120), Vector2(offset, 120), Color("344b58"))
+		draw_line(Vector2(-120, offset), Vector2(120, offset), Color("344b58"))
+	draw_rect(BASE_AREA, Color("365665"))
+	for offset in [-24, 24]:
+		draw_line(Vector2(offset, -72), Vector2(offset, 72), Color("517b89"))
+		draw_line(Vector2(-72, offset), Vector2(72, offset), Color("517b89"))
+	draw_rect(BASE_AREA, BASE_COLOR, false, 3)
+	draw_circle(Vector2.ZERO, 34, Color("365665"))
+	draw_circle(Vector2.ZERO, 25, Color("426b79"))
+	for building in buildings:
+		if building.get("destroyed", false) or building.kind == 2:
+			continue
+		var rect := Rect2(Vector2(building.anchor) * CELL - Vector2.ONE * CELL / 2, Vector2.ONE * CELL * 2)
+		var color: Color = BUILDING_COLORS[building.kind]
+		draw_rect(rect.grow(-4), color.darkened(0.5))
+		draw_rect(rect.grow(-4), color, false, 3)
+		if building.kind == 0:
+			for offset in [Vector2(14, 14), Vector2(52, 14), Vector2(14, 52), Vector2(52, 52)]:
+				draw_rect(Rect2(rect.position + offset, Vector2(28, 28)), color)
+		else:
+			draw_rect(Rect2(rect.position + Vector2(14, 22), Vector2(68, 56)), color)
+			draw_rect(Rect2(rect.position + Vector2(39, 48), Vector2(18, 30)), color.darkened(0.6))
+			draw_line(rect.position + Vector2(10, 22), rect.position + Vector2(48, 9), color.lightened(0.3), 4)
+			draw_line(rect.position + Vector2(48, 9), rect.position + Vector2(86, 22), color.lightened(0.3), 4)
