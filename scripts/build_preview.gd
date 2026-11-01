@@ -6,7 +6,7 @@ func _draw() -> void:
 	var anchor: Vector2i = world._build_anchor()
 	var cell: float = world.CELL
 	var preview := Rect2(Vector2(anchor) * cell - Vector2.ONE * cell / 2, Vector2.ONE * cell * 2)
-	var valid: bool = world._can_build(anchor) and world.money >= world._building_cost(world.selected_building)
+	var valid: bool = world._can_build(anchor) and world.money >= world._building_cost(world.selected_building) and world._building_count(world.selected_building) < world._building_limit(world.selected_building)
 	var color := Color("65e994") if valid else Color("f17777")
 	draw_rect(preview, Color(color, 0.25))
 	draw_rect(preview.grow(-2), color, false, 3)

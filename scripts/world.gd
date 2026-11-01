@@ -45,6 +45,9 @@ const SKILLS := [
 	{"id": "tower_health", "group": "Turm", "name": "Lebenspunkte", "cost": 25, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 20."},
 	{"id": "tower_shots", "group": "Turm", "name": "Anzahl Schüsse", "cost": 100, "icon": "res://assets/icons/tower.svg", "description": "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."},
 	{"id": "tower_rate", "group": "Turm", "name": "Schussrate", "cost": 40, "icon": "res://assets/icons/tower.svg", "description": "Verkürzt die Zeit zwischen den Salven aller Türme um 10 %. Millisekunden werden auf ganze Zahlen abgerundet."},
+	{"id": "workshop_drones", "group": "Werkstatt", "name": "Drohnenanzahl", "cost": 200, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Mechaniker-Drohne. Produktion: 20 Sekunden. Maximal drei Drohnen."},
+	{"id": "workshop_repair", "group": "Werkstatt", "name": "Reparatur erhöhen", "cost": 200, "icon": "res://assets/icons/workshop.svg", "description": "Erhöht die Reparatur jeder Mechaniker-Drohne um 1 LP pro Sekunde. Maximal 3 LP/s."},
+	{"id": "workshop_speed", "group": "Werkstatt", "name": "Bewegungsgeschwindigkeit", "cost": 60, "icon": "res://assets/icons/workshop.svg", "description": "Erhöht das Bewegungstempo aller Mechaniker-Drohnen um 20. Maximal 160 Pixel/s."},
 ]
 var cleared_waves := 0
 var spawned_waves := 0
@@ -61,9 +64,12 @@ var tower_health := 100
 var tower_shots := 1
 var tower_interval_ms := 1000
 var mining_level := 1
+var workshop_drone_count := 1
+var workshop_repair := 1
+var workshop_speed := 100
 const BASE_HOME := -1
-const BUILDINGS := ["Sammler", "Kaserne", "Turm"]
-const BUILDING_COLORS := [Color("e0ac65"), Color("9e94ed"), Color("7eb7ff")]
+const BUILDINGS := ["Sammler", "Kaserne", "Turm", "Werkstatt"]
+const BUILDING_COLORS := [Color("e0ac65"), Color("9e94ed"), Color("7eb7ff"), Color("8de6a4")]
 var build_mode := BuildMode.PLAY
 var selected_building := 0
 var block_cells: Dictionary = {}
@@ -429,7 +435,21 @@ func _confirm_skill() -> void:
 		return
 	skill.cost = _skill_cost(id)
 	var money_before := money
-	if skill.get("id", "") == "base_health" and money >= skill.cost:
+	if id.begins_with("workshop_") and money >= skill.cost:
+		money -= skill.cost
+		match id:
+			"workshop_drones":
+				workshop_drone_count += 1
+				for index in buildings.size():
+					if buildings[index].kind == 3:
+						_queue_drone(index)
+			"workshop_repair": workshop_repair += 1
+			"workshop_speed": workshop_speed += 20
+		for child in get_children():
+			if child.get_script() == Drone and child.mechanic:
+				child.speed = workshop_speed
+		_update_counters()
+	elif skill.get("id", "") == "base_health" and money >= skill.cost:
 		money -= skill.cost
 		base_max_health += 25
 		base_health += 25
@@ -533,6 +553,9 @@ func _spawn_collector_drone(index: int) -> void:
 		drone.passive = true
 		drone.tint = BUILDING_COLORS[1]
 		drone.max_health = barracks_drone_health
+	elif building.kind == 3:
+		drone.mechanic = true
+		drone.tint = BUILDING_COLORS[3]
 	if building.has("main_drone") and is_instance_valid(building.main_drone) and not building.main_drone.is_queued_for_deletion():
 		var main: Node2D = building.main_drone
 		drone.speed = main.speed
@@ -545,6 +568,8 @@ func _spawn_collector_drone(index: int) -> void:
 	drone.mining_power = mining_level
 	if index != BASE_HOME and building.kind == 0:
 		_set_collector_stats(drone)
+	if drone.mechanic:
+		drone.speed = workshop_speed
 	add_child(drone)
 	if drone.passive:
 		drone.destroyed.connect(_on_barracks_drone_destroyed.bind(index))
@@ -717,6 +742,9 @@ func _finish_building(index: int) -> void:
 		buildings[index]["tower"] = tower
 		add_child(tower)
 		tower.destroyed.connect(_on_tower_destroyed.bind(tower.building_index))
+	elif building_kind == 3:
+		for drone in workshop_drone_count:
+			_spawn_collector_drone(index)
 	_update_build_ui()
 	queue_redraw()
 
@@ -806,7 +834,7 @@ func deposit_drone_blocks(index: int, amount: int) -> void:
 func _building_cost(kind: int) -> int:
 	var count := _building_count(kind)
 	var prices: Array = Balance.BUILD_PRICES[kind]
-	return maxi(0, int(prices[mini(count, prices.size() - 1)]) + [collector_cost - 30, barracks_cost - 25, tower_cost - 20][kind])
+	return maxi(0, int(prices[mini(count, prices.size() - 1)]) + [collector_cost - 30, barracks_cost - 25, tower_cost - 20, 0][kind])
 
 
 func _building_count(kind: int) -> int:
@@ -839,7 +867,10 @@ func _skill_block_reason(id: String) -> String:
 	var defense := Balance.is_defense_skill(id)
 	var tier := Balance.stage(cleared_waves, defense)
 	if bought >= Balance.upgrade_limit(id, tier):
-		return "Freischaltung nach Welle %d" % Balance.unlock_waves(defense)[mini(tier, 2)]
+		for future_tier in range(tier + 1, 4):
+			if bought < Balance.upgrade_limit(id, future_tier):
+				return "Freischaltung nach Welle %d" % Balance.unlock_waves(defense)[future_tier - 1]
+		return "Maximum erreicht"
 	var kind := -1
 	if id.begins_with("collector_") or id == "cash_drone":
 		kind = 0
@@ -847,6 +878,8 @@ func _skill_block_reason(id: String) -> String:
 		kind = 1
 	elif id.begins_with("tower_"):
 		kind = 2
+	elif id.begins_with("workshop_"):
+		kind = 3
 	if kind >= 0:
 		var ready_building := false
 		for building in buildings:
@@ -890,14 +923,14 @@ func _tick_production(delta: float) -> void:
 				_finish_building(index)
 		if building.pending_drones > 0:
 			building.production += available
-			var duration := 20.0 if building.kind == 1 else 8.0
+			var duration := 20.0 if building.kind in [1, 3] else 8.0
 			while building.production >= duration and building.pending_drones > 0:
 				building.production -= duration
 				building.pending_drones -= 1
 				_spawn_collector_drone(index)
 			if building.pending_drones == 0:
 				building.production = 0.0
-		building.status.text = "Bau: %d s" % ceili(building.construction) if building.construction > 0.0 else ("Drohnen: %d · %d s" % [building.pending_drones, ceili((20.0 if building.kind == 1 else 8.0) - building.production)] if building.pending_drones > 0 else "")
+		building.status.text = "Bau: %d s" % ceili(building.construction) if building.construction > 0.0 else ("Drohnen: %d · %d s" % [building.pending_drones, ceili((20.0 if building.kind in [1, 3] else 8.0) - building.production)] if building.pending_drones > 0 else "")
 
 
 func _update_build_ui() -> void:
@@ -951,6 +984,15 @@ func _update_build_ui() -> void:
 			elif skill.get("id", "") == "tower_rate":
 				skill.current_effect = "Schussintervall: %d ms" % tower_interval_ms
 				skill.next_effect = "Schussintervall: %d ms" % maxi(1, floori(tower_interval_ms * 0.9))
+			elif id == "workshop_drones":
+				skill.current_effect = "%d Mechaniker-Drohnen" % workshop_drone_count
+				skill.next_effect = "%d Mechaniker-Drohnen" % (workshop_drone_count + 1)
+			elif id == "workshop_repair":
+				skill.current_effect = "%d LP/s je Drohne" % workshop_repair
+				skill.next_effect = "%d LP/s je Drohne" % (workshop_repair + 1)
+			elif id == "workshop_speed":
+				skill.current_effect = "%d Pixel/s" % workshop_speed
+				skill.next_effect = "%d Pixel/s" % (workshop_speed + 20)
 		for skill in skills:
 			if skill.get("lock_reason", "") == "Maximum erreicht":
 				skill.next_effect = "Maximum erreicht"
@@ -962,8 +1004,10 @@ func _update_build_ui() -> void:
 			var description := "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab." % collector_drone_count if index == 0 else "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner." % barracks_drone_count
 			if index == 2:
 				description = "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer." % [tower_health, tower_shots, tower_interval_ms]
+			elif index == 3:
+				description = "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände." % [workshop_drone_count, workshop_repair]
 			description += "\nBauzeit: %d s" % int(Balance.BUILD_SECONDS[index])
-			items.append({"name": "%s (%d/%d)" % [BUILDINGS[index], _building_count(index), _building_limit(index)], "lock_reason": "Gebäudelimit erreicht" if _building_count(index) >= _building_limit(index) else "", "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg"][index], "description": description})
+			items.append({"name": "%s (%d/%d)" % [BUILDINGS[index], _building_count(index), _building_limit(index)], "lock_reason": "Gebäudelimit erreicht" if _building_count(index) >= _building_limit(index) else "", "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg", "res://assets/icons/workshop.svg"][index], "description": description})
 		build_options.configure("BAUEN / 2 × 2", items, selected_building, money, "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen")
 	if build_mode == BuildMode.PLACE:
 		var valid := _can_build(_build_anchor())
@@ -1293,6 +1337,10 @@ func _draw() -> void:
 		if building.kind == 0:
 			for offset in [Vector2(14, 14), Vector2(52, 14), Vector2(14, 52), Vector2(52, 52)]:
 				draw_rect(Rect2(rect.position + offset, Vector2(28, 28)), color)
+		elif building.kind == 3:
+			draw_rect(Rect2(rect.position + Vector2(18, 28), Vector2(60, 50)), color)
+			draw_line(rect.position + Vector2(48, 35), rect.position + Vector2(48, 69), color.darkened(0.6), 8)
+			draw_line(rect.position + Vector2(31, 52), rect.position + Vector2(65, 52), color.darkened(0.6), 8)
 		else:
 			draw_rect(Rect2(rect.position + Vector2(14, 22), Vector2(68, 56)), color)
 			draw_rect(Rect2(rect.position + Vector2(39, 48), Vector2(18, 30)), color.darkened(0.6))

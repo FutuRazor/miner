@@ -21,6 +21,9 @@ var combat_ai: RefCounted
 var attack_flash := 0.0
 var cash_carried := 0
 var cash_source := -1
+var mechanic := false
+var mechanic_ai: RefCounted
+var is_moving := false
 
 const DIRECTIONS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 var world: Node2D
@@ -42,6 +45,8 @@ func _ready() -> void:
 		add_to_group("barracks_drones")
 	if passive or hostile:
 		combat_ai = preload("res://scripts/combat_ai.gd").new(self)
+	if mechanic:
+		mechanic_ai = preload("res://scripts/mechanic_ai.gd").new(self)
 	status = Label.new()
 	status.z_as_relative = false
 	status.z_index = 100
@@ -64,7 +69,12 @@ func _physics_process(delta: float) -> void:
 		attack_flash = maxf(0.0, attack_flash - delta)
 		queue_redraw()
 	if passive or hostile:
+		var before := position
 		combat_ai.tick(delta)
+		is_moving = not position.is_equal_approx(before)
+		return
+	if mechanic:
+		mechanic_ai.tick(delta)
 		return
 	if collects_money and cash_source >= 0 and world.buildings[cash_source].money <= 0:
 		# The player may have emptied the collector while this drone was en route.
@@ -188,7 +198,9 @@ func _plan(go_home: bool) -> void:
 
 
 func _update_status() -> void:
-	if passive or hostile:
+	if mechanic:
+		status.text = "Reparatur: %d LP/s" % world.workshop_repair if is_instance_valid(mechanic_ai.repair_target) else "Mechaniker: bereit"
+	elif passive or hostile:
 		status.text = "Lebenspunkte\n%d/%d" % [health, max_health]
 	elif collects_money:
 		status.text = "%d Geld%s" % [cash_carried, " Abholen…" if cash_source >= 0 and path.is_empty() else ""]
@@ -319,6 +331,9 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 10, tint)
 	draw_line(Vector2(-15, -6), Vector2(15, -6), tint.lightened(0.5), 3)
 	draw_circle(Vector2.ZERO, 4, Color("554e79"))
+	if mechanic:
+		draw_line(Vector2(-5, 0), Vector2(5, 0), Color("d8ffe1"), 3)
+		draw_line(Vector2(0, -5), Vector2(0, 5), Color("d8ffe1"), 3)
 	if attack_flash > 0.0:
 		draw_arc(Vector2.ZERO, 14, 0, TAU, 24, tint.lightened(0.5), 3)
 		if is_instance_valid(combat_target):

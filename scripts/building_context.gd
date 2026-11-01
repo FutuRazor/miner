@@ -108,13 +108,15 @@ func _refresh() -> void:
 		text += "\nGuthaben: %d Geld\nTempo: %d · Abbau: %d %%\nKapazität: %d · Abbaustufe: %d" % [building.money, world.collector_move_speed, world.collector_mining_speed, world.collector_capacity, world.mining_level]
 	elif building.kind == 1:
 		text += "\nDrohnen-LP: %d" % world.barracks_drone_health
+	elif building.kind == 3:
+		text += "\nReparatur: %d LP/s je Drohne\nTempo: %d\nPriorität: Basis → Türme → Kampfdrohnen" % [world.workshop_repair, world.workshop_speed]
 	elif building.has("tower") and is_instance_valid(building.tower):
 		text += "\nLP: %d/%d\nSchüsse: %d · Intervall: %d ms" % [building.tower.health, building.tower.max_health, world.tower_shots, world.tower_interval_ms]
 	text += "\nVerstärkungen:"
 	var upgrades := 0
 	for skill in world.SKILLS:
 		var id: String = skill.get("id", "")
-		var applies: bool = (building.kind == 0 and (id.begins_with("collector_") or id == "mining_level")) or (building.kind == 1 and id.begins_with("barracks_")) or (building.kind == 2 and id.begins_with("tower_"))
+		var applies: bool = (building.kind == 0 and (id.begins_with("collector_") or id == "mining_level")) or (building.kind == 1 and id.begins_with("barracks_")) or (building.kind == 2 and id.begins_with("tower_")) or (building.kind == 3 and id.begins_with("workshop_"))
 		if applies and world._skill_purchases(id) > 0:
 			text += "\n%s: +%d" % [skill.name, world._skill_purchases(id)]
 			upgrades += 1

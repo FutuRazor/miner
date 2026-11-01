@@ -19,6 +19,13 @@ func _alive(node) -> bool:
 	return is_instance_valid(node) and not node.is_queued_for_deletion() and not node.dead
 
 
+func will_move() -> bool:
+	if _alive(actor.combat_target):
+		return actor.position.distance_to(actor.combat_target.position) > 20.001
+	var home: Vector2 = Vector2(actor.world.buildings[actor.collector_index].anchor) * actor.world.CELL
+	return not actor.position.is_equal_approx(home)
+
+
 func tick(delta: float) -> void:
 	if actor.dead or actor.world.is_game_over:
 		return
