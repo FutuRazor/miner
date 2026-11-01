@@ -13,6 +13,7 @@ func _build(world: Node, anchor: Vector2i) -> void:
 				world.block_cells[cell].queue_free()
 	world.get_node("Player").position = Vector2(anchor) * 48
 	world._place_building()
+	world._tick_production(10.0)
 	world.buildings[-1].main_drone.set_physics_process(false)
 
 
@@ -24,9 +25,10 @@ func _run() -> void:
 	world.set_physics_process(false)
 	var player = world.get_node("Player")
 	player.set_physics_process(false)
-	assert(world.collector_cost == 10 and world.barracks_cost == 10)
+	assert(world.collector_cost == 30 and world.barracks_cost == 25)
 	world.collector_cost = 0
 	_build(world, Vector2i(2, 0))
+	world.money = world._building_cost(0)
 	_build(world, Vector2i(-2, 2))
 	world.buildings[0].money = 5
 	world.buildings[1].money = 20

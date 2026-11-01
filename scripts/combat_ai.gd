@@ -52,6 +52,12 @@ func tick(delta: float) -> void:
 	if travel > step + 0.001:
 		contact_time = 0.0
 		return
+	# Intercept on contact, not on the first damage tick. Otherwise an equally
+	# fast fleeing enemy consumes the defender's entire tick in pursuit forever.
+	if actor.passive and _alive(actor.combat_target) and actor.combat_target.hostile:
+		var opponent: Node2D = actor.combat_target
+		if not _alive(opponent.combat_target) or opponent.combat_target.is_tower:
+			opponent.combat_ai.set_target(actor)
 	# Count only time actually spent in contact, with a separate clock per attacker.
 	var contact_delta := delta - step / maxf(actor.speed, 0.001)
 	contact_time += maxf(0.0, contact_delta)

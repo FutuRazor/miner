@@ -18,27 +18,27 @@ func _run() -> void:
 	clock._physics_process(99.0)
 	assert(clock.remaining == 1.0 and world._live_combat_drones("enemy_drones").is_empty())
 	clock._physics_process(1.0)
-	assert(world._live_combat_drones("enemy_drones").size() == 10)
-	assert(clock.next_wave == 2 and clock.remaining == 100.0)
+	assert(world._live_combat_drones("enemy_drones").size() == 6)
+	assert(clock.next_wave == 2 and clock.remaining == 80.0)
 	world.wave_pause_button.button_pressed = true
 	clock._physics_process(200.0)
-	assert(clock.timer_paused and clock.remaining == 100.0 and clock.next_wave == 2)
+	assert(clock.timer_paused and clock.remaining == 80.0 and clock.next_wave == 2)
 	assert(clock.caption.text.contains("Pause"))
 	assert(not paused)
 	world.wave_pause_button.button_pressed = false
-	clock._physics_process(250.0)
-	assert(clock.next_wave == 4 and clock.remaining == 50.0)
-	assert(world._live_combat_drones("enemy_drones").size() == 30)
+	clock._physics_process(170.0)
+	assert(clock.next_wave == 4 and clock.remaining == 70.0)
+	assert(world._live_combat_drones("enemy_drones").size() == 24)
 	world.pause_button.pressed.emit()
 	clock._physics_process(20.0)
-	assert(clock.remaining == 50.0)
+	assert(clock.remaining == 70.0)
 	world.wave_pause_button.button_pressed = true
 	world.play_button.pressed.emit()
 	clock._physics_process(20.0)
-	assert(clock.remaining == 50.0 and not paused)
+	assert(clock.remaining == 70.0 and not paused)
 	world.wave_pause_button.button_pressed = false
 	clock._physics_process(5.0)
-	assert(clock.remaining == 45.0)
+	assert(clock.remaining == 65.0)
 	for frame in 4:
 		await process_frame
 	var rect: Rect2 = clock.get_global_rect()

@@ -23,7 +23,7 @@ func _run() -> void:
 	player.set_physics_process(false)
 	_key(world, KEY_B)
 	assert(world.build_mode == world.BuildMode.MENU)
-	assert(not player.movement_enabled and not player.mining_enabled)
+	assert(player.movement_enabled and player.mining_enabled and not player.keyboard_movement_enabled)
 	assert(world.build_panel.visible)
 	_key(world, KEY_S)
 	assert(world.selected_building == 1)
@@ -57,16 +57,17 @@ func _run() -> void:
 	_key(world, KEY_ENTER)
 	_key(world, KEY_ENTER)
 	assert(world.buildings.size() == 1 and world.occupied_cells.size() == 13)
-	assert(world.money == 15 and world.money_label.text == "Basis: 15 Geld")
+	assert(world.money == 0 and world.money_label.text == "Basis: 0 Geld")
 	world._place_building()
-	assert(world.money == 15 and world.buildings.size() == 1)
+	world._tick_production(10.0)
+	assert(world.money == 0 and world.buildings.size() == 1)
 	assert(not world._can_build(Vector2i.ZERO))
 	assert(not world._can_build(Vector2i(-1, -1)))
 	assert(world.build_mode == world.BuildMode.PLAY)
 	# Storage can be placed for exactly its price, leaving a zero balance.
 	player.position = Vector2(-96, 96)
 	world.selected_building = 0
-	world.money = 10
+	world.money = 30
 	for cell in [Vector2i(-2, 3), Vector2i(-1, 3)]:
 		world.block_cells[cell].queue_free()
 	_key(world, KEY_B)

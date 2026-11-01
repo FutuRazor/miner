@@ -17,6 +17,7 @@ func _run() -> void:
 	world.block_cells[Vector2i(3, 0)].queue_free()
 	world.block_cells[Vector2i(3, 1)].queue_free()
 	world._place_building()
+	world._tick_production(10.0)
 	var drone: Node2D
 	for child in world.get_children():
 		if child.get_script() == world.Drone:

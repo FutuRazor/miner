@@ -25,6 +25,7 @@ func _run() -> void:
 	for cell in [Vector2i(3, 0), Vector2i(3, 1)]:
 		world.block_cells[cell].queue_free()
 	world._place_building()
+	world._tick_production(10.0)
 	var drone: Node2D = world.buildings[0].main_drone
 	drone.set_physics_process(false)
 	assert(drone.mining_power == 1)

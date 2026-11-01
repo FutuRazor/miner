@@ -2,11 +2,12 @@ extends Node2D
 
 const Block = preload("res://scripts/block.gd")
 const Drone = preload("res://scripts/drone.gd")
+const Balance = preload("res://scripts/balance.gd")
 const CELL := 48
 const RADIUS := 22
 const BASE_AREA := Rect2(-72, -72, 144, 144)
 const BASE_COLOR := Color("66e5db")
-var base_drone_settings: Dictionary = {"anchor": Vector2i(-1, -1)}
+var base_drone_settings: Dictionary = {"anchor": Vector2i(-1, -1), "pending_drones": 0, "production": 0.0}
 @export var money_per_block: int = 1
 @export_range(1, 100000, 1) var base_max_health: int = 100
 var base_health := 100
@@ -17,11 +18,11 @@ var play_button: Button
 var pause_button: Button
 var main_menu_button: Button
 var return_dialog_open := false
-@export_range(0, 100000, 1) var collector_cost: int = 10
-@export_range(0, 100000, 1) var barracks_cost: int = 10
-@export_range(0, 100000, 1) var tower_cost: int = 10
+@export_range(0, 100000, 1) var collector_cost: int = 30
+@export_range(0, 100000, 1) var barracks_cost: int = 25
+@export_range(0, 100000, 1) var tower_cost: int = 20
 var collected_count := 0
-var money := 10
+var money := 40
 var money_label: Label
 var drone_count_label: Label
 var enemy_count_label: Label
@@ -31,27 +32,30 @@ var combat_assignment_time := 0.0
 var was_in_base := true
 enum BuildMode { PLAY, MENU, PLACE, SKILLS }
 const SKILLS := [
-	{"id": "base_health", "group": "Basis", "name": "Lebenspunkte", "cost": 10, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 50."},
-	{"id": "mining_level", "group": "Basis", "name": "Abbaustufe", "cost": 10, "icon": "res://assets/icons/build.svg", "description": "Erhöht die Abbaustufe der Spielfigur und aller bestehenden und zukünftigen Abbaudrohnen."},
-	{"id": "cash_drone", "group": "Basis", "name": "Geld-Sammeldrohne", "cost": 10, "icon": "res://assets/icons/drone.svg", "description": "Holt Geld beim Sammler mit dem höchsten Guthaben.\nAbholung: 0,6 Sekunden\nAbgabe an Spielfigur oder Basis: sofort."},
-	{"id": "collector_drones", "group": "Sammler", "name": "Drohne", "cost": 10, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Drohne für jeden bestehenden und zukünftigen Sammler."},
-	{"id": "collector_speed", "group": "Sammler", "name": "Schneller sammeln", "cost": 10, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Bewegungsgeschwindigkeit um 10 Pixel/s und die Abbaugeschwindigkeit um 10 Prozentpunkte. Gilt für alle Sammlerdrohnen."},
-	{"id": "collector_capacity", "group": "Sammler", "name": "Kapazität erhöhen", "cost": 10, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 10."},
-	{"id": "barracks_drones", "group": "Kaserne", "name": "Drohne", "cost": 10, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."},
-	{"id": "barracks_health", "group": "Kaserne", "name": "Lebenspunkte", "cost": 10, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."},
+	{"id": "base_health", "group": "Basis", "name": "Lebenspunkte", "cost": 40, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 25."},
+	{"id": "mining_level", "group": "Basis", "name": "Abbaustufe", "cost": 20, "icon": "res://assets/icons/build.svg", "description": "Erhöht die Abbaustufe der Spielfigur und aller bestehenden und zukünftigen Abbaudrohnen."},
+	{"id": "cash_drone", "group": "Basis", "name": "Geld-Sammeldrohne", "cost": 25, "icon": "res://assets/icons/drone.svg", "description": "Holt Geld beim Sammler mit dem höchsten Guthaben.\nAbholung: 0,6 Sekunden\nAbgabe an Spielfigur oder Basis: sofort."},
+	{"id": "collector_drones", "group": "Sammler", "name": "Drohne", "cost": 80, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Drohne für jeden bestehenden und zukünftigen Sammler."},
+	{"id": "collector_speed", "group": "Sammler", "name": "Schneller sammeln", "cost": 25, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Bewegungsgeschwindigkeit um 10 Pixel/s und die Abbaugeschwindigkeit um 5 Prozentpunkte. Gilt für alle Sammlerdrohnen."},
+	{"id": "collector_capacity", "group": "Sammler", "name": "Kapazität erhöhen", "cost": 20, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 5."},
+	{"id": "barracks_drones", "group": "Kaserne", "name": "Drohne", "cost": 60, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."},
+	{"id": "barracks_health", "group": "Kaserne", "name": "Lebenspunkte", "cost": 30, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."},
 	{"group": "Kaserne", "name": "Angriff", "placeholder": true, "icon": "res://assets/icons/skills.svg", "description": "Geplant: Angriff verbessern."},
 	{"group": "Kaserne", "name": "Verteidigung", "placeholder": true, "icon": "res://assets/icons/skills.svg", "description": "Geplant: Verteidigung verbessern."},
-	{"id": "tower_health", "group": "Turm", "name": "Lebenspunkte", "cost": 10, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 10."},
-	{"id": "tower_shots", "group": "Turm", "name": "Anzahl Schüsse", "cost": 10, "icon": "res://assets/icons/tower.svg", "description": "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."},
-	{"id": "tower_rate", "group": "Turm", "name": "Schussrate", "cost": 10, "icon": "res://assets/icons/tower.svg", "description": "Verkürzt die Zeit zwischen den Salven aller Türme um 20 %. Millisekunden werden auf ganze Zahlen abgerundet."},
+	{"id": "tower_health", "group": "Turm", "name": "Lebenspunkte", "cost": 25, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 20."},
+	{"id": "tower_shots", "group": "Turm", "name": "Anzahl Schüsse", "cost": 100, "icon": "res://assets/icons/tower.svg", "description": "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."},
+	{"id": "tower_rate", "group": "Turm", "name": "Schussrate", "cost": 40, "icon": "res://assets/icons/tower.svg", "description": "Verkürzt die Zeit zwischen den Salven aller Türme um 10 %. Millisekunden werden auf ganze Zahlen abgerundet."},
 ]
+var cleared_waves := 0
+var spawned_waves := 0
+var wave_alive: Dictionary = {}
 var selected_skill := 0
 var skill_levels: Dictionary = {"cash_drone": 0}
 var collector_drone_count := 1
 var collector_move_speed: int = 100
 var collector_mining_speed: int = 100
 var collector_capacity: int = 10
-var barracks_drone_count := 1
+var barracks_drone_count := 2
 var barracks_drone_health := 30
 var tower_health := 100
 var tower_shots := 1
@@ -117,6 +121,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_tick_production(delta)
 	combat_assignment_time -= delta
 	if combat_assignment_time <= 0.0:
 		combat_assignment_time = 0.25
@@ -350,10 +355,10 @@ func _set_build_mode(mode: BuildMode) -> void:
 	build_options.clear_hover()
 	if mode != BuildMode.PLACE:
 		mouse_placement = false
-	$Player.movement_enabled = mode not in [BuildMode.MENU, BuildMode.SKILLS]
-	$Player.mining_enabled = mode not in [BuildMode.MENU, BuildMode.SKILLS]
+	# Menus capture keyboard movement, but automatic mining stays active.
+	$Player.movement_enabled = true
+	$Player.mining_enabled = true
 	$Player.keyboard_movement_enabled = mode not in [BuildMode.MENU, BuildMode.SKILLS]
-	$Player.stop_mining()
 	mouse_held = false
 	camera_drag_held = false
 	mouse_dragging = false
@@ -373,12 +378,16 @@ func _build_anchor() -> Vector2i:
 
 
 func _confirm_skill() -> void:
-	var skill: Dictionary = SKILLS[selected_skill]
+	var skill: Dictionary = SKILLS[selected_skill].duplicate(true)
+	var id: String = skill.get("id", "")
+	if not _skill_block_reason(id).is_empty():
+		return
+	skill.cost = _skill_cost(id)
 	var money_before := money
 	if skill.get("id", "") == "base_health" and money >= skill.cost:
 		money -= skill.cost
-		base_max_health += 50
-		base_health += 50
+		base_max_health += 25
+		base_health += 25
 		_update_base_health()
 		_update_counters()
 	elif skill.get("id", "") == "collector_drones" and money >= skill.cost:
@@ -386,18 +395,18 @@ func _confirm_skill() -> void:
 		collector_drone_count += 1
 		for index in buildings.size():
 			if buildings[index].kind == 0:
-				_spawn_collector_drone(index)
+				_queue_drone(index)
 		_update_counters()
 	elif skill.get("id", "") == "cash_drone" and money >= skill.cost:
 		money -= skill.cost
-		_spawn_collector_drone(BASE_HOME)
+		base_drone_settings.pending_drones += 1
 		_update_counters()
 	elif skill.get("id", "") == "barracks_drones" and money >= skill.cost:
 		money -= skill.cost
 		barracks_drone_count += 1
 		for index in buildings.size():
 			if buildings[index].kind == 1:
-				_spawn_collector_drone(index)
+				_queue_drone(index)
 		_update_counters()
 	elif skill.get("id", "") == "mining_level" and money >= skill.cost:
 		money -= skill.cost
@@ -412,12 +421,12 @@ func _confirm_skill() -> void:
 	elif skill.get("id", "") == "collector_speed" and money >= skill.cost:
 		money -= skill.cost
 		collector_move_speed += 10
-		collector_mining_speed += 10
+		collector_mining_speed += 5
 		_refresh_collector_stats()
 		_update_counters()
 	elif skill.get("id", "") == "collector_capacity" and money >= skill.cost:
 		money -= skill.cost
-		collector_capacity += 10
+		collector_capacity += 5
 		_refresh_collector_stats()
 		_update_counters()
 	elif skill.get("id", "") == "barracks_health" and money >= skill.cost:
@@ -434,10 +443,10 @@ func _confirm_skill() -> void:
 		var health_bonus := 0
 		match skill.id:
 			"tower_health":
-				tower_health += 10
-				health_bonus = 10
+				tower_health += 20
+				health_bonus = 20
 			"tower_shots": tower_shots += 1
-			"tower_rate": tower_interval_ms = maxi(1, floori(tower_interval_ms * 0.8))
+			"tower_rate": tower_interval_ms = maxi(1, floori(tower_interval_ms * 0.9))
 		for tower in _live_combat_drones("towers"):
 			tower.max_health = tower_health
 			tower.health = mini(tower.health + health_bonus, tower.max_health)
@@ -446,7 +455,6 @@ func _confirm_skill() -> void:
 			tower.update_health()
 		_update_counters()
 	if money < money_before:
-		var id: String = skill.id
 		skill_levels[id] = int(skill_levels.get(id, 1)) + 1
 	_update_build_ui()
 
@@ -475,6 +483,7 @@ func _spawn_collector_drone(index: int) -> void:
 		drone.position = Vector2.ZERO
 		drone.tint = BASE_COLOR
 		drone.collects_money = true
+		drone.speed = 140.0
 	elif building.kind == 1:
 		drone.passive = true
 		drone.tint = BUILDING_COLORS[1]
@@ -500,20 +509,7 @@ func _spawn_collector_drone(index: int) -> void:
 
 
 func _on_barracks_drone_destroyed(index: int) -> void:
-	_restore_barracks_drones.call_deferred(index)
-
-
-func _restore_barracks_drones(index: int) -> void:
-	if not is_inside_tree() or is_queued_for_deletion() or is_game_over:
-		return
-	if index < 0 or index >= buildings.size() or buildings[index].kind != 1:
-		return
-	var alive := 0
-	for child in get_children():
-		if child.get_script() == Drone and child.collector_index == index and not child.is_queued_for_deletion():
-			alive += 1
-	for missing in maxi(0, barracks_drone_count - alive):
-		_spawn_collector_drone(index)
+	_queue_drone(index)
 
 
 func _update_drone_count() -> void:
@@ -542,12 +538,15 @@ func spawn_enemy_wave() -> void:
 	if is_game_over or get_tree().paused:
 		return
 	var edge := (RADIUS + 0.5) * CELL
-	for index in 10:
+	spawned_waves += 1
+	var number := spawned_waves
+	wave_alive[number] = 6 + 2 * (number - 1)
+	for index in int(wave_alive[number]):
 		var enemy := Drone.new()
 		enemy.world = self
 		enemy.collector_index = -2
 		enemy.hostile = true
-		enemy.max_health = 3
+		enemy.max_health = 3 + floori(float(number - 1) / 4.0)
 		enemy.tint = Color("ff7373")
 		var along := randf_range(-edge + 12, edge - 12)
 		match randi_range(0, 3):
@@ -556,13 +555,17 @@ func spawn_enemy_wave() -> void:
 			2: enemy.position = Vector2(along, -edge)
 			3: enemy.position = Vector2(along, edge)
 		add_child(enemy)
-		enemy.destroyed.connect(_on_enemy_destroyed)
+		enemy.destroyed.connect(_on_enemy_destroyed.bind(number))
 		enemy.tree_exited.connect(_update_drone_count)
 	_update_drone_count()
 	_assign_combat_targets()
 
 
-func _on_enemy_destroyed() -> void:
+func _on_enemy_destroyed(number: int) -> void:
+	wave_alive[number] -= 1
+	while wave_alive.has(cleared_waves + 1) and wave_alive[cleared_waves + 1] == 0:
+		cleared_waves += 1
+	_update_build_ui()
 	_update_drone_count()
 	_assign_combat_targets.call_deferred()
 
@@ -579,7 +582,19 @@ func _assign_combat_targets() -> void:
 	enemies.sort_custom(func(a: Node2D, b: Node2D) -> bool: return _base_distance(a.position) < _base_distance(b.position))
 	var assigned: Dictionary = {}
 	var sectors: Dictionary = {}
+	var engaged: Dictionary = {}
+	# Keep defenders in mutual melee and account for their assignments before
+	# spreading the remaining defenders over approaching threats.
 	for defender in defenders:
+		var target: Node2D = defender.combat_target
+		if is_instance_valid(target) and not target.dead and not target.is_queued_for_deletion() and target.combat_target == defender and defender.position.distance_to(target.position) <= 20.001:
+			engaged[defender.get_instance_id()] = true
+			assigned[target.get_instance_id()] = int(assigned.get(target.get_instance_id(), 0)) + 1
+			var sector := posmod(floori((target.position.angle() + PI) / TAU * 8.0), 8)
+			sectors[sector] = int(sectors.get(sector, 0)) + 1
+	for defender in defenders:
+		if engaged.has(defender.get_instance_id()):
+			continue
 		var best: Node2D = null
 		var best_score := INF
 		for enemy in enemies:
@@ -611,9 +626,27 @@ func _can_build(anchor: Vector2i) -> bool:
 func _place_building() -> void:
 	var anchor := _build_anchor()
 	var cost := _building_cost(selected_building)
-	if not _can_build(anchor) or money < cost:
+	if not _can_build(anchor) or money < cost or _building_count(selected_building) >= _building_limit(selected_building):
 		return
-	buildings.append({"anchor": anchor, "kind": selected_building, "money": 0})
+	buildings.append({"anchor": anchor, "kind": selected_building, "money": 0, "construction": Balance.BUILD_SECONDS[selected_building], "pending_drones": 0, "production": 0.0})
+	var index := buildings.size() - 1
+	var status := Label.new()
+	status.position = Vector2(anchor) * CELL + Vector2(-20, -68)
+	status.z_index = 100
+	add_child(status)
+	buildings[index]["status"] = status
+	for y in 2:
+		for x in 2:
+			occupied_cells[anchor + Vector2i(x, y)] = true
+	money -= cost
+	_update_counters()
+	_set_build_mode(BuildMode.PLAY)
+	queue_redraw()
+
+
+func _finish_building(index: int) -> void:
+	var selected_building: int = buildings[index].kind
+	var anchor: Vector2i = buildings[index].anchor
 	if selected_building == 0:
 		var label := Label.new()
 		label.position = Vector2(anchor) * CELL + Vector2(-20, -48)
@@ -621,30 +654,26 @@ func _place_building() -> void:
 		label.z_index = 100
 		label.add_theme_font_size_override("font_size", 15)
 		add_child(label)
-		buildings[-1]["label"] = label
-		update_collector_label(buildings.size() - 1)
+		buildings[index]["label"] = label
+		update_collector_label(index)
 		for drone in collector_drone_count:
-			_spawn_collector_drone(buildings.size() - 1)
+			_spawn_collector_drone(index)
 	elif selected_building == 1:
 		for drone in barracks_drone_count:
-			_spawn_collector_drone(buildings.size() - 1)
+			_spawn_collector_drone(index)
 	elif selected_building == 2:
 		var tower := preload("res://scripts/tower.gd").new()
 		tower.world = self
-		tower.building_index = buildings.size() - 1
+		tower.building_index = index
 		tower.position = (Vector2(anchor) + Vector2(0.5, 0.5)) * CELL
 		tower.max_health = tower_health
 		tower.shots = tower_shots
 		tower.fire_interval_ms = tower_interval_ms
-		buildings[-1]["tower"] = tower
+		buildings[index]["tower"] = tower
 		add_child(tower)
 		tower.destroyed.connect(_on_tower_destroyed.bind(tower.building_index))
-	for y in 2:
-		for x in 2:
-			occupied_cells[anchor + Vector2i(x, y)] = true
-	money -= cost
-	_update_counters()
-	_set_build_mode(BuildMode.PLAY)
+	_update_build_ui()
+	queue_redraw()
 
 
 func _on_tower_destroyed(index: int) -> void:
@@ -653,6 +682,7 @@ func _on_tower_destroyed(index: int) -> void:
 	for y in 2:
 		for x in 2:
 			occupied_cells.erase(anchor + Vector2i(x, y))
+	_update_build_ui()
 	queue_redraw()
 
 
@@ -673,7 +703,100 @@ func deposit_drone_blocks(index: int, amount: int) -> void:
 
 
 func _building_cost(kind: int) -> int:
-	return maxi(0, [collector_cost, barracks_cost, tower_cost][kind])
+	var count := _building_count(kind)
+	var prices: Array = Balance.BUILD_PRICES[kind]
+	return maxi(0, int(prices[mini(count, prices.size() - 1)]) + [collector_cost - 30, barracks_cost - 25, tower_cost - 20][kind])
+
+
+func _building_count(kind: int) -> int:
+	var count := 0
+	for building in buildings:
+		if building.kind == kind and not building.get("destroyed", false):
+			count += 1
+	return count
+
+
+func _building_limit(kind: int) -> int:
+	return Balance.BUILD_LIMITS[kind][Balance.stage(cleared_waves, kind != 0)]
+
+
+func _skill_purchases(id: String) -> int:
+	return int(skill_levels.get(id, 0 if id == "cash_drone" else 1)) - (0 if id == "cash_drone" else 1)
+
+
+func _skill_cost(id: String) -> int:
+	var prices: Array = Balance.PRICES[id]
+	return prices[mini(_skill_purchases(id), prices.size() - 1)]
+
+
+func _skill_block_reason(id: String) -> String:
+	if not Balance.PRICES.has(id):
+		return "Noch nicht verfügbar"
+	var bought := _skill_purchases(id)
+	if bought >= Balance.PRICES[id].size():
+		return "Maximum erreicht"
+	var defense := Balance.is_defense_skill(id)
+	var tier := Balance.stage(cleared_waves, defense)
+	if bought >= Balance.upgrade_limit(id, tier):
+		return "Freischaltung nach Welle %d" % Balance.unlock_waves(defense)[mini(tier, 2)]
+	var kind := -1
+	if id.begins_with("collector_") or id == "cash_drone":
+		kind = 0
+	elif id.begins_with("barracks_"):
+		kind = 1
+	elif id.begins_with("tower_"):
+		kind = 2
+	if kind >= 0:
+		var ready_building := false
+		for building in buildings:
+			if building.kind == kind and not building.get("destroyed", false) and building.construction <= 0.0:
+				ready_building = true
+		if not ready_building:
+			return "%s fertigstellen" % BUILDINGS[kind]
+	return ""
+
+
+func _queue_drone(index: int) -> void:
+	if is_game_over:
+		return
+	# Unfinished buildings receive their full current complement at completion.
+	if buildings[index].construction > 0.0:
+		return
+	buildings[index].pending_drones += 1
+
+
+func _tick_production(delta: float) -> void:
+	if is_game_over:
+		return
+	if base_drone_settings.pending_drones > 0:
+		base_drone_settings.production += delta
+		while base_drone_settings.production >= 8.0 and base_drone_settings.pending_drones > 0:
+			base_drone_settings.production -= 8.0
+			base_drone_settings.pending_drones -= 1
+			_spawn_collector_drone(BASE_HOME)
+		if base_drone_settings.pending_drones == 0:
+			base_drone_settings.production = 0.0
+		_update_counters()
+	for index in buildings.size():
+		var building := buildings[index]
+		if building.get("destroyed", false):
+			continue
+		var available := delta
+		if building.construction > 0.0:
+			available = maxf(0.0, delta - building.construction)
+			building.construction = maxf(0.0, building.construction - delta)
+			if building.construction <= 0.0:
+				_finish_building(index)
+		if building.pending_drones > 0:
+			building.production += available
+			var duration := 20.0 if building.kind == 1 else 8.0
+			while building.production >= duration and building.pending_drones > 0:
+				building.production -= duration
+				building.pending_drones -= 1
+				_spawn_collector_drone(index)
+			if building.pending_drones == 0:
+				building.production = 0.0
+		building.status.text = "Bau: %d s" % ceili(building.construction) if building.construction > 0.0 else ("Drohnen: %d · %d s" % [building.pending_drones, ceili((20.0 if building.kind == 1 else 8.0) - building.production)] if building.pending_drones > 0 else "")
 
 
 func _update_build_ui() -> void:
@@ -687,9 +810,13 @@ func _update_build_ui() -> void:
 		var skills: Array = SKILLS.duplicate(true)
 		for skill in skills:
 			skill.level = int(skill_levels.get(skill.get("id", ""), 1))
+			var id: String = skill.get("id", "")
+			if Balance.PRICES.has(id):
+				skill.cost = _skill_cost(id)
+				skill.lock_reason = _skill_block_reason(id)
 			if skill.get("id", "") == "base_health":
 				skill.current_effect = "%d maximale Lebenspunkte" % base_max_health
-				skill.next_effect = "%d maximale Lebenspunkte" % (base_max_health + 50)
+				skill.next_effect = "%d maximale Lebenspunkte" % (base_max_health + 25)
 			elif skill.get("id", "") == "cash_drone":
 				skill.description = "-sammelt Geld ein-"
 				var count: int = skill_levels.get("cash_drone", 0)
@@ -707,22 +834,25 @@ func _update_build_ui() -> void:
 				skill.next_effect = "Abbaustufe %d" % (mining_level + 1)
 			elif skill.get("id", "") == "collector_speed":
 				skill.current_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed, collector_mining_speed]
-				skill.next_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed + 10, collector_mining_speed + 10]
+				skill.next_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed + 10, collector_mining_speed + 5]
 			elif skill.get("id", "") == "collector_capacity":
 				skill.current_effect = "%d Einheiten Tragkapazität" % collector_capacity
-				skill.next_effect = "%d Einheiten Tragkapazität" % (collector_capacity + 10)
+				skill.next_effect = "%d Einheiten Tragkapazität" % (collector_capacity + 5)
 			elif skill.get("id", "") == "barracks_health":
 				skill.current_effect = "%d maximale Lebenspunkte" % barracks_drone_health
 				skill.next_effect = "%d maximale Lebenspunkte" % (barracks_drone_health + 10)
 			elif skill.get("id", "") == "tower_health":
 				skill.current_effect = "%d maximale Lebenspunkte" % tower_health
-				skill.next_effect = "%d maximale Lebenspunkte" % (tower_health + 10)
+				skill.next_effect = "%d maximale Lebenspunkte" % (tower_health + 20)
 			elif skill.get("id", "") == "tower_shots":
 				skill.current_effect = "%d gleichzeitige Schüsse" % tower_shots
 				skill.next_effect = "%d gleichzeitige Schüsse" % (tower_shots + 1)
 			elif skill.get("id", "") == "tower_rate":
 				skill.current_effect = "Schussintervall: %d ms" % tower_interval_ms
-				skill.next_effect = "Schussintervall: %d ms" % maxi(1, floori(tower_interval_ms * 0.8))
+				skill.next_effect = "Schussintervall: %d ms" % maxi(1, floori(tower_interval_ms * 0.9))
+		for skill in skills:
+			if skill.get("lock_reason", "") == "Maximum erreicht":
+				skill.next_effect = "Maximum erreicht"
 		build_options.configure("SKILL-TREE", skills, selected_skill, money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nWeitere Einträge sind Platzhalter · J / Esc: schließen")
 		return
 	if build_mode == BuildMode.MENU:
@@ -731,14 +861,17 @@ func _update_build_ui() -> void:
 			var description := "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab." % collector_drone_count if index == 0 else "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner." % barracks_drone_count
 			if index == 2:
 				description = "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer." % [tower_health, tower_shots, tower_interval_ms]
-			items.append({"name": BUILDINGS[index], "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg"][index], "description": description})
+			description += "\nBauzeit: %d s" % int(Balance.BUILD_SECONDS[index])
+			items.append({"name": "%s (%d/%d)" % [BUILDINGS[index], _building_count(index), _building_limit(index)], "lock_reason": "Gebäudelimit erreicht" if _building_count(index) >= _building_limit(index) else "", "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg"][index], "description": description})
 		build_options.configure("BAUEN / 2 × 2", items, selected_building, money, "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen")
 	if build_mode == BuildMode.PLACE:
 		var valid := _can_build(_build_anchor())
 		var cost := _building_cost(selected_building)
-		var affordable := money >= cost
+		var affordable := money >= cost and _building_count(selected_building) < _building_limit(selected_building)
 		var status := "Fläche frei" if valid else "Fläche blockiert (Basis, Gebäude oder Blöcke)"
-		if not affordable:
+		if _building_count(selected_building) >= _building_limit(selected_building):
+			status += " · Gebäudelimit erreicht"
+		elif money < cost:
 			status += " · Zu wenig Geld"
 		var controls := "Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen" if mouse_placement else "Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
 		build_status.text = "%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s" % [BUILDINGS[selected_building], cost, money, controls, status]
@@ -1029,6 +1162,8 @@ func _update_base_health() -> void:
 func _update_counters() -> void:
 	$Player.update_load(collected_count)
 	money_label.text = "Basis: %d Geld" % money
+	if base_drone_settings.pending_drones > 0:
+		money_label.text += "\nGeld-Drohne: %d s" % ceili(8.0 - base_drone_settings.production)
 
 
 func _draw() -> void:
@@ -1045,7 +1180,7 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, 34, Color("365665"))
 	draw_circle(Vector2.ZERO, 25, Color("426b79"))
 	for building in buildings:
-		if building.get("destroyed", false) or building.kind == 2:
+		if building.get("destroyed", false) or (building.kind == 2 and building.construction <= 0.0):
 			continue
 		var rect := Rect2(Vector2(building.anchor) * CELL - Vector2.ONE * CELL / 2, Vector2.ONE * CELL * 2)
 		var color: Color = BUILDING_COLORS[building.kind]

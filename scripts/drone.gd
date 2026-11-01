@@ -66,6 +66,13 @@ func _physics_process(delta: float) -> void:
 	if passive or hostile:
 		combat_ai.tick(delta)
 		return
+	if collects_money and cash_source >= 0 and world.buildings[cash_source].money <= 0:
+		# The player may have emptied the collector while this drone was en route.
+		cash_source = -1
+		path.clear()
+		deposit_elapsed = 0.0
+		retry_time = 0.0
+		_update_status()
 	if collects_money and cash_carried > 0 and (world.BASE_AREA.has_point(position) or position.distance_to(world.get_node("Player").position) <= 24.0):
 		path.clear()
 		_cash_deliver()
@@ -245,13 +252,22 @@ func _cash_tick(delta: float) -> void:
 	var highest := 0
 	for index in world.buildings.size():
 		var building: Dictionary = world.buildings[index]
-		if building.kind != 0 or building.money <= highest:
+		if building.kind != 0 or building.money <= highest or _cash_source_reserved(index):
 			continue
 		var route := _cash_route(index)
 		if not route.is_empty():
 			highest = building.money
 			cash_source = index
 			path = route
+
+
+func _cash_source_reserved(index: int) -> bool:
+	# The active pickup assignment is the reservation. No separate state can
+	# become stale after cancellation, pickup, or removal of the owner.
+	for drone in world._live_combat_drones("friendly_drones"):
+		if drone != self and drone.collects_money and drone.cash_source == index:
+			return true
+	return false
 
 
 func _cash_deliver() -> void:

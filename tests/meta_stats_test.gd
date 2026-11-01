@@ -25,13 +25,13 @@ func _run() -> void:
 	world.get_node("Player").set_physics_process(false)
 	var block: Node = world.block_cells[Vector2i(3, 0)]
 	for step in 4:
-		assert(block.mine(0.85, step % 2 == 0))
+		assert(block.mine(1.0, step % 2 == 0))
 		assert(meta.collected_by_hardness["1"] == step + 1)
 		assert(int(meta.destroyed_by_hardness.get("1", 0)) == (1 if step == 3 else 0))
 	assert(not block.mine(10.0))
 	var hard: Node = world.block_cells[Vector2i(5, 0)]
 	assert(not hard.mine(1.0))
-	assert(hard.mine(0.85, false, null, 2))
+	assert(hard.mine(1.0, false, null, 2))
 	assert(meta.collected_by_hardness["2"] == 1)
 	var enemy = world.Drone.new()
 	enemy.world = world
@@ -116,12 +116,12 @@ func _run() -> void:
 	current_scene.get_node("Center/Menu/StartButton").pressed.emit()
 	for frame in 4:
 		await process_frame
-	assert(current_scene.money == 10 and meta.total_collected() == 5)
+	assert(current_scene.money == 40 and meta.total_collected() == 5)
 	current_scene.damage_base(100)
 	current_scene.game_over_screen._retry()
 	for frame in 4:
 		await process_frame
-	assert(not paused and current_scene.money == 10 and meta.total_collected() == 5)
+	assert(not paused and current_scene.money == 40 and meta.total_collected() == 5)
 	assert(meta.enemy_drones_defeated == 1)
 	for instance in [store, loaded, recovered, final_store, autosave, auto_loaded, exit_loaded]:
 		instance.queue_free()

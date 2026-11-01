@@ -37,7 +37,7 @@ func _run() -> void:
 	await _settle()
 	world = current_scene
 	assert(world.name == "Miner" and not paused)
-	assert(world.base_health == 100 and world.money == 10 and world.mining_level == 1)
+	assert(world.base_health == 100 and world.money == 40 and world.mining_level == 1)
 	assert(world.buildings.is_empty() and not world.is_game_over)
 	world.damage_base(100)
 	world.game_over_screen.get_node("Screen/Center/Menu/MainMenu").pressed.emit()

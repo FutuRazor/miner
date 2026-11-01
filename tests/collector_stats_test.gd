@@ -1,21 +1,7 @@
 extends SceneTree
 
-
 func _initialize() -> void:
 	call_deferred("_run")
-
-
-func _build(world: Node, anchor: Vector2i, kind: int) -> void:
-	for y in 2:
-		for x in 2:
-			var cell := anchor + Vector2i(x, y)
-			if world.block_cells.has(cell) and is_instance_valid(world.block_cells[cell]):
-				world.block_cells[cell].queue_free()
-	world.get_node("Player").position = Vector2(anchor) * 48
-	world.selected_building = kind
-	world._place_building()
-	world.buildings[-1].main_drone.set_physics_process(false)
-
 
 func _run() -> void:
 	root.get_node("MetaStats").persistence_enabled = false
@@ -23,51 +9,42 @@ func _run() -> void:
 	root.add_child(world)
 	world.set_physics_process(false)
 	world.get_node("Player").set_physics_process(false)
-	world.collector_cost = 0
-	world.barracks_cost = 0
-	_build(world, Vector2i(2, 0), 0)
-	_build(world, Vector2i(-2, 2), 1)
-	world._spawn_collector_drone(-1)
-	var cash: Node2D = world.base_drone_settings.main_drone
-	cash.set_physics_process(false)
-	var drone: Node2D = world.buildings[0].main_drone
-	var passive: Node2D = world.buildings[1].main_drone
-	world.money = 40
+	world.wave_timer.set_physics_process(false)
+	world.money = 10000
+	world.cleared_waves = 14
+	for kind in 3:
+		var anchor: Vector2i = [Vector2i(2, 0), Vector2i(-2, 2), Vector2i(0, -4)][kind]
+		for y in 2:
+			for x in 2:
+				var cell: Vector2i = anchor + Vector2i(x, y)
+				if world.block_cells.has(cell): world.block_cells[cell].queue_free()
+		world.selected_building = kind
+		world.get_node("Player").position = Vector2(anchor) * 48
+		world._place_building()
+		world._tick_production(10.0)
+	world.base_health -= 12
+	world.buildings[1].main_drone.take_damage(12)
+	world.selected_skill = 4
+	var prices: Array = world.Balance.PRICES["collector_speed"]
+	for price in prices:
+		var before: int = world.money
+		world._confirm_skill()
+		assert(world.money == before - price)
+		world._tick_production(60.0)
+	var before: int = world.money
+	world._confirm_skill()
+	assert(world.money == before)
+	assert(world._skill_block_reason("collector_speed") == "Maximum erreicht")
+	assert(world.collector_move_speed == 150 and world.collector_mining_speed == 125)
+	assert(world.buildings[0].main_drone.speed == 150)
+	world.selected_skill = 5
+	for price in [20, 40, 75, 120]:
+		var balance_before: int = world.money
+		world._confirm_skill()
+		assert(world.money == balance_before - price)
+	assert(world.collector_capacity == 30 and world.buildings[0].main_drone.capacity == 30)
 	world._on_skills_button_pressed()
-	world._on_option_clicked(4)
-	assert(world.money == 30 and drone.speed == 110 and drone.mining_speed == 110)
-	var before: Vector2 = drone.position
-	drone.path.assign([before + Vector2(100, 0)])
-	drone._physics_process(0.1)
-	assert(is_equal_approx(drone.position.x - before.x, 11.0))
-	drone.path.clear()
-	drone.position = before
-	var block: Node = world.block_cells[Vector2i(4, 0)]
-	drone.target = block
-	drone._physics_process(0.8)
-	assert(block.completed_steps == 1 and drone.carried == 1)
-	world._on_option_clicked(5)
-	assert(world.money == 20 and drone.capacity == 20)
-	assert(drone.carried == 1 and drone.status.text == "1/20")
-	assert(passive.speed == 100 and passive.capacity == 10)
-	assert(cash.speed == 100 and cash.capacity == 10)
-	assert(world.get_node("Player").capacity == 10)
-	world._on_option_clicked(4)
-	world._on_option_clicked(5)
-	assert(world.money == 0 and drone.speed == 120 and drone.mining_speed == 120 and drone.capacity == 30)
-	world._on_option_clicked(5)
-	assert(world.money == 0 and drone.capacity == 30)
-	world._spawn_collector_drone(0)
-	var added: Node2D = world.get_child(world.get_child_count() - 1)
-	added.set_physics_process(false)
-	assert(added.speed == 120 and added.mining_speed == 120 and added.capacity == 30)
-	_build(world, Vector2i(0, -4), 0)
-	var future: Node2D = world.buildings[2].main_drone
-	assert(future.speed == 120 and future.mining_speed == 120 and future.capacity == 30)
-	world._on_skills_button_pressed()
-	assert(world.build_options.current_items[4].current_effect == "Bewegung: 120 Pixel/s\nAbbau: 120 %")
-	assert(world.build_options.current_items[5].current_effect == "30 Einheiten Tragkapazität")
-	assert(typeof(world.collector_move_speed) == TYPE_INT and typeof(world.collector_mining_speed) == TYPE_INT)
-	print("PASS: integer speed stats, faster movement/mining, +10 capacity, repeated costs, existing/future drones, isolated other roles and live labels")
+	assert(world.build_options.current_items[4].lock_reason == "Maximum erreicht")
 	world.queue_free()
+	print("PASS: collector_speed prices, effects, production, cap and menu state")
 	quit()

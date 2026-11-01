@@ -35,7 +35,8 @@ func _run() -> void:
 	assert(world.build_mode == world.BuildMode.MENU and world.build_panel.can_process())
 	_key(ui, KEY_J)
 	assert(world.build_mode == world.BuildMode.SKILLS and paused)
-	world.build_options.rows[2].button.pressed.emit()
+	world._spawn_collector_drone(-1)
+	world.build_options.rows[0].button.pressed.emit()
 	assert(world.money == 0 and world.build_mode == world.BuildMode.SKILLS)
 	var cash: Node2D = world.base_drone_settings.main_drone
 	assert(not cash.can_process())

@@ -61,6 +61,7 @@ func show_item(item: Dictionary, money: int) -> void:
 		cost.add_theme_color_override("font_color", Color("adbdc8"))
 		show()
 		return
-	cost.text = "Kosten: %d Geld" % item.cost
+	var locked: String = item.get("lock_reason", "")
+	cost.text = locked if not locked.is_empty() else "Kosten: %d Geld" % item.cost
 	cost.add_theme_color_override("font_color", Color("ff7777") if money < item.cost else Color("e9f6f5"))
 	show()

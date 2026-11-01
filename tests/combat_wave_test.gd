@@ -20,8 +20,8 @@ func _run() -> void:
 	assert(not world.get_node("GameUI").has_node("TestWaveButton"))
 	world.spawn_enemy_wave()
 	var enemies: Array[Node2D] = world._live_combat_drones("enemy_drones")
-	assert(enemies.size() == 10)
-	assert(world.drone_count_label.text == "Drohnen: 0" and world.enemy_count_label.text == "Gegner: 10")
+	assert(enemies.size() == 6)
+	assert(world.drone_count_label.text == "Drohnen: 0" and world.enemy_count_label.text == "Gegner: 6")
 	var edge: float = (world.RADIUS + 0.5) * world.CELL
 	var first_position := enemies[0].position
 	var varied := false
@@ -41,10 +41,10 @@ func _run() -> void:
 	assert(world.base_health == 100)
 	for enemy in enemies:
 		enemy._physics_process(0.01)
-	assert(world.base_health == 90)
+	assert(world.base_health == 94)
 	for enemy in enemies:
 		enemy._physics_process(2.0)
-	assert(world.base_health == 70)
+	assert(world.base_health == 82)
 	assert(world.block_cells[Vector2i(22, 0)].completed_steps == 0)
 	# Add two defenders; similarly urgent threats from different directions split them.
 	world.barracks_cost = 0
@@ -53,6 +53,7 @@ func _run() -> void:
 	world.get_node("Player").position = Vector2(96, 0)
 	world.selected_building = 1
 	world._place_building()
+	world._tick_production(10.0)
 	world._on_skills_button_pressed()
 	world._on_option_clicked(6)
 	var defenders: Array[Node2D] = world._live_combat_drones("barracks_drones")
@@ -61,7 +62,7 @@ func _run() -> void:
 		defender.set_physics_process(false)
 	enemies[0].position = Vector2(180, 0)
 	enemies[1].position = Vector2(-190, 0)
-	for index in range(2, 10):
+	for index in range(2, 6):
 		enemies[index].position = Vector2(1000, 500 + index * 10)
 	world._assign_combat_targets()
 	assert(defenders[0].combat_target == enemies[0])
@@ -82,13 +83,13 @@ func _run() -> void:
 		attacker.position = defender.position + Vector2(20, 0)
 		attacker.combat_ai.set_target(defender)
 		attacker._physics_process(1.0)
-	assert(defender.health == 19)
+	assert(defender.health == 23)
 	# Enemy death is permanent; defenders retarget safely after the node is freed.
 	enemy.take_damage(2, defender)
 	assert(enemy.dead and enemy.is_queued_for_deletion())
 	await _settle()
 	assert(not is_instance_valid(enemy))
-	assert(world._live_combat_drones("enemy_drones").size() == 9)
+	assert(world._live_combat_drones("enemy_drones").size() == 5)
 	var remaining: Array[Node2D] = world._live_combat_drones("enemy_drones")
 	remaining[0].position = Vector2(100, 0)
 	for index in range(1, remaining.size()):
@@ -99,9 +100,11 @@ func _run() -> void:
 	# Friendly death still restores the barracks limit with full health.
 	defender.take_damage(100)
 	await _settle()
+	assert(world._live_combat_drones("barracks_drones").size() == 1)
+	world._tick_production(20.0)
 	assert(world._live_combat_drones("barracks_drones").size() == 2)
 	assert(world.drone_count_label.text == "Drohnen: 2")
-	assert(world.enemy_count_label.text == "Gegner: 9")
+	assert(world.enemy_count_label.text == "Gegner: 5")
 	# The last base hit ends the game and prevents more test waves.
 	world.base_health = 1
 	var last := remaining[0]
@@ -110,7 +113,7 @@ func _run() -> void:
 	last._physics_process(1.0)
 	assert(world.is_game_over and paused)
 	world.spawn_enemy_wave()
-	assert(world._live_combat_drones("enemy_drones").size() == 9)
+	assert(world._live_combat_drones("enemy_drones").size() == 5)
 	print("PASS: random edge wave, flight, 10 concurrent base hits, interval catch-up, direction spread, retaliation, concurrent defender hits, permanent enemy death, retarget, respawn and game over")
 	world.queue_free()
 	quit()

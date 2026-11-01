@@ -41,15 +41,15 @@ func _run() -> void:
 	var options = world.build_options
 	assert(options.rows[0].icon.texture != null)
 	assert(options.rows[2].cost_label.get_theme_color("font_color") == options.COST_UNAFFORDABLE)
-	world.money = 10
+	world.money = 40
 	world._update_build_ui()
 	assert(options.rows[2].cost_label.get_theme_color("font_color") == options.COST_NORMAL)
-	options.rows[2].button.pressed.emit()
-	assert(world.money == 0 and world.drone_count_label.text == "Drohnen: 1")
+	options.rows[0].button.pressed.emit()
+	assert(world.money == 0 and world.base_max_health == 125)
 	world._set_build_mode(world.BuildMode.MENU)
 	assert(options.rows.size() == 3)
-	assert(options.rows[0].name_label.text == "Sammler")
-	assert(options.rows[1].name_label.text == "Kaserne")
+	assert(options.rows[0].name_label.text == "Sammler (0/2)")
+	assert(options.rows[1].name_label.text == "Kaserne (0/1)")
 	options.rows[1].button.pressed.emit()
 	assert(world.build_mode == world.BuildMode.PLACE and world.selected_building == 1)
 	menu.get_node("Margin/Rows/SkillsRow/Skills").pressed.emit()

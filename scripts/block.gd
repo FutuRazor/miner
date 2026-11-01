@@ -2,7 +2,7 @@ extends StaticBody2D
 
 signal collected(by_player: bool)
 
-@export var mining_duration: float = 0.85
+@export var mining_duration: float = 1.0
 @export_range(1, 16, 1) var mining_steps: int = 4
 @export_range(1, 100, 1) var hardness: int = 1
 var completed_steps := 0

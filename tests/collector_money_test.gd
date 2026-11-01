@@ -17,6 +17,7 @@ func _run() -> void:
 	for cell in [Vector2i(3, 0), Vector2i(3, 1)]:
 		world.block_cells[cell].queue_free()
 	world._place_building()
+	world._tick_production(10.0)
 	world.buildings[0].money = 17
 	world.update_collector_label(0)
 	world.money = 5

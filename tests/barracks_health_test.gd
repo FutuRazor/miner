@@ -27,6 +27,7 @@ func _build(world: Node, anchor: Vector2i) -> void:
 	world.get_node("Player").position = Vector2(anchor) * 48
 	world.selected_building = 1
 	world._place_building()
+	world._tick_production(10.0)
 
 
 func _run() -> void:
@@ -36,11 +37,13 @@ func _run() -> void:
 	world.set_physics_process(false)
 	world.get_node("Player").set_physics_process(false)
 	world.barracks_cost = 0
+	world.money = 1000
+	world.cleared_waves = 14
 	_build(world, Vector2i(2, 0))
 	_build(world, Vector2i(-2, 2))
 	world.money = 10
 	world._on_skills_button_pressed()
-	world._on_option_clicked(6)
+	world._on_option_clicked(8)
 	assert(_drones(world, 0).size() == 2 and _drones(world, 1).size() == 2)
 	var drone: Node2D = world.buildings[0].main_drone
 	assert(drone.health == 30 and drone.status.text == "Lebenspunkte\n30/30")
@@ -53,6 +56,8 @@ func _run() -> void:
 	drone.take_damage(100)
 	assert(drone.dead and drone.is_queued_for_deletion() and not drone.visible)
 	await _settle()
+	assert(_drones(world, 0).size() == 1)
+	world._tick_production(20.0)
 	assert(not is_instance_valid(drone))
 	assert(_drones(world, 0).size() == 2 and _drones(world, 1).size() == 2)
 	assert(is_instance_valid(world.buildings[0].main_drone))
@@ -62,11 +67,12 @@ func _run() -> void:
 		for worker in _drones(world, index):
 			worker.take_damage(30)
 	await _settle()
+	world._tick_production(40.0)
 	for index in [0, 1]:
 		assert(_drones(world, index).size() == 2)
 		for worker in _drones(world, index):
 			assert(worker.health == 30 and worker.max_health == 30)
-	assert(world.money == 0 and world.drone_count_label.text == "Drohnen: 4")
+	assert(world.money == 10 and world.drone_count_label.text == "Drohnen: 4")
 	# Game over prevents any further reinforcements.
 	world.damage_base(100)
 	_drones(world, 0)[0].take_damage(30)

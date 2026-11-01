@@ -3,6 +3,7 @@ extends ProgressBar
 signal wave_due(number: int)
 
 const DURATION := 100.0
+const INTERVAL := 80.0
 var remaining := DURATION
 var next_wave := 1
 var timer_paused := false
@@ -30,7 +31,8 @@ func _physics_process(delta: float) -> void:
 	while remaining <= 0.0:
 		var number := next_wave
 		next_wave += 1
-		remaining += DURATION
+		remaining += INTERVAL
+		max_value = INTERVAL
 		wave_due.emit(number)
 	_refresh()
 

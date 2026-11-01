@@ -16,6 +16,7 @@ func _run() -> void:
 	for cell in [Vector2i(3, 0), Vector2i(3, 1)]:
 		world.block_cells[cell].queue_free()
 	world._place_building()
+	world._tick_production(10.0)
 	world._spawn_collector_drone(0)
 	world._spawn_collector_drone(0)
 	var drones: Array[Node] = []
@@ -38,10 +39,10 @@ func _run() -> void:
 	# Player resets cannot erase the active drone's progress.
 	block.reset_progress()
 	assert(is_equal_approx(block.progress, 0.1))
-	drones[0]._physics_process(0.8)
+	drones[0]._physics_process(0.9)
 	assert(not block.depleted and block.completed_steps == 1 and drones[0].carried == 1)
 	for step in 3:
-		drones[0]._physics_process(0.85)
+		drones[0]._physics_process(1.0)
 	assert(block.depleted and drones[0].carried == 4)
 	assert(world.collected_count == 0)
 	assert(not block.mine(1.0, false, drones[1]))

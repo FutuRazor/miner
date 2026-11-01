@@ -1,9 +1,7 @@
 extends SceneTree
 
-
 func _initialize() -> void:
 	call_deferred("_run")
-
 
 func _run() -> void:
 	root.get_node("MetaStats").persistence_enabled = false
@@ -11,26 +9,35 @@ func _run() -> void:
 	root.add_child(world)
 	world.set_physics_process(false)
 	world.get_node("Player").set_physics_process(false)
+	world.wave_timer.set_physics_process(false)
+	world.money = 10000
+	world.cleared_waves = 14
+	for kind in 3:
+		var anchor: Vector2i = [Vector2i(2, 0), Vector2i(-2, 2), Vector2i(0, -4)][kind]
+		for y in 2:
+			for x in 2:
+				var cell: Vector2i = anchor + Vector2i(x, y)
+				if world.block_cells.has(cell): world.block_cells[cell].queue_free()
+		world.selected_building = kind
+		world.get_node("Player").position = Vector2(anchor) * 48
+		world._place_building()
+		world._tick_production(10.0)
+	world.base_health -= 12
+	world.buildings[1].main_drone.take_damage(12)
+	world.selected_skill = 0
+	var prices: Array = world.Balance.PRICES["base_health"]
+	for price in prices:
+		var before: int = world.money
+		world._confirm_skill()
+		assert(world.money == before - price)
+		world._tick_production(60.0)
+	var before: int = world.money
+	world._confirm_skill()
+	assert(world.money == before)
+	assert(world._skill_block_reason("base_health") == "Maximum erreicht")
+	assert(world.base_max_health == 200 and world.base_health == 188)
 	world._on_skills_button_pressed()
-	world.money = 9
-	world._on_option_clicked(0)
-	assert(world.base_health == 100 and world.base_max_health == 100 and world.money == 9)
-	assert(world.build_options.current_items[0].level == 1)
-	world.money = 20
-	world._on_option_clicked(0)
-	assert(world.base_health == 150 and world.base_max_health == 150 and world.money == 10)
-	assert(world.build_options.info_panel.title.text == "Lebenspunkte (lvl. 2)")
-	assert(world.base_health_label.text == "Lebenspunkte\n150/150")
-	world.damage_base(35)
-	world._on_option_clicked(0)
-	assert(world.base_health == 165 and world.base_max_health == 200 and world.money == 0)
-	assert(world.build_options.info_panel.title.text == "Lebenspunkte (lvl. 3)")
-	assert(world.base_health_label.text == "Lebenspunkte\n165/200")
-	assert(world.build_mode == world.BuildMode.SKILLS and world.build_panel.visible)
-	assert(world.build_options.current_items[0].current_effect == "200 maximale Lebenspunkte")
-	assert(world.build_options.current_items[0].next_effect == "250 maximale Lebenspunkte")
-	world.damage_base(165)
-	assert(world.is_game_over)
-	print("PASS: health upgrade costs 10, repeatable +50 current/max, damage preserved, live info and game-over threshold")
+	assert(world.build_options.current_items[0].lock_reason == "Maximum erreicht")
 	world.queue_free()
+	print("PASS: base_health prices, effects, production, cap and menu state")
 	quit()

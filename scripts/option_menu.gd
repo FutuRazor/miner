@@ -57,7 +57,8 @@ func configure(title: String, items: Array, selected: int, money: int, help: Str
 			group_count += 1
 		row.name_label.text = items[index].name
 		var placeholder: bool = items[index].get("placeholder", false)
-		row.cost_label.text = "Später" if placeholder else "%d Geld" % items[index].cost
+		var locked: String = items[index].get("lock_reason", "")
+		row.cost_label.text = "Später" if placeholder else (("Maximum" if locked.contains("Maximum") or locked.contains("limit") else "Gesperrt") if not locked.is_empty() else "%d Geld" % items[index].cost)
 		row.cost_label.add_theme_color_override("font_color", Color("adbdc8") if placeholder else (COST_UNAFFORDABLE if money < items[index].cost else COST_NORMAL))
 		row.button.button_pressed = index == selected
 		row.icon.texture = load(items[index].icon)
