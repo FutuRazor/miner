@@ -72,6 +72,7 @@ func _run() -> void:
 	assert(defender.health == 21)
 	# A drone in its barracks footprint but returning home is still moving.
 	defender.position += Vector2(5, 0)
+	defender.is_moving = true
 	mechanic._physics_process(2.0)
 	assert(defender.health == 21 and mechanic.mechanic_ai.repair_target == null)
 	defender.position = Vector2(world.buildings[2].anchor) * world.CELL

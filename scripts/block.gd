@@ -30,12 +30,16 @@ func claim_for_drone(drone: Node) -> bool:
 	if mining_drone != drone:
 		progress = 0.0
 		mining_drone = drone
+		if get_parent().has_method("_mining_jobs_changed"):
+			get_parent()._mining_jobs_changed()
 	return true
 
 
 func release_drone(drone: Node) -> void:
 	if mining_drone == drone:
 		mining_drone = null
+		if get_parent().has_method("_mining_jobs_changed"):
+			get_parent()._mining_jobs_changed()
 		reset_progress()
 
 

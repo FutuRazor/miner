@@ -25,6 +25,8 @@ var cash_source := -1
 var mechanic := false
 var mechanic_ai: RefCounted
 var is_moving := false
+var navigation: RefCounted
+const COLLISION_RADIUS := 10.0
 
 const DIRECTIONS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 var world: Node2D
@@ -37,9 +39,15 @@ var target: StaticBody2D
 var path: Array[Vector2] = []
 var retry_time := 0.0
 var status: Label
+var empty_revision := -1
+var empty_jobs := -1
+var empty_power := -1
+var parking_goal := Vector2(INF, INF)
+var parking_remaining := 0.0
 
 
 func _ready() -> void:
+	navigation = preload("res://scripts/drone_navigation.gd").new(self)
 	z_index = 3
 	add_to_group("enemy_drones" if hostile else "friendly_drones")
 	if passive:
@@ -88,15 +96,26 @@ func _physics_process(delta: float) -> void:
 		path.clear()
 		_cash_deliver()
 		return
+	# A crowded depot need not be reached at one exact path endpoint.
+	if returning and not collects_money and home_area().has_point(position):
+		path.clear()
+	elif collects_money and cash_source >= 0 and world.building_rect(cash_source).grow(-COLLISION_RADIUS).has_point(position):
+		path.clear()
 	if not path.is_empty():
-		position = position.move_toward(path[0], speed * delta)
-		if position.distance_to(path[0]) < 0.01:
+		# Waypoints are small areas, not exclusive points all workers must occupy.
+		if position.distance_to(path[0]) <= 23.01:
 			path.pop_front()
+		else:
+			navigation.move_to(path[0], speed * delta, delta, 23.0)
 		return
 	if collects_money:
 		_cash_tick(delta)
 		return
 	if returning:
+		if not home_area().has_point(position):
+			park_home(delta)
+			deposit_elapsed = 0.0
+			return
 		# The return path ends inside the drone's home building.
 		deposit_elapsed += delta
 		_update_status()
@@ -133,6 +152,52 @@ func _has_block(cell: Vector2i) -> bool:
 	return world.block_cells.has(cell) and is_instance_valid(world.block_cells[cell]) and not world.block_cells[cell].is_queued_for_deletion()
 
 
+func home_area() -> Rect2:
+	return world.building_rect(collector_index).grow(-COLLISION_RADIUS - 1.0)
+
+
+func park_home(delta: float) -> void:
+	move_into_area(home_area(), delta)
+
+
+func move_into_area(area: Rect2, delta: float) -> void:
+	# Anywhere within the footprint is a valid parking position.
+	if area.has_point(position):
+		parking_remaining = 0.0
+		return
+	parking_remaining -= delta
+	if parking_remaining > 0.0 and area.has_point(parking_goal):
+		navigation.move_to(parking_goal, speed * delta, delta, 1.0)
+		return
+	parking_remaining = 0.4 + float(get_instance_id() % 7) * 0.02
+	if position.distance_to(position.clamp(area.position, area.end)) > 96.0:
+		parking_goal = area.get_center()
+		navigation.move_to(parking_goal, speed * delta, delta, 1.0)
+		return
+	# Leave room for navigation-grid rounding at the footprint boundary.
+	area = area.grow(-4.0)
+	var nearest := position.clamp(area.position, area.end - Vector2.ONE * 0.01)
+	var best := nearest
+	var score := INF
+	var neighbors: Array[Node2D] = world._live_combat_drones("friendly_drones")
+	neighbors.append_array(world._live_combat_drones("enemy_drones"))
+	# Search around the nearest point for a free gap, without assigning slots.
+	for ring in 7:
+		for direction in 24:
+			var candidate := (nearest + Vector2.from_angle(direction * TAU / 24.0) * ring * 12.0).clamp(area.position, area.end - Vector2.ONE * 0.01)
+			var candidate_score := position.distance_squared_to(candidate)
+			for neighbor in neighbors:
+				if neighbor == self:
+					continue
+				var overlap := maxf(0.0, COLLISION_RADIUS * 2.0 + 1.0 - candidate.distance_to(neighbor.position))
+				candidate_score += overlap * overlap * 100.0
+			if candidate_score < score:
+				score = candidate_score
+				best = candidate
+	parking_goal = best
+	navigation.move_to(best, speed * delta, delta, 1.0)
+
+
 func _exit_tree() -> void:
 	if is_instance_valid(target):
 		target.release_drone(self)
@@ -142,6 +207,16 @@ func _plan(go_home: bool) -> void:
 	if is_instance_valid(target):
 		target.release_drone(self)
 	target = null
+	if not go_home and carried == 0 and empty_revision == world.navigation_revision and empty_jobs == world.mining_assignment_revision and empty_power == mining_power:
+		return
+	if not go_home and not world.has_mining_job(mining_power):
+		if carried > 0:
+			_plan(true)
+		else:
+			empty_revision = world.navigation_revision
+			empty_jobs = world.mining_assignment_revision
+			empty_power = mining_power
+		return
 	# Flood the reachable free grid; record paths and exposed mining faces.
 	var start := Vector2i((position / world.CELL).round())
 	var at_base: bool = collector_index == world.BASE_HOME
@@ -182,7 +257,15 @@ func _plan(go_home: bool) -> void:
 	if not found:
 		if carried > 0 and not go_home:
 			_plan(true)
+		elif not go_home:
+			empty_revision = world.navigation_revision
+			empty_jobs = world.mining_assignment_revision
+			empty_power = mining_power
 		return
+	if not go_home and is_instance_valid(candidate):
+		# Reserve before departure, not only after reaching the mining face.
+		if not candidate.claim_for_drone(self):
+			return
 	path.clear()
 	var step := destination
 	while step != start:
@@ -243,6 +326,11 @@ func _cash_tick(delta: float) -> void:
 			cash_source = -1
 			deposit_elapsed = 0.0
 			_update_status()
+			return
+		var pickup_area: Rect2 = world.building_rect(cash_source).grow(-COLLISION_RADIUS - 1.0)
+		if not pickup_area.has_point(position):
+			deposit_elapsed = 0.0
+			move_into_area(pickup_area, delta)
 			return
 		deposit_elapsed += delta
 		_update_status()

@@ -47,6 +47,10 @@ func _run() -> void:
 	drone.carried = 0
 	drone._plan(false)
 	assert(is_instance_valid(drone.target) and drone.target.hardness == 2)
+	# Workplaces are now reserved before arrival; the player cannot steal one.
+	if hard.mining_drone == drone:
+		assert(not hard.mine(10.0, true, null, 2))
+		hard.release_drone(drone)
 	assert(hard.mine(10.0, true, null, 2))
 	print("PASS: all hardness rings, player/drone strength 1, hard block rejection, drone filtering and partial-load return")
 	world.queue_free()

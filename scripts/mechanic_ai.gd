@@ -60,8 +60,7 @@ func tick(delta: float) -> void:
 		elapsed = 0.0
 	if next == null:
 		elapsed = 0.0
-		var home: Vector2 = Vector2(actor.world.buildings[actor.collector_index].anchor) * actor.world.CELL
-		actor.position = actor.position.move_toward(home, actor.speed * delta)
+		actor.park_home(delta)
 		actor._update_status()
 		return
 	var destination: Vector2
@@ -73,9 +72,14 @@ func tick(delta: float) -> void:
 		destination = actor.position.clamp(area.position, area.end)
 	else:
 		destination = next.position
-	var travel := maxf(0.0, actor.position.distance_to(destination) - 10.0)
+	var reach: float = 10.0 if next == actor.world or next.is_tower else actor.COLLISION_RADIUS + next.COLLISION_RADIUS + 4.0
+	var travel := maxf(0.0, actor.position.distance_to(destination) - reach)
 	var step := minf(travel, actor.speed * delta)
-	actor.position = actor.position.move_toward(destination, step)
+	actor.navigation.move_to(destination, step, delta, reach)
+	if actor.position.distance_to(destination) > reach + 0.001:
+		elapsed = 0.0
+		actor._update_status()
+		return
 	if travel > step + 0.001:
 		elapsed = 0.0
 		actor._update_status()

@@ -22,8 +22,7 @@ func _alive(node) -> bool:
 func will_move() -> bool:
 	if _alive(actor.combat_target):
 		return actor.position.distance_to(actor.combat_target.position) > 20.001
-	var home: Vector2 = Vector2(actor.world.buildings[actor.collector_index].anchor) * actor.world.CELL
-	return not actor.position.is_equal_approx(home)
+	return not actor.home_area().has_point(actor.position)
 
 
 func tick(delta: float) -> void:
@@ -31,12 +30,11 @@ func tick(delta: float) -> void:
 		return
 	if not _alive(actor.combat_target):
 		set_target(null)
-		if not actor.hostile:
+		if not actor.hostile and not actor.world._live_combat_drones("enemy_drones").is_empty():
 			actor.world._assign_combat_targets()
 	if not actor.hostile and not _alive(actor.combat_target):
 		contact_time = 0.0
-		var home: Vector2 = Vector2(actor.world.buildings[actor.collector_index].anchor) * actor.world.CELL
-		actor.position = actor.position.move_toward(home, actor.speed * delta)
+		actor.park_home(delta)
 		return
 	var attacking_base: bool = actor.hostile and not _alive(actor.combat_target)
 	var destination: Vector2

@@ -33,6 +33,7 @@ var enemy_count_label: Label
 var wave_timer: ProgressBar
 var wave_pause_button: Button
 var combat_assignment_time := 0.0
+var combat_reassign_pending := false
 var was_in_base := true
 enum BuildMode { PLAY, MENU, PLACE, SKILLS }
 const SKILLS := [
@@ -93,6 +94,7 @@ var mouse_held := false
 var camera_drag_held := false
 var right_press_building := -1
 var building_context: PanelContainer
+var drone_collisions: Node
 var mouse_dragging := false
 var mouse_travel := Vector2.ZERO
 var mouse_placement := false
@@ -101,6 +103,10 @@ var mouse_goal_active := false
 var mouse_goal := Vector2.ZERO
 var mouse_repath_timer := 0.0
 var navigation_revision := 0
+var mining_assignment_revision := 0
+var mining_job_cache: Dictionary = {}
+var mining_cache_revision := -1
+var mining_cache_assignments := -1
 var mouse_path_revision := -1
 var mouse_direct_follow := false
 var mouse_hold_time := 0.0
@@ -134,6 +140,9 @@ func _ready() -> void:
 	build_preview.z_index = 50
 	add_child(build_preview)
 	_create_hud()
+	drone_collisions = preload("res://scripts/drone_collisions.gd").new()
+	drone_collisions.world = self
+	add_child(drone_collisions)
 
 
 func _physics_process(delta: float) -> void:
@@ -646,11 +655,20 @@ func spawn_enemy_wave() -> void:
 
 func _on_enemy_destroyed(number: int) -> void:
 	wave_alive[number] -= 1
+	var before := cleared_waves
 	while wave_alive.has(cleared_waves + 1) and wave_alive[cleared_waves + 1] == 0:
 		cleared_waves += 1
-	_update_build_ui()
+	if cleared_waves != before:
+		_update_build_ui()
 	_update_drone_count()
-	_assign_combat_targets.call_deferred()
+	if not combat_reassign_pending:
+		combat_reassign_pending = true
+		_flush_combat_reassignment.call_deferred()
+
+
+func _flush_combat_reassignment() -> void:
+	combat_reassign_pending = false
+	_assign_combat_targets()
 
 
 func _base_distance(point: Vector2) -> float:
@@ -1269,6 +1287,24 @@ func _on_block_collected(by_player: bool = true) -> void:
 		return
 	collected_count += 1
 	_update_counters()
+
+
+func _mining_jobs_changed() -> void:
+	mining_assignment_revision += 1
+
+
+func has_mining_job(power: int) -> bool:
+	if mining_cache_revision != navigation_revision or mining_cache_assignments != mining_assignment_revision:
+		mining_job_cache.clear()
+		mining_cache_revision = navigation_revision
+		mining_cache_assignments = mining_assignment_revision
+	if not mining_job_cache.has(power):
+		mining_job_cache[power] = false
+		for block in block_cells.values():
+			if is_instance_valid(block) and not block.is_queued_for_deletion() and not block.depleted and block.hardness <= power and not is_instance_valid(block.mining_drone):
+				mining_job_cache[power] = true
+				break
+	return mining_job_cache[power]
 
 
 func _set_wave_timer_paused(value: bool) -> void:
