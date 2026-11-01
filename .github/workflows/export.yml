@@ -1,0 +1,49 @@
+name: Export Windows release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+env:
+  # Keep the editor and export templates on the same version.
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  export-windows:
+    name: Build and upload Windows executable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          lfs: true
+
+      - name: Export Windows Desktop
+        id: export
+        uses: firebelley/godot-export@v8.0.0
+        with:
+          godot_executable_download_url: https://github.com/godotengine/godot-builds/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_linux.x86_64.zip
+          godot_export_templates_download_url: https://github.com/godotengine/godot-builds/releases/download/${{ env.GODOT_VERSION }}-stable/Godot_v${{ env.GODOT_VERSION }}-stable_export_templates.tpz
+          relative_project_path: ./
+          presets_to_export: Windows Desktop
+          export_debug: false
+          cache: true
+
+      - name: Attach executable to existing release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          BUILD_DIRECTORY: ${{ steps.export.outputs.build_directory }}
+        shell: bash
+        run: |
+          mapfile -d '' executables < <(find "$BUILD_DIRECTORY" -type f -name '*.exe' -print0)
+          if [ "${#executables[@]}" -eq 0 ]; then
+            echo "No Windows executable was exported." >&2
+            exit 1
+          fi
+          gh release upload "$RELEASE_TAG" "${executables[@]}" --clobber
