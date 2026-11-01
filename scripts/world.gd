@@ -16,6 +16,10 @@ var is_game_over := false
 var game_over_screen: CanvasLayer
 var play_button: Button
 var pause_button: Button
+const GAME_SPEEDS := [1.0, 1.5, 2.0, 3.0]
+var game_speed_index := 0
+var speed_button: Button
+var normal_physics_rate := Engine.physics_ticks_per_second
 var main_menu_button: Button
 var return_dialog_open := false
 @export_range(0, 100000, 1) var collector_cost: int = 30
@@ -103,6 +107,7 @@ var mouse_hold_time := 0.0
 
 
 func _ready() -> void:
+	Engine.time_scale = 1.0
 	base_health = base_max_health
 	RenderingServer.set_default_clear_color(Color("151e28"))
 	# The existing base occupies all nine central cells, but stays walkable.
@@ -1067,6 +1072,14 @@ func _create_hud() -> void:
 	pause_button.focus_mode = Control.FOCUS_NONE
 	playback.add_child(pause_button)
 	pause_button.pressed.connect(_set_paused.bind(true))
+	speed_button = Button.new()
+	speed_button.name = "Speed"
+	speed_button.text = "1×"
+	speed_button.tooltip_text = "Spieltempo wechseln: 1× → 1,5× → 2× → 3×"
+	speed_button.custom_minimum_size = Vector2(60, 40)
+	speed_button.focus_mode = Control.FOCUS_NONE
+	playback.add_child(speed_button)
+	speed_button.pressed.connect(_cycle_game_speed)
 	_update_pause_controls()
 	wave_timer = preload("res://scripts/wave_timer.gd").new()
 	wave_timer.name = "WaveTimer"
@@ -1255,6 +1268,22 @@ func _set_wave_timer_paused(value: bool) -> void:
 	wave_pause_button.tooltip_text = "Wellentimer fortsetzen" if value else "Wellentimer anhalten"
 
 
+func _cycle_game_speed() -> void:
+	if is_game_over or return_dialog_open:
+		return
+	game_speed_index = (game_speed_index + 1) % GAME_SPEEDS.size()
+	var speed: float = GAME_SPEEDS[game_speed_index]
+	Engine.time_scale = speed
+	# Keep simulation steps equally small at higher speed.
+	Engine.physics_ticks_per_second = roundi(normal_physics_rate * speed)
+	speed_button.text = ["1×", "1,5×", "2×", "3×"][game_speed_index]
+
+
+func _exit_tree() -> void:
+	Engine.time_scale = 1.0
+	Engine.physics_ticks_per_second = normal_physics_rate
+
+
 func _set_paused(value: bool) -> void:
 	if is_game_over or (return_dialog_open and not value):
 		return
@@ -1270,6 +1299,7 @@ func _set_paused(value: bool) -> void:
 func _update_pause_controls() -> void:
 	play_button.disabled = is_game_over or return_dialog_open or not get_tree().paused
 	pause_button.disabled = is_game_over or return_dialog_open or get_tree().paused
+	speed_button.disabled = is_game_over or return_dialog_open
 	if is_instance_valid(main_menu_button):
 		main_menu_button.disabled = is_game_over or return_dialog_open
 	if is_instance_valid(wave_pause_button):
