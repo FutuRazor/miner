@@ -77,7 +77,7 @@ func tick(delta: float) -> void:
 		if attacking_base:
 			actor.world.damage_base(1)
 		elif _alive(actor.combat_target):
-			actor.combat_target.take_damage(1, actor)
+			actor.combat_target.take_damage(actor.attack_damage, actor)
 		else:
 			set_target(null)
 			break

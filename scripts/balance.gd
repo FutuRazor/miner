@@ -9,6 +9,7 @@ const PRICES := {
 	"collector_drones": [80, 200, 400], "barracks_drones": [60, 140, 260],
 	"collector_speed": [25, 45, 75, 120, 180], "collector_capacity": [20, 40, 75, 120],
 	"cash_drone": [25, 75], "barracks_health": [30, 55, 90, 140, 210],
+	"barracks_attack": [250],
 	"tower_health": [25, 45, 80, 130], "tower_shots": [100, 250],
 	"tower_rate": [40, 70, 110, 170, 250], "base_health": [40, 80, 140, 220],
 	"workshop_drones": [200, 350], "workshop_repair": [200, 400], "workshop_speed": [60, 80, 140],
@@ -26,6 +27,7 @@ static func is_defense_skill(id: String) -> bool:
 
 static func upgrade_limit(id: String, tier: int) -> int:
 	match id:
+		"barracks_attack": return 1 if tier >= 3 else 0
 		"workshop_drones", "workshop_repair": return maxi(0, tier - 1)
 		"workshop_speed": return tier
 		"mining_level": return 9

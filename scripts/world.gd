@@ -44,8 +44,7 @@ const SKILLS := [
 	{"id": "collector_capacity", "group": "Sammler", "name": "Kapazität erhöhen", "cost": 20, "icon": "res://assets/icons/collector.svg", "description": "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 5."},
 	{"id": "barracks_drones", "group": "Kaserne", "name": "Drohne", "cost": 60, "icon": "res://assets/icons/drone.svg", "description": "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."},
 	{"id": "barracks_health", "group": "Kaserne", "name": "Lebenspunkte", "cost": 30, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."},
-	{"group": "Kaserne", "name": "Angriff", "placeholder": true, "icon": "res://assets/icons/skills.svg", "description": "Geplant: Angriff verbessern."},
-	{"group": "Kaserne", "name": "Verteidigung", "placeholder": true, "icon": "res://assets/icons/skills.svg", "description": "Geplant: Verteidigung verbessern."},
+	{"id": "barracks_attack", "group": "Kaserne", "name": "Angriff", "cost": 250, "icon": "res://assets/icons/skills.svg", "description": "Erhöht den Schaden aller bestehenden, neuen und nachproduzierten Kasernen-Drohnen von 1 auf 2 je Treffer. Einmalig nach Welle 13 kaufbar."},
 	{"id": "tower_health", "group": "Turm", "name": "Lebenspunkte", "cost": 25, "icon": "res://assets/icons/skills.svg", "description": "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 20."},
 	{"id": "tower_shots", "group": "Turm", "name": "Anzahl Schüsse", "cost": 100, "icon": "res://assets/icons/tower.svg", "description": "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."},
 	{"id": "tower_rate", "group": "Turm", "name": "Schussrate", "cost": 40, "icon": "res://assets/icons/tower.svg", "description": "Verkürzt die Zeit zwischen den Salven aller Türme um 10 %. Millisekunden werden auf ganze Zahlen abgerundet."},
@@ -64,6 +63,7 @@ var collector_mining_speed: int = 100
 var collector_capacity: int = 10
 var barracks_drone_count := 2
 var barracks_drone_health := 30
+var barracks_attack := 1
 var tower_health := 100
 var tower_shots := 1
 var tower_interval_ms := 1000
@@ -499,6 +499,13 @@ func _confirm_skill() -> void:
 		collector_capacity += 5
 		_refresh_collector_stats()
 		_update_counters()
+	elif id == "barracks_attack" and money >= skill.cost:
+		money -= skill.cost
+		barracks_attack = 2
+		for child in get_children():
+			if child.get_script() == Drone and child.passive and not child.is_queued_for_deletion():
+				child.attack_damage = barracks_attack
+		_update_counters()
 	elif skill.get("id", "") == "barracks_health" and money >= skill.cost:
 		money -= skill.cost
 		barracks_drone_health += 10
@@ -558,6 +565,7 @@ func _spawn_collector_drone(index: int) -> void:
 		drone.passive = true
 		drone.tint = BUILDING_COLORS[1]
 		drone.max_health = barracks_drone_health
+		drone.attack_damage = barracks_attack
 	elif building.kind == 3:
 		drone.mechanic = true
 		drone.tint = BUILDING_COLORS[3]
@@ -980,6 +988,9 @@ func _update_build_ui() -> void:
 			elif skill.get("id", "") == "barracks_health":
 				skill.current_effect = "%d maximale Lebenspunkte" % barracks_drone_health
 				skill.next_effect = "%d maximale Lebenspunkte" % (barracks_drone_health + 10)
+			elif id == "barracks_attack":
+				skill.current_effect = "%d Schaden je Treffer" % barracks_attack
+				skill.next_effect = "2 Schaden je Treffer"
 			elif skill.get("id", "") == "tower_health":
 				skill.current_effect = "%d maximale Lebenspunkte" % tower_health
 				skill.next_effect = "%d maximale Lebenspunkte" % (tower_health + 20)
@@ -1001,7 +1012,7 @@ func _update_build_ui() -> void:
 		for skill in skills:
 			if skill.get("lock_reason", "") == "Maximum erreicht":
 				skill.next_effect = "Maximum erreicht"
-		build_options.configure("SKILL-TREE", skills, selected_skill, money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nWeitere Einträge sind Platzhalter · J / Esc: schließen")
+		build_options.configure("SKILL-TREE", skills, selected_skill, money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen")
 		return
 	if build_mode == BuildMode.MENU:
 		var items: Array = []

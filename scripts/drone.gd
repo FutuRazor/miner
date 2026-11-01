@@ -4,6 +4,7 @@ signal destroyed
 
 @export var max_health: int = 30
 var health := 30
+var attack_damage := 1
 var dead := false
 @export var speed: float = 100.0
 @export var capacity: int = 10

@@ -93,12 +93,12 @@ func _run() -> void:
 		assert(world._skill_block_reason("collector_speed").is_empty())
 	world.skill_levels.erase("base_health")
 	world.skill_levels.erase("collector_speed")
-	_buy(world, 11)
-	_buy(world, 11)
-	_buy(world, 11)
+	_buy(world, 10)
+	_buy(world, 10)
+	_buy(world, 10)
 	assert(tower.shots == 3)
 	for purchase in 6:
-		_buy(world, 12)
+		_buy(world, 11)
 	assert(tower.fire_interval_ms == 590)
 	for purchase in 10:
 		_buy(world, 1)

@@ -92,22 +92,22 @@ func _run() -> void:
 	assert(defender.health == 22)
 	assert(world._skill_block_reason("workshop_drones") == "Freischaltung nach Welle 9")
 	world.cleared_waves = 8
+	_buy(world, 12)
 	_buy(world, 13)
-	_buy(world, 14)
 	assert(world.workshop_drone_count == 1 and world.workshop_repair == 1)
 	world.cleared_waves = 9
+	_buy(world, 12)
 	_buy(world, 13)
-	_buy(world, 14)
 	assert(world.workshop_drone_count == 2 and world.workshop_repair == 2)
 	assert(world.buildings[0].pending_drones == 1)
 	world._tick_production(20.0)
 	assert(world._live_combat_drones("friendly_drones").filter(func(drone: Node2D) -> bool: return drone.mechanic).size() == 2)
 	assert(world._skill_block_reason("workshop_drones") == "Freischaltung nach Welle 14")
 	world.cleared_waves = 14
+	_buy(world, 12)
 	_buy(world, 13)
-	_buy(world, 14)
 	for purchase in 4:
-		_buy(world, 15)
+		_buy(world, 14)
 	assert(world.workshop_speed == 160 and mechanic.speed == 160)
 	assert(world.workshop_drone_count == 3 and world.workshop_repair == 3)
 	assert(world._skill_block_reason("workshop_repair") == "Maximum erreicht")

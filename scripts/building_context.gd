@@ -107,7 +107,7 @@ func _refresh() -> void:
 	if building.kind == 0:
 		text += "\nGuthaben: %d Geld\nTempo: %d · Abbau: %d %%\nKapazität: %d · Abbaustufe: %d" % [building.money, world.collector_move_speed, world.collector_mining_speed, world.collector_capacity, world.mining_level]
 	elif building.kind == 1:
-		text += "\nDrohnen-LP: %d" % world.barracks_drone_health
+		text += "\nDrohnen-LP: %d\nSchaden je Treffer: %d" % [world.barracks_drone_health, world.barracks_attack]
 	elif building.kind == 3:
 		text += "\nReparatur: %d LP/s je Drohne\nTempo: %d\nPriorität: Basis → Türme → Kampfdrohnen" % [world.workshop_repair, world.workshop_speed]
 	elif building.has("tower") and is_instance_valid(building.tower):
