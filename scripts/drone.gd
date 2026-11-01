@@ -252,7 +252,7 @@ func _cash_tick(delta: float) -> void:
 	var highest := 0
 	for index in world.buildings.size():
 		var building: Dictionary = world.buildings[index]
-		if building.kind != 0 or building.money <= highest or _cash_source_reserved(index):
+		if building.get("destroyed", false) or building.kind != 0 or building.money <= highest or _cash_source_reserved(index):
 			continue
 		var route := _cash_route(index)
 		if not route.is_empty():

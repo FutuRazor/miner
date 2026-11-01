@@ -81,6 +81,8 @@ const ZOOM_STEP := 1.1
 const WALK_DIRECTIONS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 var mouse_held := false
 var camera_drag_held := false
+var right_press_building := -1
+var building_context: PanelContainer
 var mouse_dragging := false
 var mouse_travel := Vector2.ZERO
 var mouse_placement := false
@@ -201,6 +203,15 @@ func _unhandled_input(event: InputEvent) -> void:
 			mouse_dragging = false
 		get_viewport().set_input_as_handled()
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT:
+		var clicked_building := building_at(get_global_transform_with_canvas().affine_inverse() * event.position)
+		if event.pressed:
+			right_press_building = clicked_building if build_mode != BuildMode.PLACE else -1
+		elif camera_drag_held and not mouse_dragging and right_press_building >= 0 and right_press_building == clicked_building:
+			camera_drag_held = false
+			building_context.open(right_press_building)
+			right_press_building = -1
+			get_viewport().set_input_as_handled()
+			return
 		var close_menu: bool = not event.pressed and camera_drag_held and not mouse_dragging and build_mode != BuildMode.PLAY
 		camera_drag_held = event.pressed
 		mouse_held = false
@@ -662,7 +673,7 @@ func _place_building() -> void:
 	var cost := _building_cost(selected_building)
 	if not _can_build(anchor) or money < cost or _building_count(selected_building) >= _building_limit(selected_building):
 		return
-	buildings.append({"anchor": anchor, "kind": selected_building, "money": 0, "construction": Balance.BUILD_SECONDS[selected_building], "pending_drones": 0, "production": 0.0})
+	buildings.append({"anchor": anchor, "kind": selected_building, "money": 0, "construction": Balance.BUILD_SECONDS[selected_building], "pending_drones": 0, "production": 0.0, "paid_cost": cost})
 	var index := buildings.size() - 1
 	var status := Label.new()
 	status.position = Vector2(anchor) * CELL + Vector2(-20, -68)
@@ -679,9 +690,9 @@ func _place_building() -> void:
 
 
 func _finish_building(index: int) -> void:
-	var selected_building: int = buildings[index].kind
+	var building_kind: int = buildings[index].kind
 	var anchor: Vector2i = buildings[index].anchor
-	if selected_building == 0:
+	if building_kind == 0:
 		var label := Label.new()
 		label.position = Vector2(anchor) * CELL + Vector2(-20, -48)
 		label.z_as_relative = false
@@ -692,10 +703,10 @@ func _finish_building(index: int) -> void:
 		update_collector_label(index)
 		for drone in collector_drone_count:
 			_spawn_collector_drone(index)
-	elif selected_building == 1:
+	elif building_kind == 1:
 		for drone in barracks_drone_count:
 			_spawn_collector_drone(index)
-	elif selected_building == 2:
+	elif building_kind == 2:
 		var tower := preload("res://scripts/tower.gd").new()
 		tower.world = self
 		tower.building_index = index
@@ -717,6 +728,62 @@ func _on_tower_destroyed(index: int) -> void:
 		for x in 2:
 			occupied_cells.erase(anchor + Vector2i(x, y))
 	_update_build_ui()
+	queue_redraw()
+
+
+func building_rect(index: int) -> Rect2:
+	return Rect2(Vector2(buildings[index].anchor) * CELL - Vector2.ONE * CELL / 2.0, Vector2.ONE * CELL * 2.0)
+
+
+func building_at(point: Vector2) -> int:
+	for index in buildings.size():
+		if not buildings[index].get("destroyed", false) and building_rect(index).has_point(point):
+			return index
+	return -1
+
+
+func building_refund(index: int) -> int:
+	return floori(float(buildings[index].get("paid_cost", 0)) * 0.75)
+
+
+func sell_building(index: int) -> void:
+	if is_game_over or return_dialog_open or index < 0 or index >= buildings.size() or buildings[index].get("destroyed", false):
+		return
+	var building := buildings[index]
+	# Keep indices stable: removed buildings remain as inactive records.
+	building.destroyed = true
+	money += building_refund(index) + int(building.money)
+	building.money = 0
+	building.pending_drones = 0
+	for child in get_children():
+		if child.get_script() != Drone:
+			continue
+		if child.collector_index == index and not child.is_queued_for_deletion():
+			money += child.carried * money_per_block
+			if is_instance_valid(child.target):
+				child.target.release_drone(child)
+				child.target = null
+			child.dead = true
+			child.queue_free()
+		elif child.collects_money and child.cash_source == index:
+			child.cash_source = -1
+			child.path.clear()
+			child.deposit_elapsed = 0.0
+			child.retry_time = 0.0
+	if building.has("tower") and is_instance_valid(building.tower):
+		building.tower.dead = true
+		building.tower.queue_free()
+	for key in ["label", "status"]:
+		if building.has(key) and is_instance_valid(building[key]):
+			building[key].queue_free()
+	for y in 2:
+		for x in 2:
+			occupied_cells.erase(building.anchor + Vector2i(x, y))
+	building_context.close()
+	_update_drone_count()
+	_update_counters()
+	_update_build_ui()
+	_assign_combat_targets()
 	queue_redraw()
 
 
@@ -791,7 +858,7 @@ func _skill_block_reason(id: String) -> String:
 
 
 func _queue_drone(index: int) -> void:
-	if is_game_over:
+	if is_game_over or buildings[index].get("destroyed", false):
 		return
 	# Unfinished buildings receive their full current complement at completion.
 	if buildings[index].construction > 0.0:
@@ -931,6 +998,9 @@ func _create_hud() -> void:
 	layer.name = "GameUI"
 	layer.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(layer)
+	building_context = preload("res://scripts/building_context.gd").new()
+	building_context.world = self
+	layer.add_child(building_context)
 	var playback := HBoxContainer.new()
 	playback.name = "PlaybackControls"
 	playback.position = Vector2(20, 20)
@@ -1064,7 +1134,7 @@ func _create_hud() -> void:
 	deposit_help.text = "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
 	rows.add_child(deposit_help)
 	var build_help := Label.new()
-	build_help.text = "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nMausrad: Karte zoomen"
+	build_help.text = "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nRechtsklick auf Gebäude: Infos / Abreißen\nMausrad: Karte zoomen"
 	rows.add_child(build_help)
 	build_panel = PanelContainer.new()
 	layer.add_child(build_panel)
@@ -1203,7 +1273,7 @@ func _update_counters() -> void:
 func _draw() -> void:
 	draw_rect(Rect2(-120, -120, 240, 240), Color("293c49"))
 	for line in range(-2, 4):
-		var offset := line * CELL - CELL / 2
+		var offset := line * CELL - CELL / 2.0
 		draw_line(Vector2(offset, -120), Vector2(offset, 120), Color("344b58"))
 		draw_line(Vector2(-120, offset), Vector2(120, offset), Color("344b58"))
 	draw_rect(BASE_AREA, Color("365665"))
