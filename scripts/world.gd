@@ -74,6 +74,9 @@ var build_options: VBoxContainer
 var build_status: Label
 var build_preview: Node2D
 const DRAG_THRESHOLD := 8.0
+const MIN_ZOOM := 0.3
+const MAX_ZOOM := 3.0
+const ZOOM_STEP := 1.1
 @export_range(0.1, 1.0, 0.05) var mouse_hold_threshold: float = 0.3
 const WALK_DIRECTIONS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 var mouse_held := false
@@ -162,6 +165,18 @@ func _collect_sampler_money() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if is_game_over or return_dialog_open:
 		return
+	if event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]:
+		# ScrollContainers can pass wheel events through at either end. They
+		# still belong to the UI whenever the cursor is over a UI control.
+		var hovered := get_viewport().gui_get_hovered_control()
+		if is_instance_valid(hovered) and get_node("GameUI").is_ancestor_of(hovered):
+			get_viewport().set_input_as_handled()
+			return
+		if event.pressed:
+			var direction := 1.0 if event.button_index == MOUSE_BUTTON_WHEEL_UP else -1.0
+			_zoom_camera(direction * (event.factor if event.factor > 0.0 else 1.0), event.position)
+		get_viewport().set_input_as_handled()
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		if not event.pressed and suppress_left_release:
 			suppress_left_release = false
@@ -203,6 +218,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif mouse_dragging:
 			camera.position -= event.relative / camera.zoom
 		get_viewport().set_input_as_handled()
+
+
+func _zoom_camera(steps: float, screen_position: Vector2) -> void:
+	var camera: Camera2D = $Player/Camera2D
+	var zoom_value := clampf(camera.zoom.x * pow(ZOOM_STEP, steps), MIN_ZOOM, MAX_ZOOM)
+	if is_equal_approx(zoom_value, camera.zoom.x):
+		return
+	var world_before := get_canvas_transform().affine_inverse() * screen_position
+	# Preserve the visible center even while camera follow smoothing is active.
+	camera.global_position = camera.get_screen_center_position()
+	camera.zoom = Vector2.ONE * zoom_value
+	camera.reset_smoothing()
+	camera.force_update_scroll()
+	var world_after := get_canvas_transform().affine_inverse() * screen_position
+	camera.global_position += world_before - world_after
+	camera.reset_smoothing()
+	camera.force_update_scroll()
+	if build_mode == BuildMode.PLACE:
+		_update_build_ui()
 
 
 func _set_mouse_goal(goal: Vector2) -> void:
@@ -1030,7 +1064,7 @@ func _create_hud() -> void:
 	deposit_help.text = "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
 	rows.add_child(deposit_help)
 	var build_help := Label.new()
-	build_help.text = "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben"
+	build_help.text = "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nMausrad: Karte zoomen"
 	rows.add_child(build_help)
 	build_panel = PanelContainer.new()
 	layer.add_child(build_panel)

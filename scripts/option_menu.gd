@@ -24,6 +24,7 @@ func _ready() -> void:
 	add_child(heading)
 	entries.add_theme_constant_override("separation", 6)
 	entry_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	entry_scroll.mouse_force_pass_scroll_events = false
 	entry_scroll.custom_minimum_size.x = 310
 	add_child(entry_scroll)
 	entries.size_flags_horizontal = Control.SIZE_EXPAND_FILL

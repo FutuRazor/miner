@@ -34,7 +34,7 @@ func _input(event: InputEvent) -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not get_tree().paused or world.is_game_over or world.return_dialog_open:
 		return
-	var camera_gesture: bool = (event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_RIGHT) or (event is InputEventMouseMotion and world.camera_drag_held)
+	var camera_gesture: bool = (event is InputEventMouseButton and event.button_index in [MOUSE_BUTTON_RIGHT, MOUSE_BUTTON_WHEEL_UP, MOUSE_BUTTON_WHEEL_DOWN]) or (event is InputEventMouseMotion and world.camera_drag_held)
 	var placement: bool = world.build_mode == world.BuildMode.PLACE and world.mouse_placement
 	var placement_release: bool = event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and world.suppress_left_release
 	if camera_gesture or placement or placement_release:
