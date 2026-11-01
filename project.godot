@@ -12,6 +12,8 @@ config_version=5
 
 config/name="Miner"
 run/main_scene="res://scenes/start_menu.tscn"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="FutuRazor/Miner"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 run/max_fps=60
 config/icon="res://icon.svg"
