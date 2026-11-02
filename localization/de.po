@@ -202,7 +202,7 @@ msgstr "Abbaustufe 3 ist verfügbar. Besiege die erste Welle."
 msgid "Abbaustufe 3 später im Tutorial"
 msgstr "Abbaustufe 3 später im Tutorial"
 
-#: scripts/victory.gd:13
+#: scripts/game_over.gd:18
 msgid "Abgebaute Sektoren: %d Blöcke"
 msgstr "Abgebaute Sektoren: %d Blöcke"
 
@@ -414,7 +414,7 @@ msgstr "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 25."
 msgid "Erhöhung der Abbaustufe verfügbar"
 msgstr "Erhöhung der Abbaustufe verfügbar"
 
-#: scenes/victory.tscn:56
+#: scenes/game_over.tscn:49 scenes/victory.tscn:56
 msgid "Erneut versuchen"
 msgstr "Erneut versuchen"
 
@@ -470,7 +470,7 @@ msgstr "Gesammelt"
 msgid "Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d"
 msgstr "Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d"
 
-#: scripts/victory.gd:14
+#: scripts/game_over.gd:19
 msgid "Gesamteinnahmen: $%d"
 msgstr "Gesamteinnahmen: $%d"
 
@@ -493,10 +493,6 @@ msgstr "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld d
 #: scripts/world.gd:1134
 msgid "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände."
 msgstr "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände."
-
-#: scenes/game_over.tscn:47
-msgid "Hauptmenü"
-msgstr "Hauptmenü"
 
 #: scripts/game_ui.gd:151 scripts/meta_stats_screen.gd:114
 msgid "Hauptmenü konnte nicht geladen werden: %s"
@@ -594,17 +590,13 @@ msgstr "Menü einklappen"
 msgid "Nein"
 msgstr "Nein"
 
-#: scripts/victory.gd:12
+#: scripts/game_over.gd:17
 msgid "Neutralisierte Gegner: %d"
 msgstr "Neutralisierte Gegner: %d"
 
 #: scripts/menu_info.gd:54
 msgid "Noch keine Beschreibung verfügbar."
 msgstr "Noch keine Beschreibung verfügbar."
-
-#: scenes/game_over.tscn:41
-msgid "Noch mal"
-msgstr "Noch mal"
 
 #: scripts/world.gd:978
 msgid "Noch nicht verfügbar"
@@ -646,7 +638,7 @@ msgstr "Reparatur erhöhen"
 msgid "Reparatur: %d LP/s"
 msgstr "Reparatur: %d LP/s"
 
-#: scripts/victory.gd:11
+#: scripts/game_over.gd:16
 msgid "Rundendauer: %s"
 msgstr "Rundendauer: %s"
 
@@ -722,7 +714,7 @@ msgstr "Sprache"
 msgid "Später"
 msgstr "Später"
 
-#: scripts/game_over.gd:41
+#: scripts/game_over.gd:53
 msgid "Szene konnte nicht geladen werden: %s"
 msgstr "Szene konnte nicht geladen werden: %s"
 
@@ -794,6 +786,10 @@ msgstr "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und ha
 msgid "Weiterspielen"
 msgstr "Weiterspielen"
 
+#: scripts/game_over.gd:8
+msgid "Welle %d erreicht – Die Basis wurde zerstört."
+msgstr "Welle %d erreicht – Die Basis wurde zerstört."
+
 #: scenes/victory.tscn:39
 msgid "Welle 20 überlebt – Die Basis ist gesichert!"
 msgstr "Welle 20 überlebt – Die Basis ist gesichert!"
@@ -814,7 +810,7 @@ msgstr "Werkstatt"
 msgid "Zeit bis Welle %d · %d s%s"
 msgstr "Zeit bis Welle %d · %d s%s"
 
-#: scenes/victory.tscn:62 scripts/meta_stats_screen.gd:64 scripts/options_menu.gd:49 scripts/world.gd:1229
+#: scenes/game_over.tscn:55 scenes/victory.tscn:62 scripts/meta_stats_screen.gd:64 scripts/options_menu.gd:49 scripts/world.gd:1229
 msgid "Zurück zum Hauptmenü"
 msgstr "Zurück zum Hauptmenü"
 

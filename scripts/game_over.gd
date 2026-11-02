@@ -5,7 +5,19 @@ var switching := false
 
 func _ready() -> void:
 	$Screen/Center/Menu/Retry.grab_focus()
+	$Screen/Center/Menu/Subtitle.text = tr("Welle %d erreicht – Die Basis wurde zerstört.") % get_parent().spawned_waves
+	_show_round_stats()
 
+
+func _show_round_stats() -> void:
+	var world = get_parent()
+	var seconds := int(world.round_duration)
+	$Screen/Center/Menu/Stats.text = "\n".join([
+		tr("Rundendauer: %s") % ("%02d:%02d" % [seconds / 60, seconds % 60]),
+		tr("Neutralisierte Gegner: %d") % world.enemies_neutralized,
+		tr("Abgebaute Sektoren: %d Blöcke") % world.sectors_mined,
+		tr("Gesamteinnahmen: $%d") % world.total_revenue,
+	])
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:

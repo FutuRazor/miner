@@ -17,6 +17,11 @@ func _run() -> void:
 	assert(change_scene_to_file("res://scenes/main.tscn") == OK)
 	await _settle()
 	var world = current_scene
+	world.round_duration = 125.0
+	world.spawned_waves = 7
+	world.enemies_neutralized = 42
+	world.sectors_mined = 18
+	world.receive_income(123)
 	world.money = 77
 	world.mining_level = 3
 	world._set_build_mode(world.BuildMode.MENU)
@@ -28,6 +33,10 @@ func _run() -> void:
 	var overlay: CanvasLayer = world.game_over_screen
 	assert(overlay.layer == 100 and overlay.process_mode == Node.PROCESS_MODE_ALWAYS)
 	assert(overlay.get_node("Screen/Center/Menu/Retry").has_focus())
+	assert(not overlay.has_node("Screen/Center/Menu/Endless"))
+	assert("7" in overlay.get_node("Screen/Center/Menu/Subtitle").text)
+	var stats: String = overlay.get_node("Screen/Center/Menu/Stats").text
+	assert("02:05" in stats and "42" in stats and "18" in stats and "$123" in stats)
 	world.damage_base(20)
 	assert(world.game_over_screen == overlay)
 	var event := InputEventKey.new()

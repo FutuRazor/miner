@@ -474,9 +474,6 @@ msgstr "Size: 2 × 2 cells\nMining drones on completion: %d.\nStores credits ear
 msgid "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände."
 msgstr "Size: 2 × 2 cells · Maximum: one workshop\n%d mechanic drones · %d HP/s per drone\nPriority: Base, towers, stationary combat drones on their barracks grounds."
 
-#: scenes/game_over.tscn:47
-msgid "Hauptmenü"
-msgstr "Main menu"
 
 #: scripts/game_ui.gd:151 scripts/meta_stats_screen.gd:114
 msgid "Hauptmenü konnte nicht geladen werden: %s"
@@ -574,9 +571,6 @@ msgstr "No"
 msgid "Noch keine Beschreibung verfügbar."
 msgstr "No description available yet."
 
-#: scenes/game_over.tscn:41
-msgid "Noch mal"
-msgstr "Try again"
 
 #: scripts/world.gd:962
 msgid "Noch nicht verfügbar"
@@ -818,3 +812,6 @@ msgstr "Sectors Mined: %d blocks"
 
 msgid "Gesamteinnahmen: $%d"
 msgstr "Total Revenue: $%d"
+
+msgid "Welle %d erreicht – Die Basis wurde zerstört."
+msgstr "Wave %d reached – The base was destroyed."

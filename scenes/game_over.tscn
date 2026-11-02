@@ -34,17 +34,25 @@ theme_override_font_sizes/font_size = 44
 text = "Game Over"
 horizontal_alignment = 1
 
+[node name="Subtitle" type="Label" parent="Screen/Center/Menu"]
+layout_mode = 2
+horizontal_alignment = 1
+
+[node name="Stats" type="Label" parent="Screen/Center/Menu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+
 [node name="Retry" type="Button" parent="Screen/Center/Menu"]
 custom_minimum_size = Vector2(280, 54)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Noch mal"
+text = "Erneut versuchen"
 
 [node name="MainMenu" type="Button" parent="Screen/Center/Menu"]
 custom_minimum_size = Vector2(280, 54)
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "Hauptmenü"
+text = "Zurück zum Hauptmenü"
 
 [connection signal="pressed" from="Screen/Center/Menu/Retry" to="." method="_retry"]
 [connection signal="pressed" from="Screen/Center/Menu/MainMenu" to="." method="_main_menu"]
