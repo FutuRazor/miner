@@ -58,6 +58,8 @@ func mine(delta: float, by_player: bool = true, drone: Node = null, mining_power
 		var stats := get_node_or_null("/root/MetaStats")
 		if stats != null:
 			stats.record_block_step(hardness, depleted)
+		if depleted and get_parent().has_method("has_mission_limit"):
+			get_parent().sectors_mined += 1
 		collected.emit(by_player)
 		if depleted:
 			queue_free()

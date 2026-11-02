@@ -16,6 +16,16 @@ var base_drone_settings: Dictionary = {"anchor": Vector2i(-1, -1), "pending_dron
 var base_health := 100
 var base_health_label: Label
 var is_game_over := false
+var endless_freeplay := false
+var round_duration := 0.0
+var enemies_neutralized := 0
+var sectors_mined := 0
+var total_revenue := 0
+
+
+func has_mission_limit() -> bool:
+	return scene_file_path == "res://scenes/main.tscn" and not endless_freeplay
+
 var game_over_screen: CanvasLayer
 var play_button: Button
 var pause_button: Button
@@ -151,6 +161,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	# Physics delta includes the selected game speed; display real active play time.
+	round_duration += delta / Engine.time_scale
 	_tick_production(delta)
 	combat_assignment_time -= delta
 	if combat_assignment_time <= 0.0:
@@ -667,7 +679,7 @@ func _live_combat_drones(group: String) -> Array[Node2D]:
 
 
 func spawn_enemy_wave() -> void:
-	if is_game_over or get_tree().paused:
+	if is_game_over or get_tree().paused or (has_mission_limit() and spawned_waves >= 20):
 		return
 	var edge := (map_radius + 0.5) * CELL
 	spawned_waves += 1
@@ -694,12 +706,15 @@ func spawn_enemy_wave() -> void:
 
 
 func _on_enemy_destroyed(number: int) -> void:
+	enemies_neutralized += 1
 	wave_alive[number] -= 1
 	var before := cleared_waves
 	while wave_alive.has(cleared_waves + 1) and wave_alive[cleared_waves + 1] == 0:
 		cleared_waves += 1
 	if cleared_waves != before:
 		_update_build_ui()
+	if has_mission_limit() and cleared_waves >= 20:
+		_end_game(true)
 	_update_drone_count()
 	if not combat_reassign_pending:
 		combat_reassign_pending = true
@@ -907,6 +922,7 @@ func deposit_drone_blocks(index: int, amount: int) -> void:
 func receive_income(amount: int) -> void:
 	money += amount
 	if amount > 0:
+		total_revenue += amount
 		income_received.emit(amount)
 
 
@@ -1438,7 +1454,7 @@ func damage_base(amount: int) -> void:
 		_end_game()
 
 
-func _end_game() -> void:
+func _end_game(victory: bool = false) -> void:
 	if is_game_over:
 		return
 	is_game_over = true
@@ -1450,9 +1466,25 @@ func _end_game() -> void:
 	$Player.velocity = Vector2.ZERO
 	$Player.movement_enabled = false
 	$Player.mining_enabled = false
-	game_over_screen = preload("res://scenes/game_over.tscn").instantiate()
+	game_over_screen = preload("res://scenes/victory.tscn").instantiate() if victory else preload("res://scenes/game_over.tscn").instantiate()
 	add_child(game_over_screen)
 	get_tree().paused = true
+	_update_pause_controls()
+
+
+func continue_endless() -> void:
+	if not is_game_over or not is_instance_valid(game_over_screen):
+		return
+	endless_freeplay = true
+	is_game_over = false
+	game_over_screen.queue_free()
+	game_over_screen = null
+	$Player.movement_enabled = true
+	$Player.mining_enabled = true
+	wave_timer.remaining = wave_timer.INTERVAL
+	wave_timer.next_wave = spawned_waves + 1
+	wave_timer._refresh()
+	get_tree().paused = false
 	_update_pause_controls()
 
 

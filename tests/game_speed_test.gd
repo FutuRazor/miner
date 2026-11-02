@@ -25,6 +25,9 @@ func _run() -> void:
 		assert(Engine.time_scale == speeds[index])
 		assert(Engine.physics_ticks_per_second == roundi(initial_rate * speeds[index]))
 		assert(world.speed_button.text == labels[index])
+		var before: float = world.round_duration
+		world._physics_process(10.0 * speeds[index])
+		assert(is_equal_approx(world.round_duration - before, 10.0))
 	world._set_paused(true)
 	assert(world.speed_button.can_process())
 	world.speed_button.pressed.emit()

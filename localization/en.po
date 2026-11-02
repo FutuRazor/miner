@@ -793,3 +793,28 @@ msgstr "Open the blinking build menu in the bottom-left corner and build your fi
 #: scripts/menu_info.gd:36
 msgid "↓"
 msgstr "↓"
+
+msgid "MISSION ACCOMPLISHED"
+msgstr "MISSION ACCOMPLISHED"
+
+msgid "Welle 20 überlebt – Die Basis ist gesichert!"
+msgstr "Wave 20 survived – The base is secure!"
+
+msgid "Endlos weiterspielen"
+msgstr "Endless Freeplay"
+
+msgid "Erneut versuchen"
+msgstr "Retry"
+
+
+msgid "Rundendauer: %s"
+msgstr "Rounds Duration: %s"
+
+msgid "Neutralisierte Gegner: %d"
+msgstr "Enemies Neutralized: %d"
+
+msgid "Abgebaute Sektoren: %d Blöcke"
+msgstr "Sectors Mined: %d blocks"
+
+msgid "Gesamteinnahmen: $%d"
+msgstr "Total Revenue: $%d"

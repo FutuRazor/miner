@@ -6,7 +6,7 @@ msgstr "Project-Id-Version: Miner\nLanguage: de\nMIME-Version: 1.0\nContent-Type
 msgid "\n%s: +%d"
 msgstr "\n%s: +%d"
 
-#: scripts/world.gd:1119
+#: scripts/world.gd:1135
 msgid "\nBauzeit: %d s"
 msgstr "\nBauzeit: %d s"
 
@@ -22,7 +22,7 @@ msgstr "\nDrohnen-LP: %d\nSchaden je Treffer: %d"
 msgid "\nEinnahmen bis zum nächsten Schritt: %d"
 msgstr "\nEinnahmen bis zum nächsten Schritt: %d"
 
-#: scripts/world.gd:1467
+#: scripts/world.gd:1499
 msgid "\nGeld-Drohne: %d s"
 msgstr "\nGeld-Drohne: %d s"
 
@@ -74,39 +74,39 @@ msgstr " Voll"
 msgid " keine"
 msgstr " keine"
 
-#: scripts/world.gd:1128
+#: scripts/world.gd:1144
 msgid " · Gebäudelimit erreicht"
 msgstr " · Gebäudelimit erreicht"
 
-#: scripts/wave_timer.gd:47
+#: scripts/wave_timer.gd:51
 msgid " · Pause"
 msgstr " · Pause"
 
-#: scripts/world.gd:1130
+#: scripts/world.gd:1146
 msgid " · Zu wenig Geld"
 msgstr " · Zu wenig Geld"
 
-#: scripts/world.gd:1059 scripts/world.gd:1060
+#: scripts/world.gd:1075 scripts/world.gd:1076
 msgid "%d %s"
 msgstr "%d %s"
 
-#: scripts/world.gd:1066
+#: scripts/world.gd:1082
 msgid "%d %s je Kaserne"
 msgstr "%d %s je Kaserne"
 
-#: scripts/world.gd:1063
+#: scripts/world.gd:1079
 msgid "%d %s je Sammler"
 msgstr "%d %s je Sammler"
 
-#: scripts/world.gd:1067
+#: scripts/world.gd:1083
 msgid "%d Drohnen je Kaserne"
 msgstr "%d Drohnen je Kaserne"
 
-#: scripts/world.gd:1064
+#: scripts/world.gd:1080
 msgid "%d Drohnen je Sammler"
 msgstr "%d Drohnen je Sammler"
 
-#: scripts/world.gd:1075 scripts/world.gd:1076
+#: scripts/world.gd:1091 scripts/world.gd:1092
 msgid "%d Einheiten Tragkapazität"
 msgstr "%d Einheiten Tragkapazität"
 
@@ -118,67 +118,67 @@ msgstr "%d Geld"
 msgid "%d Geld%s"
 msgstr "%d Geld%s"
 
-#: scripts/world.gd:1096 scripts/world.gd:1097
+#: scripts/world.gd:1112 scripts/world.gd:1113
 msgid "%d LP/s je Drohne"
 msgstr "%d LP/s je Drohne"
 
-#: scripts/world.gd:1093 scripts/world.gd:1094
+#: scripts/world.gd:1109 scripts/world.gd:1110
 msgid "%d Mechaniker-Drohnen"
 msgstr "%d Mechaniker-Drohnen"
 
-#: scripts/world.gd:1099 scripts/world.gd:1100
+#: scripts/world.gd:1115 scripts/world.gd:1116
 msgid "%d Pixel/s"
 msgstr "%d Pixel/s"
 
-#: scripts/world.gd:1081
+#: scripts/world.gd:1097
 msgid "%d Schaden je Treffer"
 msgstr "%d Schaden je Treffer"
 
-#: scripts/world.gd:1087 scripts/world.gd:1088
+#: scripts/world.gd:1103 scripts/world.gd:1104
 msgid "%d gleichzeitige Schüsse"
 msgstr "%d gleichzeitige Schüsse"
 
-#: scripts/world.gd:1054 scripts/world.gd:1055 scripts/world.gd:1078 scripts/world.gd:1079 scripts/world.gd:1084 scripts/world.gd:1085
+#: scripts/world.gd:1070 scripts/world.gd:1071 scripts/world.gd:1094 scripts/world.gd:1095 scripts/world.gd:1100 scripts/world.gd:1101
 msgid "%d maximale Lebenspunkte"
 msgstr "%d maximale Lebenspunkte"
 
-#: scripts/world.gd:1120
+#: scripts/world.gd:1136
 msgid "%s (%d/%d)"
 msgstr "%s (%d/%d)"
 
-#: scripts/world.gd:1132
+#: scripts/world.gd:1148
 msgid "%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s"
 msgstr "%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s"
 
-#: scripts/tutorial_world.gd:120 scripts/world.gd:988
+#: scripts/tutorial_world.gd:120 scripts/world.gd:1004
 msgid "%s fertigstellen"
 msgstr "%s fertigstellen"
 
-#: scripts/world.gd:1062
+#: scripts/world.gd:1078
 msgid "-baut Blöcke ab-"
 msgstr "-baut Blöcke ab-"
 
-#: scripts/world.gd:1057
+#: scripts/world.gd:1073
 msgid "-sammelt Geld ein-"
 msgstr "-sammelt Geld ein-"
 
-#: scripts/world.gd:1402
+#: scripts/world.gd:1418
 msgid "1,5×"
 msgstr "1,5×"
 
-#: scripts/world.gd:1182 scripts/world.gd:1402
+#: scripts/world.gd:1198 scripts/world.gd:1418
 msgid "1×"
 msgstr "1×"
 
-#: scripts/world.gd:1082
+#: scripts/world.gd:1098
 msgid "2 Schaden je Treffer"
 msgstr "2 Schaden je Treffer"
 
-#: scripts/world.gd:1402
+#: scripts/world.gd:1418
 msgid "2×"
 msgstr "2×"
 
-#: scripts/world.gd:1402
+#: scripts/world.gd:1418
 msgid "3×"
 msgstr "3×"
 
@@ -186,11 +186,11 @@ msgstr "3×"
 msgid ">"
 msgstr ">"
 
-#: scripts/world.gd:44
+#: scripts/world.gd:54
 msgid "Abbaustufe"
 msgstr "Abbaustufe"
 
-#: scripts/world.gd:1069 scripts/world.gd:1070
+#: scripts/world.gd:1085 scripts/world.gd:1086
 msgid "Abbaustufe %d"
 msgstr "Abbaustufe %d"
 
@@ -202,6 +202,10 @@ msgstr "Abbaustufe 3 ist verfügbar. Besiege die erste Welle."
 msgid "Abbaustufe 3 später im Tutorial"
 msgstr "Abbaustufe 3 später im Tutorial"
 
+#: scripts/victory.gd:13
+msgid "Abgebaute Sektoren: %d Blöcke"
+msgstr "Abgebaute Sektoren: %d Blöcke"
+
 #: scripts/building_context.gd:36
 msgid "Abreißen?"
 msgstr "Abreißen?"
@@ -210,27 +214,27 @@ msgstr "Abreißen?"
 msgid "Alle Partien · dauerhaft gespeichert"
 msgstr "Alle Partien · dauerhaft gespeichert"
 
-#: scripts/world.gd:51
+#: scripts/world.gd:61
 msgid "Angriff"
 msgstr "Angriff"
 
-#: scripts/world.gd:53
+#: scripts/world.gd:63
 msgid "Anzahl Schüsse"
 msgstr "Anzahl Schüsse"
 
-#: scripts/world.gd:1299
+#: scripts/world.gd:1315
 msgid "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nRechtsklick auf Gebäude: Infos / Abreißen\nMausrad: Karte zoomen"
 msgstr "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nRechtsklick auf Gebäude: Infos / Abreißen\nMausrad: Karte zoomen"
 
-#: scripts/world.gd:1121
+#: scripts/world.gd:1137
 msgid "BAUEN / 2 × 2"
 msgstr "BAUEN / 2 × 2"
 
-#: scripts/world.gd:43 scripts/world.gd:44 scripts/world.gd:45
+#: scripts/world.gd:53 scripts/world.gd:54 scripts/world.gd:55
 msgid "Basis"
 msgstr "Basis"
 
-#: scripts/world.gd:1296
+#: scripts/world.gd:1312
 msgid "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
 msgstr "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
 
@@ -238,11 +242,11 @@ msgstr "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
 msgid "Basis-Skills verfügbar"
 msgstr "Basis-Skills verfügbar"
 
-#: scripts/world.gd:1465
+#: scripts/world.gd:1497
 msgid "Basis: %d Geld"
 msgstr "Basis: %d Geld"
 
-#: scripts/world.gd:1032
+#: scripts/world.gd:1048
 msgid "Bau: %d s"
 msgstr "Bau: %d s"
 
@@ -278,15 +282,15 @@ msgstr "Baumenü verfügbar"
 msgid "Beenden"
 msgstr "Beenden"
 
-#: scripts/world.gd:1131
+#: scripts/world.gd:1147
 msgid "Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
 msgstr "Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
 
-#: scripts/world.gd:1072 scripts/world.gd:1073
+#: scripts/world.gd:1088 scripts/world.gd:1089
 msgid "Bewegung: %d Pixel/s\nAbbau: %d %%"
 msgstr "Bewegung: %d Pixel/s\nAbbau: %d %%"
 
-#: scripts/world.gd:57
+#: scripts/world.gd:67
 msgid "Bewegungsgeschwindigkeit"
 msgstr "Bewegungsgeschwindigkeit"
 
@@ -318,23 +322,23 @@ msgstr "Die Werkstatt ist jetzt verfügbar. Ihre Mechaniker reparieren zuerst di
 msgid "Die gespeicherte Statistik konnte nicht gelesen werden. Beschädigte Dateien bleiben zur Wiederherstellung erhalten."
 msgstr "Die gespeicherte Statistik konnte nicht gelesen werden. Beschädigte Dateien bleiben zur Wiederherstellung erhalten."
 
-#: scripts/world.gd:1063 scripts/world.gd:1066 scripts/world.gd:46 scripts/world.gd:49
+#: scripts/world.gd:1079 scripts/world.gd:1082 scripts/world.gd:56 scripts/world.gd:59
 msgid "Drohne"
 msgstr "Drohne"
 
-#: scripts/world.gd:1063 scripts/world.gd:1066
+#: scripts/world.gd:1079 scripts/world.gd:1082
 msgid "Drohnen"
 msgstr "Drohnen"
 
-#: scripts/building_context.gd:102 scripts/world.gd:654
+#: scripts/building_context.gd:102 scripts/world.gd:666
 msgid "Drohnen: %d"
 msgstr "Drohnen: %d"
 
-#: scripts/world.gd:1032
+#: scripts/world.gd:1048
 msgid "Drohnen: %d · %d s"
 msgstr "Drohnen: %d · %d s"
 
-#: scripts/world.gd:55
+#: scripts/world.gd:65
 msgid "Drohnenanzahl"
 msgstr "Drohnenanzahl"
 
@@ -350,55 +354,59 @@ msgstr "Du trägst 10 Rohstoffeinheiten. Gehe in die Basis, um sie abzugeben. F�
 msgid "Ein zweiter Sammler ist verfügbar. Erweitere deine Wirtschaft."
 msgstr "Ein zweiter Sammler ist verfügbar. Erweitere deine Wirtschaft."
 
-#: scripts/world.gd:46
+#: scripts/world.gd:56
 msgid "Eine zusätzliche Drohne für jeden bestehenden und zukünftigen Sammler."
 msgstr "Eine zusätzliche Drohne für jeden bestehenden und zukünftigen Sammler."
 
-#: scripts/world.gd:49
+#: scripts/world.gd:59
 msgid "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."
 msgstr "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."
 
-#: scripts/world.gd:55
+#: scripts/world.gd:65
 msgid "Eine zusätzliche Mechaniker-Drohne. Produktion: 20 Sekunden. Maximal drei Drohnen."
 msgstr "Eine zusätzliche Mechaniker-Drohne. Produktion: 20 Sekunden. Maximal drei Drohnen."
 
-#: scripts/world.gd:57
+#: scenes/victory.tscn:50
+msgid "Endlos weiterspielen"
+msgstr "Endlos weiterspielen"
+
+#: scripts/world.gd:67
 msgid "Erhöht das Bewegungstempo aller Mechaniker-Drohnen um 20. Maximal 160 Pixel/s."
 msgstr "Erhöht das Bewegungstempo aller Mechaniker-Drohnen um 20. Maximal 160 Pixel/s."
 
-#: scripts/world.gd:51
+#: scripts/world.gd:61
 msgid "Erhöht den Schaden aller bestehenden, neuen und nachproduzierten Kasernen-Drohnen von 1 auf 2 je Treffer. Einmalig nach Welle 13 kaufbar."
 msgstr "Erhöht den Schaden aller bestehenden, neuen und nachproduzierten Kasernen-Drohnen von 1 auf 2 je Treffer. Einmalig nach Welle 13 kaufbar."
 
-#: scripts/world.gd:44
+#: scripts/world.gd:54
 msgid "Erhöht die Abbaustufe der Spielfigur und aller bestehenden und zukünftigen Abbaudrohnen."
 msgstr "Erhöht die Abbaustufe der Spielfigur und aller bestehenden und zukünftigen Abbaudrohnen."
 
-#: scripts/world.gd:53
+#: scripts/world.gd:63
 msgid "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."
 msgstr "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."
 
-#: scripts/world.gd:47
+#: scripts/world.gd:57
 msgid "Erhöht die Bewegungsgeschwindigkeit um 10 Pixel/s und die Abbaugeschwindigkeit um 5 Prozentpunkte. Gilt für alle Sammlerdrohnen."
 msgstr "Erhöht die Bewegungsgeschwindigkeit um 10 Pixel/s und die Abbaugeschwindigkeit um 5 Prozentpunkte. Gilt für alle Sammlerdrohnen."
 
-#: scripts/world.gd:56
+#: scripts/world.gd:66
 msgid "Erhöht die Reparatur jeder Mechaniker-Drohne um 1 LP pro Sekunde. Maximal 3 LP/s."
 msgstr "Erhöht die Reparatur jeder Mechaniker-Drohne um 1 LP pro Sekunde. Maximal 3 LP/s."
 
-#: scripts/world.gd:48
+#: scripts/world.gd:58
 msgid "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 5."
 msgstr "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 5."
 
-#: scripts/world.gd:50
+#: scripts/world.gd:60
 msgid "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."
 msgstr "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."
 
-#: scripts/world.gd:52
+#: scripts/world.gd:62
 msgid "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 20."
 msgstr "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 20."
 
-#: scripts/world.gd:43
+#: scripts/world.gd:53
 msgid "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 25."
 msgstr "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 25."
 
@@ -406,19 +414,23 @@ msgstr "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 25."
 msgid "Erhöhung der Abbaustufe verfügbar"
 msgstr "Erhöhung der Abbaustufe verfügbar"
 
-#: scripts/world.gd:1126
+#: scenes/victory.tscn:56
+msgid "Erneut versuchen"
+msgstr "Erneut versuchen"
+
+#: scripts/world.gd:1142
 msgid "Fläche blockiert (Basis, Gebäude oder Blöcke)"
 msgstr "Fläche blockiert (Basis, Gebäude oder Blöcke)"
 
-#: scripts/world.gd:1126
+#: scripts/world.gd:1142
 msgid "Fläche frei"
 msgstr "Fläche frei"
 
-#: scripts/world.gd:1167
+#: scripts/world.gd:1183
 msgid "Fortsetzen"
 msgstr "Fortsetzen"
 
-#: scripts/world.gd:971
+#: scripts/world.gd:987
 msgid "Freischaltung nach Welle %d"
 msgstr "Freischaltung nach Welle %d"
 
@@ -434,19 +446,19 @@ msgstr "Game Over"
 msgid "Gebäude verkaufen und abreißen"
 msgstr "Gebäude verkaufen und abreißen"
 
-#: scripts/option_menu.gd:62 scripts/world.gd:1120
+#: scripts/option_menu.gd:62 scripts/world.gd:1136
 msgid "Gebäudelimit erreicht"
 msgstr "Gebäudelimit erreicht"
 
-#: scripts/world.gd:656
+#: scripts/world.gd:668
 msgid "Gegner: %d"
 msgstr "Gegner: %d"
 
-#: scripts/world.gd:1059 scripts/world.gd:1060 scripts/world.gd:45
+#: scripts/world.gd:1075 scripts/world.gd:1076 scripts/world.gd:55
 msgid "Geld-Sammeldrohne"
 msgstr "Geld-Sammeldrohne"
 
-#: scripts/world.gd:1059 scripts/world.gd:1060
+#: scripts/world.gd:1075 scripts/world.gd:1076
 msgid "Geld-Sammeldrohnen"
 msgstr "Geld-Sammeldrohnen"
 
@@ -458,23 +470,27 @@ msgstr "Gesammelt"
 msgid "Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d"
 msgstr "Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d"
 
+#: scripts/victory.gd:14
+msgid "Gesamteinnahmen: $%d"
+msgstr "Gesamteinnahmen: $%d"
+
 #: scripts/option_menu.gd:63
 msgid "Gesperrt"
 msgstr "Gesperrt"
 
-#: scripts/world.gd:1116
+#: scripts/world.gd:1132
 msgid "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer."
 msgstr "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer."
 
-#: scripts/world.gd:1114
+#: scripts/world.gd:1130
 msgid "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner."
 msgstr "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner."
 
-#: scripts/world.gd:1114
+#: scripts/world.gd:1130
 msgid "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab."
 msgstr "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab."
 
-#: scripts/world.gd:1118
+#: scripts/world.gd:1134
 msgid "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände."
 msgstr "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände."
 
@@ -486,7 +502,7 @@ msgstr "Hauptmenü"
 msgid "Hauptmenü konnte nicht geladen werden: %s"
 msgstr "Hauptmenü konnte nicht geladen werden: %s"
 
-#: scripts/world.gd:45
+#: scripts/world.gd:55
 msgid "Holt Geld beim Sammler mit dem höchsten Guthaben.\nAbholung: 0,6 Sekunden\nAbgabe an Spielfigur oder Basis: sofort."
 msgstr "Holt Geld beim Sammler mit dem höchsten Guthaben.\nAbholung: 0,6 Sekunden\nAbgabe an Spielfigur oder Basis: sofort."
 
@@ -506,11 +522,11 @@ msgstr "Ja"
 msgid "Jeder Abbauschritt zählt als eine gesammelte Einheit.\nNach dem vierten Schritt zählt der Block zusätzlich als vollständig abgebaut."
 msgstr "Jeder Abbauschritt zählt als eine gesammelte Einheit.\nNach dem vierten Schritt zählt der Block zusätzlich als vollständig abgebaut."
 
-#: scripts/world.gd:48
+#: scripts/world.gd:58
 msgid "Kapazität erhöhen"
 msgstr "Kapazität erhöhen"
 
-#: scripts/world.gd:49 scripts/world.gd:50 scripts/world.gd:51 scripts/world.gd:79
+#: scripts/world.gd:59 scripts/world.gd:60 scripts/world.gd:61 scripts/world.gd:89
 msgid "Kaserne"
 msgstr "Kaserne"
 
@@ -526,19 +542,23 @@ msgstr "Kaufe Abbaustufe 2, um die nächsten beiden Blockreihen abzubauen. Abbau
 msgid "Kosten: %d Geld"
 msgstr "Kosten: %d Geld"
 
-#: scripts/world.gd:43 scripts/world.gd:50 scripts/world.gd:52
+#: scripts/world.gd:53 scripts/world.gd:60 scripts/world.gd:62
 msgid "Lebenspunkte"
 msgstr "Lebenspunkte"
 
-#: scripts/drone.gd:288 scripts/tower.gd:74 scripts/world.gd:1460
+#: scripts/drone.gd:288 scripts/tower.gd:74 scripts/world.gd:1492
 msgid "Lebenspunkte\n%d/%d"
 msgstr "Lebenspunkte\n%d/%d"
 
-#: scripts/world.gd:1263
+#: scripts/world.gd:1279
 msgid "MINER / PROTOTYP"
 msgstr "MINER / PROTOTYP"
 
-#: scripts/world.gd:1131
+#: scenes/victory.tscn:34
+msgid "MISSION ACCOMPLISHED"
+msgstr "MISSION ACCOMPLISHED"
+
+#: scripts/world.gd:1147
 msgid "Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
 msgstr "Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
 
@@ -550,7 +570,7 @@ msgstr "Maximale Tragkraft erreicht"
 msgid "Maximum"
 msgstr "Maximum"
 
-#: scripts/option_menu.gd:62 scripts/tutorial_world.gd:112 scripts/world.gd:1102 scripts/world.gd:1103 scripts/world.gd:965 scripts/world.gd:972
+#: scripts/option_menu.gd:62 scripts/tutorial_world.gd:112 scripts/world.gd:1118 scripts/world.gd:1119 scripts/world.gd:981 scripts/world.gd:988
 msgid "Maximum erreicht"
 msgstr "Maximum erreicht"
 
@@ -574,6 +594,10 @@ msgstr "Menü einklappen"
 msgid "Nein"
 msgstr "Nein"
 
+#: scripts/victory.gd:12
+msgid "Neutralisierte Gegner: %d"
+msgstr "Neutralisierte Gegner: %d"
+
 #: scripts/menu_info.gd:54
 msgid "Noch keine Beschreibung verfügbar."
 msgstr "Noch keine Beschreibung verfügbar."
@@ -582,7 +606,7 @@ msgstr "Noch keine Beschreibung verfügbar."
 msgid "Noch mal"
 msgstr "Noch mal"
 
-#: scripts/world.gd:962
+#: scripts/world.gd:978
 msgid "Noch nicht verfügbar"
 msgstr "Noch nicht verfügbar"
 
@@ -598,11 +622,11 @@ msgstr "OPTIONEN"
 msgid "Optionen"
 msgstr "Optionen"
 
-#: scripts/game_ui.gd:64 scripts/world.gd:1173
+#: scripts/game_ui.gd:64 scripts/world.gd:1189
 msgid "Pause"
 msgstr "Pause"
 
-#: scripts/world.gd:1175
+#: scripts/world.gd:1191
 msgid "Pausieren"
 msgstr "Pausieren"
 
@@ -614,7 +638,7 @@ msgstr "Perks & Statistik"
 msgid "Platzhalter · Noch nicht upgradebar"
 msgstr "Platzhalter · Noch nicht upgradebar"
 
-#: scripts/world.gd:56
+#: scripts/world.gd:66
 msgid "Reparatur erhöhen"
 msgstr "Reparatur erhöhen"
 
@@ -622,31 +646,35 @@ msgstr "Reparatur erhöhen"
 msgid "Reparatur: %d LP/s"
 msgstr "Reparatur: %d LP/s"
 
+#: scripts/victory.gd:11
+msgid "Rundendauer: %s"
+msgstr "Rundendauer: %s"
+
 #: scripts/building_context.gd:126
 msgid "Rückzahlung: %d Geld (75 %% Baupreis)"
 msgstr "Rückzahlung: %d Geld (75 %% Baupreis)"
 
-#: scripts/world.gd:1108
+#: scripts/world.gd:1124
 msgid "SKILL-TREE"
 msgstr "SKILL-TREE"
 
-#: scripts/world.gd:46 scripts/world.gd:47 scripts/world.gd:48 scripts/world.gd:79
+#: scripts/world.gd:56 scripts/world.gd:57 scripts/world.gd:58 scripts/world.gd:89
 msgid "Sammler"
 msgstr "Sammler"
 
-#: scripts/world.gd:893
+#: scripts/world.gd:908
 msgid "Sammler: %d Geld"
 msgstr "Sammler: %d Geld"
 
-#: scripts/world.gd:47
+#: scripts/world.gd:57
 msgid "Schneller sammeln"
 msgstr "Schneller sammeln"
 
-#: scripts/world.gd:1090 scripts/world.gd:1091
+#: scripts/world.gd:1106 scripts/world.gd:1107
 msgid "Schussintervall: %d ms"
 msgstr "Schussintervall: %d ms"
 
-#: scripts/world.gd:54
+#: scripts/world.gd:64
 msgid "Schussrate"
 msgstr "Schussrate"
 
@@ -674,15 +702,15 @@ msgstr "Spiel konnte nicht gestartet werden: %s"
 msgid "Spiel starten"
 msgstr "Spiel starten"
 
-#: scripts/world.gd:1239
+#: scripts/world.gd:1255
 msgid "Spielinformationen schließen"
 msgstr "Spielinformationen schließen"
 
-#: scripts/world.gd:1226 scripts/world.gd:1239
+#: scripts/world.gd:1242 scripts/world.gd:1255
 msgid "Spielinformationen öffnen"
 msgstr "Spielinformationen öffnen"
 
-#: scripts/world.gd:1183
+#: scripts/world.gd:1199
 msgid "Spieltempo wechseln: 1× → 1,5× → 2× → 3×"
 msgstr "Spieltempo wechseln: 1× → 1,5× → 2× → 3×"
 
@@ -706,7 +734,7 @@ msgstr "TUTORIAL · "
 msgid "TUTORIAL · Erste Welle besiegt! Baue eine Werkstatt und repariere deine Verteidigung."
 msgstr "TUTORIAL · Erste Welle besiegt! Baue eine Werkstatt und repariere deine Verteidigung."
 
-#: scripts/world.gd:52 scripts/world.gd:53 scripts/world.gd:54 scripts/world.gd:79
+#: scripts/world.gd:62 scripts/world.gd:63 scripts/world.gd:64 scripts/world.gd:89
 msgid "Turm"
 msgstr "Turm"
 
@@ -734,7 +762,7 @@ msgstr "Verbessere die Lebenspunkte deiner Kasernen-Drohnen und Türme sowie die
 msgid "Verbessere die Verteidigung und bereite dich auf die erste Welle vor."
 msgstr "Verbessere die Verteidigung und bereite dich auf die erste Welle vor."
 
-#: scripts/world.gd:54
+#: scripts/world.gd:64
 msgid "Verkürzt die Zeit zwischen den Salven aller Türme um 10 %. Millisekunden werden auf ganze Zahlen abgerundet."
 msgstr "Verkürzt die Zeit zwischen den Salven aller Türme um 10 %. Millisekunden werden auf ganze Zahlen abgerundet."
 
@@ -750,15 +778,15 @@ msgstr "Verteidigung upgraden"
 msgid "Vollständig abgebaut"
 msgstr "Vollständig abgebaut"
 
-#: scripts/world.gd:1121
+#: scripts/world.gd:1137
 msgid "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen"
 msgstr "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen"
 
-#: scripts/world.gd:1108
+#: scripts/world.gd:1124
 msgid "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen"
 msgstr "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen"
 
-#: scripts/world.gd:1293
+#: scripts/world.gd:1309
 msgid "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und halten.\nLoslassen oder Ziel wechseln setzt den Fortschritt zurück."
 msgstr "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und halten.\nLoslassen oder Ziel wechseln setzt den Fortschritt zurück."
 
@@ -766,23 +794,27 @@ msgstr "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und ha
 msgid "Weiterspielen"
 msgstr "Weiterspielen"
 
-#: scripts/world.gd:1244 scripts/world.gd:1391
+#: scenes/victory.tscn:39
+msgid "Welle 20 überlebt – Die Basis ist gesichert!"
+msgstr "Welle 20 überlebt – Die Basis ist gesichert!"
+
+#: scripts/world.gd:1260 scripts/world.gd:1407
 msgid "Wellentimer anhalten"
 msgstr "Wellentimer anhalten"
 
-#: scripts/world.gd:1391
+#: scripts/world.gd:1407
 msgid "Wellentimer fortsetzen"
 msgstr "Wellentimer fortsetzen"
 
-#: scripts/world.gd:55 scripts/world.gd:56 scripts/world.gd:57 scripts/world.gd:79
+#: scripts/world.gd:65 scripts/world.gd:66 scripts/world.gd:67 scripts/world.gd:89
 msgid "Werkstatt"
 msgstr "Werkstatt"
 
-#: scripts/wave_timer.gd:47
+#: scripts/wave_timer.gd:51
 msgid "Zeit bis Welle %d · %d s%s"
 msgstr "Zeit bis Welle %d · %d s%s"
 
-#: scripts/meta_stats_screen.gd:64 scripts/options_menu.gd:49 scripts/world.gd:1213
+#: scenes/victory.tscn:62 scripts/meta_stats_screen.gd:64 scripts/options_menu.gd:49 scripts/world.gd:1229
 msgid "Zurück zum Hauptmenü"
 msgstr "Zurück zum Hauptmenü"
 

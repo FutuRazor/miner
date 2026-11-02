@@ -27,6 +27,8 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	if timer_paused or get_tree().paused or get_parent().world.is_game_over:
 		return
+	if get_parent().world.has_mission_limit() and get_parent().world.spawned_waves >= 20:
+		return
 	remaining -= delta
 	while remaining <= 0.0:
 		var number := next_wave
@@ -34,6 +36,8 @@ func _physics_process(delta: float) -> void:
 		remaining += INTERVAL
 		max_value = INTERVAL
 		wave_due.emit(number)
+		if get_parent().world.has_mission_limit() and get_parent().world.spawned_waves >= 20:
+			break
 	_refresh()
 
 
