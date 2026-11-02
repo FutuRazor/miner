@@ -815,3 +815,30 @@ msgstr "Total Revenue: $%d"
 
 msgid "Welle %d erreicht – Die Basis wurde zerstört."
 msgstr "Wave %d reached – The base was destroyed."
+
+msgid "Blöcke"
+msgstr "Blocks"
+
+msgid "Einnahmen"
+msgstr "Revenue"
+
+msgid "Gegner"
+msgstr "Enemies"
+
+msgid "Gewonnene Partien · kürzeste Spielzeit zuerst"
+msgstr "Won games · shortest play time first"
+
+msgid "Gewonnene Spiele: %d"
+msgstr "Games won: %d"
+
+msgid "Noch keine gewonnenen Spiele."
+msgstr "No games won yet."
+
+msgid "Platz"
+msgstr "Rank"
+
+msgid "Ranking"
+msgstr "Ranking"
+
+msgid "Spielzeit"
+msgstr "Play Time"

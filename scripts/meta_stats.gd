@@ -7,6 +7,7 @@ var storage_path := "user://meta_stats.json"
 var persistence_enabled := true
 var collected_by_hardness: Dictionary = {}
 var destroyed_by_hardness: Dictionary = {}
+var victories: Array = []
 var enemy_drones_defeated := 0
 var load_warning := ""
 var save_error := ""
@@ -32,6 +33,28 @@ func record_block_step(hardness: int, fully_destroyed: bool) -> void:
 func record_enemy_defeated() -> void:
 	enemy_drones_defeated += 1
 	_mark_dirty()
+
+
+func record_victory(duration: float, enemies: int, blocks: int, revenue: int) -> void:
+	victories.append({"duration": duration, "enemies": enemies, "blocks": blocks, "revenue": revenue})
+	victories.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.duration < b.duration)
+	_mark_dirty()
+	save_now()
+
+
+func _valid_victories(value: Variant) -> bool:
+	if not value is Array:
+		return false
+	for entry in value:
+		if not entry is Dictionary:
+			return false
+		var duration: Variant = entry.get("duration")
+		if not (typeof(duration) == TYPE_INT or typeof(duration) == TYPE_FLOAT) or not is_finite(float(duration)) or float(duration) < 0:
+			return false
+		for key in ["enemies", "blocks", "revenue"]:
+			if not _valid_count(entry.get(key)):
+				return false
+	return true
 
 
 func _mark_dirty() -> void:
@@ -96,10 +119,13 @@ func _read_snapshot(path: String) -> Dictionary:
 	for key in parsed.destroyed_by_hardness:
 		if int(parsed.destroyed_by_hardness[key]) > int(parsed.collected_by_hardness.get(key, 0)):
 			return {}
+	if not _valid_victories(parsed.get("victories", [])):
+		return {}
 	return parsed
 
 
 func load_stats() -> void:
+	victories = []
 	collected_by_hardness = {}
 	destroyed_by_hardness = {}
 	enemy_drones_defeated = 0
@@ -114,6 +140,8 @@ func load_stats() -> void:
 		if FileAccess.file_exists(storage_path) or FileAccess.file_exists(storage_path + ".bak"):
 			load_warning = tr("Die gespeicherte Statistik konnte nicht gelesen werden. Beschädigte Dateien bleiben zur Wiederherstellung erhalten.")
 		return
+	victories = snapshot.get("victories", [])
+	victories.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a.duration < b.duration)
 	for key in snapshot.collected_by_hardness:
 		collected_by_hardness[key] = int(snapshot.collected_by_hardness[key])
 	for key in snapshot.destroyed_by_hardness:
@@ -132,7 +160,7 @@ func save_now() -> bool:
 	var file := FileAccess.open(temporary, FileAccess.WRITE)
 	if file == null:
 		return _save_failed(FileAccess.get_open_error())
-	file.store_string(JSON.stringify({"version": SAVE_VERSION, "collected_by_hardness": collected_by_hardness, "destroyed_by_hardness": destroyed_by_hardness, "enemy_drones_defeated": enemy_drones_defeated}, "\t"))
+	file.store_string(JSON.stringify({"version": SAVE_VERSION, "victories": victories, "collected_by_hardness": collected_by_hardness, "destroyed_by_hardness": destroyed_by_hardness, "enemy_drones_defeated": enemy_drones_defeated}, "\t"))
 	file.flush()
 	error = file.get_error()
 	file.close()

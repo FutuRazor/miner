@@ -17,6 +17,7 @@ var base_health := 100
 var base_health_label: Label
 var is_game_over := false
 var endless_freeplay := false
+var victory_recorded := false
 var round_duration := 0.0
 var enemies_neutralized := 0
 var sectors_mined := 0
@@ -1458,6 +1459,9 @@ func _end_game(victory: bool = false) -> void:
 	if is_game_over:
 		return
 	is_game_over = true
+	if victory and has_mission_limit() and cleared_waves >= 20 and not victory_recorded:
+		victory_recorded = true
+		get_node("/root/MetaStats").record_victory(round_duration, enemies_neutralized, sectors_mined, total_revenue)
 	get_node("/root/MetaStats").save_now()
 	get_node("GameUI").show_pause_badge(false)
 	_set_build_mode(BuildMode.PLAY)

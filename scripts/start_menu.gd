@@ -16,7 +16,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				focused.pressed.emit()
 		elif event.keycode in [KEY_W, KEY_S]:
 			var focused := get_viewport().gui_get_focus_owner()
-			var buttons := [$Center/Menu/StartButton, $Center/Menu/TutorialButton, $Center/Menu/StatsButton, $Center/Menu/OptionsButton]
+			var buttons := [$Center/Menu/StartButton, $Center/Menu/TutorialButton, $Center/Menu/StatsButton, $Center/Menu/RankingButton, $Center/Menu/OptionsButton]
 			var direction := -1 if event.keycode == KEY_W else 1
 			buttons[posmod(buttons.find(focused) + direction, buttons.size())].grab_focus()
 			get_viewport().set_input_as_handled()
@@ -32,6 +32,10 @@ func _start_tutorial() -> void:
 
 func _open_statistics() -> void:
 	_change_scene("res://scenes/meta_stats.tscn")
+
+
+func _open_ranking() -> void:
+	_change_scene("res://scenes/ranking.tscn")
 
 
 func _open_options() -> void:

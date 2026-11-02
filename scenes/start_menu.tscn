@@ -51,6 +51,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "Perks & Statistik"
 
+[node name="RankingButton" type="Button" parent="Center/Menu"]
+custom_minimum_size = Vector2(300, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Ranking"
+
 [node name="OptionsButton" type="Button" parent="Center/Menu"]
 custom_minimum_size = Vector2(300, 56)
 layout_mode = 2
@@ -61,3 +67,5 @@ text = "Optionen"
 [connection signal="pressed" from="Center/Menu/TutorialButton" to="." method="_start_tutorial"]
 [connection signal="pressed" from="Center/Menu/StatsButton" to="." method="_open_statistics"]
 [connection signal="pressed" from="Center/Menu/OptionsButton" to="." method="_open_options"]
+
+[connection signal="pressed" from="Center/Menu/RankingButton" to="." method="_open_ranking"]
