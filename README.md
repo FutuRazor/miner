@@ -71,11 +71,21 @@ After one barracks and two towers are finished, a **10-second preparation period
 
 ## Getting started
 
+### Play on Windows
+
+1. Open the [GitHub Releases](https://github.com/FutuRazor/miner/releases).
+2. Download the Windows build from the release assets.
+3. If the download is an archive, extract all files into one folder.
+4. Launch the **`.exe`** and choose the main game or the tutorial.
+
+**No Godot installation is required to play the Windows build.**
+
+### Run from source
+
 1. Install **Godot 4.7**. The project is developed and tested with **Godot 4.7.2**.
 2. Clone or download this repository.
 3. Import **`project.godot`** into Godot.
-4. Press **F6** with the start-menu scene open, or **F5** to run the project.
-5. Choose the main game or the tutorial.
+4. Press **F5** to run the project.
 
 > **Prototype status:** Mechanics and balance are actively evolving. The in-game interface is currently in German; this README uses English names for the main systems.
 
