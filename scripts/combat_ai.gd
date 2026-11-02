@@ -10,6 +10,8 @@ func _init(drone: Node2D) -> void:
 
 
 func set_target(next: Node2D) -> void:
+	if actor.ignores_attackers:
+		next = null
 	if actor.combat_target != next:
 		contact_time = 0.0
 		actor.combat_target = next

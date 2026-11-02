@@ -70,6 +70,7 @@ const SKILLS := [
 var cleared_waves := 0
 var spawned_waves := 0
 var wave_alive: Dictionary = {}
+var spawn_manager: RefCounted
 var selected_skill := 0
 var skill_levels: Dictionary = {"cash_drone": 0}
 var collector_drone_count := 1
@@ -127,6 +128,7 @@ var mouse_hold_time := 0.0
 
 
 func _ready() -> void:
+	spawn_manager = preload("res://scripts/spawn_manager.gd").new(self)
 	Engine.time_scale = 1.0
 	base_health = base_max_health
 	RenderingServer.set_default_clear_color(Color("151e28"))
@@ -682,28 +684,16 @@ func _live_combat_drones(group: String) -> Array[Node2D]:
 func spawn_enemy_wave() -> void:
 	if is_game_over or get_tree().paused or (has_mission_limit() and spawned_waves >= 20):
 		return
-	var edge := (map_radius + 0.5) * CELL
 	spawned_waves += 1
-	var number := spawned_waves
-	wave_alive[number] = 6 + 2 * (number - 1)
-	for index in int(wave_alive[number]):
-		var enemy := Drone.new()
-		enemy.world = self
-		enemy.collector_index = -2
-		enemy.hostile = true
-		enemy.max_health = 3 + floori(float(number - 1) / 4.0)
-		enemy.tint = Color("ff7373")
-		var along := randf_range(-edge + 12, edge - 12)
-		match randi_range(0, 3):
-			0: enemy.position = Vector2(-edge, along)
-			1: enemy.position = Vector2(edge, along)
-			2: enemy.position = Vector2(along, -edge)
-			3: enemy.position = Vector2(along, edge)
-		add_child(enemy)
-		enemy.destroyed.connect(_on_enemy_destroyed.bind(number))
-		enemy.tree_exited.connect(_update_drone_count)
+	spawn_manager.spawn_wave(spawned_waves)
+
+
+func _on_swarmer_destroyed() -> void:
+	enemies_neutralized += 1
 	_update_drone_count()
-	_assign_combat_targets()
+	if not combat_reassign_pending:
+		combat_reassign_pending = true
+		_flush_combat_reassignment.call_deferred()
 
 
 func _on_enemy_destroyed(number: int) -> void:
@@ -743,7 +733,7 @@ func _assign_combat_targets() -> void:
 	# Keep defenders in mutual melee and account for their assignments before
 	# spreading the remaining defenders over approaching threats.
 	for defender in defenders:
-		var target: Node2D = defender.combat_target
+		var target: Node2D = defender.combat_target if is_instance_valid(defender.combat_target) else null
 		if is_instance_valid(target) and not target.dead and not target.is_queued_for_deletion() and target.combat_target == defender and defender.position.distance_to(target.position) <= 20.001:
 			engaged[defender.get_instance_id()] = true
 			assigned[target.get_instance_id()] = int(assigned.get(target.get_instance_id(), 0)) + 1

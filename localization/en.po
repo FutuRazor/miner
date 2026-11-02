@@ -842,3 +842,9 @@ msgstr "Ranking"
 
 msgid "Spielzeit"
 msgstr "Play Time"
+
+msgid "MidBoss"
+msgstr "MidBoss"
+
+msgid "FinalBoss"
+msgstr "FinalBoss"

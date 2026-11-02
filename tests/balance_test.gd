@@ -117,9 +117,9 @@ func _run() -> void:
 	assert(world._live_combat_drones("enemy_drones").size() == 6)
 	world.spawned_waves = 19
 	world.spawn_enemy_wave()
-	assert(world.wave_alive[20] == 44)
+	assert(world.wave_alive[20] == 1)
 	var enemies: Array[Node2D] = world._live_combat_drones("enemy_drones")
-	assert(enemies[-1].max_health == 7)
+	assert(enemies[-1].name == "FinalBoss" and enemies[-1].max_health == 350)
 	world.queue_free()
 	print("PASS: balance prices, construction, caps, clear-based unlocks, upgrade queues, sequential replacement, upgrade maxima and wave scaling")
 	quit()
