@@ -16,7 +16,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 
 func _retry() -> void:
-	_request_scene("res://scenes/main.tscn")
+	var path: String = get_parent().scene_file_path
+	_request_scene(path if not path.is_empty() else "res://scenes/main.tscn")
 
 
 func _main_menu() -> void:

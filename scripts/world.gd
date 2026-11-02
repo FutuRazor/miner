@@ -1,10 +1,13 @@
 extends Node2D
 
+signal income_received(amount: int)
+
 const Block = preload("res://scripts/block.gd")
 const Drone = preload("res://scripts/drone.gd")
 const Balance = preload("res://scripts/balance.gd")
 const CELL := 48
 const RADIUS := 22
+@export var map_radius: int = RADIUS
 const BASE_AREA := Rect2(-72, -72, 144, 144)
 const BASE_COLOR := Color("66e5db")
 var base_drone_settings: Dictionary = {"anchor": Vector2i(-1, -1), "pending_drones": 0, "production": 0.0}
@@ -120,8 +123,8 @@ func _ready() -> void:
 	for y in range(-1, 2):
 		for x in range(-1, 2):
 			occupied_cells[Vector2i(x, y)] = true
-	for y in range(-RADIUS, RADIUS + 1):
-		for x in range(-RADIUS, RADIUS + 1):
+	for y in range(-map_radius, map_radius + 1):
+		for x in range(-map_radius, map_radius + 1):
 			if absi(x) <= 2 and absi(y) <= 2:
 				continue
 			var block := Block.new()
@@ -157,7 +160,7 @@ func _physics_process(delta: float) -> void:
 	_clamp_camera_position()
 	var in_base := BASE_AREA.has_point($Player.position)
 	if in_base and not was_in_base and collected_count > 0:
-		money += collected_count * money_per_block
+		receive_income(collected_count * money_per_block)
 		collected_count = 0
 		_update_counters()
 	was_in_base = in_base
@@ -178,7 +181,7 @@ func _collect_sampler_money() -> void:
 		var rect := Rect2(Vector2(building.anchor) * CELL - Vector2.ONE * CELL / 2, Vector2.ONE * CELL * 2)
 		var nearest := player_position.clamp(rect.position, rect.end)
 		if player_position.distance_squared_to(nearest) <= player_radius * player_radius:
-			money += building.money
+			receive_income(building.money)
 			building.money = 0
 			update_collector_label(index)
 			transferred = true
@@ -256,7 +259,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _camera_center_bounds() -> Rect2:
-	var edge := (RADIUS + 0.5) * CELL
+	var edge := (map_radius + 0.5) * CELL
 	var half_view: Vector2 = get_viewport_rect().size / ($Player/Camera2D.zoom * 2.0)
 	var extent := Vector2(edge if half_view.x < edge else 0.0, edge if half_view.y < edge else 0.0)
 	return Rect2(-extent, extent * 2.0)
@@ -379,7 +382,7 @@ func _walk_path(requested: Vector2) -> Array[Vector2]:
 
 
 func _walkable_cell(cell: Vector2i) -> bool:
-	if absi(cell.x) > RADIUS or absi(cell.y) > RADIUS:
+	if absi(cell.x) > map_radius or absi(cell.y) > map_radius:
 		return false
 	return not (block_cells.has(cell) and is_instance_valid(block_cells[cell]) and not block_cells[cell].is_queued_for_deletion())
 
@@ -430,17 +433,17 @@ func _input(event: InputEvent) -> void:
 		_on_skills_button_pressed()
 	elif build_mode == BuildMode.SKILLS:
 		if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_right"):
-			selected_skill = (selected_skill + 1) % SKILLS.size()
+			selected_skill = _cycle_available(_available_skill_indices(), selected_skill, 1)
 		elif event.is_action_pressed("ui_up") or event.is_action_pressed("ui_left"):
-			selected_skill = posmod(selected_skill - 1, SKILLS.size())
+			selected_skill = _cycle_available(_available_skill_indices(), selected_skill, -1)
 		elif event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_E]:
 			_confirm_skill()
 		_update_build_ui()
 	elif build_mode == BuildMode.MENU:
 		if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_right"):
-			selected_building = (selected_building + 1) % BUILDINGS.size()
+			selected_building = _cycle_available(_available_building_indices(), selected_building, 1)
 		elif event.is_action_pressed("ui_up") or event.is_action_pressed("ui_left"):
-			selected_building = posmod(selected_building - 1, BUILDINGS.size())
+			selected_building = _cycle_available(_available_building_indices(), selected_building, -1)
 		elif event.keycode in [KEY_ENTER, KEY_KP_ENTER, KEY_E]:
 			_set_build_mode(BuildMode.PLACE)
 		_update_build_ui()
@@ -449,6 +452,8 @@ func _input(event: InputEvent) -> void:
 
 
 func _set_build_mode(mode: BuildMode) -> void:
+	if (mode in [BuildMode.MENU, BuildMode.PLACE] and not is_build_menu_available()) or (mode == BuildMode.SKILLS and not is_skill_menu_available()):
+		return
 	build_mode = mode
 	build_options.clear_hover()
 	if mode != BuildMode.PLACE:
@@ -476,6 +481,8 @@ func _build_anchor() -> Vector2i:
 
 
 func _confirm_skill() -> void:
+	if not _available_skill_indices().has(selected_skill):
+		return
 	var skill: Dictionary = SKILLS[selected_skill].duplicate(true)
 	var id: String = skill.get("id", "")
 	if not _skill_block_reason(id).is_empty():
@@ -662,7 +669,7 @@ func _live_combat_drones(group: String) -> Array[Node2D]:
 func spawn_enemy_wave() -> void:
 	if is_game_over or get_tree().paused:
 		return
-	var edge := (RADIUS + 0.5) * CELL
+	var edge := (map_radius + 0.5) * CELL
 	spawned_waves += 1
 	var number := spawned_waves
 	wave_alive[number] = 6 + 2 * (number - 1)
@@ -749,7 +756,7 @@ func _can_build(anchor: Vector2i) -> bool:
 	for y in 2:
 		for x in 2:
 			var cell := anchor + Vector2i(x, y)
-			if absi(cell.x) > RADIUS or absi(cell.y) > RADIUS or occupied_cells.has(cell):
+			if absi(cell.x) > map_radius or absi(cell.y) > map_radius or occupied_cells.has(cell):
 				return false
 			if block_cells.has(cell) and is_instance_valid(block_cells[cell]):
 				if not block_cells[cell].is_queued_for_deletion():
@@ -758,6 +765,8 @@ func _can_build(anchor: Vector2i) -> bool:
 
 
 func _place_building() -> void:
+	if not is_build_menu_available() or not _available_building_indices().has(selected_building):
+		return
 	var anchor := _build_anchor()
 	var cost := _building_cost(selected_building)
 	if not _can_build(anchor) or money < cost or _building_count(selected_building) >= _building_limit(selected_building):
@@ -887,12 +896,38 @@ func update_collector_label(index: int) -> void:
 func deposit_drone_blocks(index: int, amount: int) -> void:
 	var value := amount * money_per_block
 	if index == BASE_HOME:
-		money += value
+		receive_income(value)
 		_update_counters()
 		_update_build_ui()
 	else:
 		buildings[index]["money"] += value
 		update_collector_label(index)
+
+
+func receive_income(amount: int) -> void:
+	money += amount
+	if amount > 0:
+		income_received.emit(amount)
+
+
+func is_build_menu_available() -> bool:
+	return true
+
+
+func is_skill_menu_available() -> bool:
+	return true
+
+
+func _available_building_indices() -> Array:
+	return range(BUILDINGS.size())
+
+
+func _available_skill_indices() -> Array:
+	return range(SKILLS.size())
+
+
+func _cycle_available(indices: Array, current: int, direction: int) -> int:
+	return indices[posmod(indices.find(current) + direction, indices.size())] if not indices.is_empty() else current
 
 
 func _building_cost(kind: int) -> int:
@@ -1063,11 +1098,16 @@ func _update_build_ui() -> void:
 		for skill in skills:
 			if skill.get("lock_reason", "") == "Maximum erreicht":
 				skill.next_effect = "Maximum erreicht"
-		build_options.configure("SKILL-TREE", skills, selected_skill, money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen")
+		var available := _available_skill_indices()
+		var visible_skills: Array = []
+		for index in available:
+			visible_skills.append(skills[index])
+		build_options.configure("SKILL-TREE", visible_skills, maxi(0, available.find(selected_skill)), money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen")
 		return
 	if build_mode == BuildMode.MENU:
 		var items: Array = []
-		for index in BUILDINGS.size():
+		var available := _available_building_indices()
+		for index in available:
 			var description := "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab." % collector_drone_count if index == 0 else "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner." % barracks_drone_count
 			if index == 2:
 				description = "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer." % [tower_health, tower_shots, tower_interval_ms]
@@ -1075,7 +1115,7 @@ func _update_build_ui() -> void:
 				description = "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände." % [workshop_drone_count, workshop_repair]
 			description += "\nBauzeit: %d s" % int(Balance.BUILD_SECONDS[index])
 			items.append({"name": "%s (%d/%d)" % [BUILDINGS[index], _building_count(index), _building_limit(index)], "lock_reason": "Gebäudelimit erreicht" if _building_count(index) >= _building_limit(index) else "", "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg", "res://assets/icons/workshop.svg"][index], "description": description})
-		build_options.configure("BAUEN / 2 × 2", items, selected_building, money, "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen")
+		build_options.configure("BAUEN / 2 × 2", items, maxi(0, available.find(selected_building)), money, "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen")
 	if build_mode == BuildMode.PLACE:
 		var valid := _can_build(_build_anchor())
 		var cost := _building_cost(selected_building)
@@ -1092,7 +1132,7 @@ func _update_build_ui() -> void:
 
 func _create_boundary() -> void:
 	# Invisible bedrock keeps the finite prototype map enclosed.
-	var edge := (RADIUS + 0.5) * CELL
+	var edge := (map_radius + 0.5) * CELL
 	for side in [Vector2.LEFT, Vector2.RIGHT, Vector2.UP, Vector2.DOWN]:
 		var body := StaticBody2D.new()
 		body.position = side * (edge + CELL / 2.0)
@@ -1305,10 +1345,10 @@ func _on_skills_button_pressed() -> void:
 
 func _on_option_clicked(index: int) -> void:
 	if build_mode == BuildMode.SKILLS:
-		selected_skill = index
+		selected_skill = _available_skill_indices()[index]
 		_confirm_skill()
 	elif build_mode == BuildMode.MENU:
-		selected_building = index
+		selected_building = _available_building_indices()[index]
 		mouse_placement = true
 		$Player.navigation_path.clear()
 		_set_build_mode(BuildMode.PLACE)

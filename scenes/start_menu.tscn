@@ -39,6 +39,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 26
 text = "Spiel starten"
 
+[node name="TutorialButton" type="Button" parent="Center/Menu"]
+custom_minimum_size = Vector2(300, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "Tutorial"
+
 [node name="StatsButton" type="Button" parent="Center/Menu"]
 custom_minimum_size = Vector2(300, 56)
 layout_mode = 2
@@ -46,4 +52,5 @@ theme_override_font_sizes/font_size = 22
 text = "Perks & Statistik"
 
 [connection signal="pressed" from="Center/Menu/StartButton" to="." method="_start_game"]
+[connection signal="pressed" from="Center/Menu/TutorialButton" to="." method="_start_tutorial"]
 [connection signal="pressed" from="Center/Menu/StatsButton" to="." method="_open_statistics"]

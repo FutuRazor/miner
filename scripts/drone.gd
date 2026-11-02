@@ -240,7 +240,7 @@ func _plan(go_home: bool) -> void:
 			break
 		for direction in DIRECTIONS:
 			var next: Vector2i = cell + direction
-			if absi(next.x) > world.RADIUS or absi(next.y) > world.RADIUS:
+			if absi(next.x) > world.map_radius or absi(next.y) > world.map_radius:
 				continue
 			if _has_block(next):
 				if not world.block_cells[next].available_for_drone(self):
@@ -372,7 +372,7 @@ func _cash_source_reserved(index: int) -> bool:
 
 
 func _cash_deliver() -> void:
-	world.money += cash_carried
+	world.receive_income(cash_carried)
 	cash_carried = 0
 	returning = false
 	deposit_elapsed = 0.0

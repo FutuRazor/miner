@@ -16,15 +16,18 @@ func _unhandled_key_input(event: InputEvent) -> void:
 				focused.pressed.emit()
 		elif event.keycode in [KEY_W, KEY_S]:
 			var focused := get_viewport().gui_get_focus_owner()
-			if focused == $Center/Menu/StartButton:
-				$Center/Menu/StatsButton.grab_focus()
-			else:
-				$Center/Menu/StartButton.grab_focus()
+			var buttons := [$Center/Menu/StartButton, $Center/Menu/TutorialButton, $Center/Menu/StatsButton]
+			var direction := -1 if event.keycode == KEY_W else 1
+			buttons[posmod(buttons.find(focused) + direction, buttons.size())].grab_focus()
 			get_viewport().set_input_as_handled()
 
 
 func _start_game() -> void:
 	_change_scene("res://scenes/main.tscn")
+
+
+func _start_tutorial() -> void:
+	_change_scene("res://scenes/tutorial.tscn")
 
 
 func _open_statistics() -> void:
