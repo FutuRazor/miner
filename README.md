@@ -61,7 +61,12 @@ The victory screen shows **real play time**, **enemies neutralized**, **fully mi
 
 Play time excludes pauses and measures real time regardless of simulation speed: ten minutes played at **3×** speed appear as **10:00**, even though thirty minutes pass in the simulation. Revenue counts income credited during the run, excluding starting money and building sale proceeds.
 
-Open **Ranking** in the start menu to see all recorded main-mission victories, sorted by **shortest real play time**. Each entry also includes defeated enemies, fully mined blocks, and revenue. Victories are saved locally when the mission is completed; continuing in Endless Freeplay does not change the recorded result. Recording starts with this feature; earlier wins cannot be reconstructed.
+Open **Ranking** in the start menu and choose a category:
+
+- **20-Wave Mission:** All recorded mission victories, sorted by shortest real play time. The result is saved on victory and remains unchanged during Endless Freeplay.
+- **Endless Game:** Runs in which at least **wave 21 has been defeated**, saved when returning to the main menu through the exit confirmation or defeat screen. Results show the highest defeated wave and are sorted by that wave first, then by shortest play time for ties. Cancelling the exit or choosing Retry does not create an entry.
+
+Both categories include real play time, defeated enemies, fully mined blocks, and revenue. Endless statistics cover the full run, including the initial 20-wave mission. Rankings are stored locally; earlier runs cannot be reconstructed.
 
 ## Tutorial
 

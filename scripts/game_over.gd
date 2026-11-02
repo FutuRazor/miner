@@ -13,7 +13,7 @@ func _show_round_stats() -> void:
 	var world = get_parent()
 	var seconds := int(world.round_duration)
 	$Screen/Center/Menu/Stats.text = "\n".join([
-		tr("Rundendauer: %s") % ("%02d:%02d" % [seconds / 60, seconds % 60]),
+		tr("Rundendauer: %s") % ("%02d:%02d" % [floori(seconds / 60.0), seconds % 60]),
 		tr("Neutralisierte Gegner: %d") % world.enemies_neutralized,
 		tr("Abgebaute Sektoren: %d Blöcke") % world.sectors_mined,
 		tr("Gesamteinnahmen: $%d") % world.total_revenue,
@@ -44,6 +44,8 @@ func _request_scene(path: String) -> void:
 
 
 func _switch_scene(path: String) -> void:
+	if path == "res://scenes/start_menu.tscn":
+		get_parent().record_endless_result()
 	var tree := get_tree()
 	var error := tree.change_scene_to_file(path)
 	if error == OK:

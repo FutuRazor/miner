@@ -18,6 +18,7 @@ var base_health_label: Label
 var is_game_over := false
 var endless_freeplay := false
 var victory_recorded := false
+var endless_recorded := false
 var round_duration := 0.0
 var enemies_neutralized := 0
 var sectors_mined := 0
@@ -1464,6 +1465,13 @@ func _end_game(victory: bool = false) -> void:
 	add_child(game_over_screen)
 	get_tree().paused = true
 	_update_pause_controls()
+
+
+func record_endless_result() -> void:
+	if scene_file_path != "res://scenes/main.tscn" or not endless_freeplay or cleared_waves < 21 or endless_recorded:
+		return
+	endless_recorded = true
+	get_node("/root/MetaStats").record_endless_game(cleared_waves, round_duration, enemies_neutralized, sectors_mined, total_revenue)
 
 
 func continue_endless() -> void:

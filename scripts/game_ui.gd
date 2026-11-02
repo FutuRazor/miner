@@ -141,6 +141,7 @@ func confirm_return() -> void:
 
 
 func _return_to_start() -> void:
+	world.record_endless_result()
 	var tree := get_tree()
 	get_node("/root/MetaStats").save_now()
 	var error := tree.change_scene_to_file("res://scenes/start_menu.tscn")

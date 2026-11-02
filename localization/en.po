@@ -848,3 +848,21 @@ msgstr "MidBoss"
 
 msgid "FinalBoss"
 msgstr "FinalBoss"
+
+msgid "20-Wellen-Mission"
+msgstr "20-Wave Mission"
+
+msgid "Endless Game"
+msgstr "Endless Game"
+
+msgid "Endless Game · höchste besiegte Welle zuerst"
+msgstr "Endless Game · highest defeated wave first"
+
+msgid "Endless-Partien: %d"
+msgstr "Endless games: %d"
+
+msgid "Höchste besiegte Welle"
+msgstr "Highest Defeated Wave"
+
+msgid "Noch keine Endless-Partien mit besiegter Welle 21."
+msgstr "No Endless games with wave 21 defeated yet."
