@@ -45,9 +45,16 @@ func resolve() -> void:
 						if overlap <= 0.001:
 							continue
 						var normal := difference / distance if distance > 0.001 else Vector2.from_angle(float(posmod(drone.get_instance_id() + other.get_instance_id(), 360)) * PI / 180.0)
-						var correction := normal * (overlap + 0.001) * 0.5
-						drone.position += correction
-						other.position -= correction
+						var correction := normal * (overlap + 0.001)
+						# Boss movement takes precedence: the smaller drone absorbs
+						# all displacement, even when a crowd surrounds the boss.
+						var share := 0.5
+						if drone.pushes_drones and not other.pushes_drones:
+							share = 0.0
+						elif other.pushes_drones and not drone.pushes_drones:
+							share = 1.0
+						drone.position += correction * share
+						other.position -= correction * (1.0 - share)
 						if drone.passive:
 							drone.is_moving = true
 						if other.passive:

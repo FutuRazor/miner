@@ -42,7 +42,8 @@ func spawn_wave(number: int) -> void:
 		boss.wave_number = number
 		boss.name = "FinalBoss" if boss.final_boss else "MidBoss"
 		boss.max_health *= 50 if boss.final_boss else 20
-		boss.ignores_attackers = not boss.final_boss
+		boss.ignores_attackers = true
+		boss.pushes_drones = true
 		boss.speed = 100.0 if boss.final_boss else 50.0
 		boss.tint = Color("c88aff") if boss.final_boss else Color("ffad55")
 		boss.boss_defeated.connect(world._on_enemy_destroyed)

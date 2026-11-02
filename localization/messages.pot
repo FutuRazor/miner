@@ -58,11 +58,11 @@ msgstr ""
 msgid " (lvl. %d)"
 msgstr ""
 
-#: scripts/drone.gd:293
+#: scripts/drone.gd:294
 msgid " Abgabe…"
 msgstr ""
 
-#: scripts/drone.gd:291
+#: scripts/drone.gd:292
 msgid " Abholen…"
 msgstr ""
 
@@ -114,7 +114,7 @@ msgstr ""
 msgid "%d Geld"
 msgstr ""
 
-#: scripts/drone.gd:291
+#: scripts/drone.gd:292
 msgid "%d Geld%s"
 msgstr ""
 
@@ -566,7 +566,7 @@ msgstr ""
 msgid "Lebenspunkte"
 msgstr ""
 
-#: scripts/drone.gd:289 scripts/tower.gd:74 scripts/world.gd:1486
+#: scripts/drone.gd:290 scripts/tower.gd:74 scripts/world.gd:1486
 msgid "Lebenspunkte\n%d/%d"
 msgstr ""
 
@@ -594,7 +594,7 @@ msgstr ""
 msgid "Maximum erreicht"
 msgstr ""
 
-#: scripts/drone.gd:287
+#: scripts/drone.gd:288
 msgid "Mechaniker: bereit"
 msgstr ""
 
@@ -674,7 +674,7 @@ msgstr ""
 msgid "Reparatur erhöhen"
 msgstr ""
 
-#: scripts/drone.gd:287
+#: scripts/drone.gd:288
 msgid "Reparatur: %d LP/s"
 msgstr ""
 

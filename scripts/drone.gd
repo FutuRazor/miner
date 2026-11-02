@@ -17,6 +17,7 @@ var collects_money := false
 var passive := false
 var hostile := false
 var ignores_attackers := false
+var pushes_drones := false
 var is_tower := false
 var combat_target: Node2D
 var combat_ai: RefCounted

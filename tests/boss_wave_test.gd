@@ -10,6 +10,36 @@ func _settle() -> void:
 		await process_frame
 
 
+func _check_push_through(world: Node2D, boss: Node2D, defender: Node2D) -> void:
+	boss.position = Vector2(500, 0)
+	defender.position = Vector2(480, 0)
+	var crowd: Array[Node2D] = [defender]
+	for index in 12:
+		var drone = world.Drone.new()
+		drone.world = world
+		drone.passive = true
+		drone.collector_index = -1
+		world.add_child(drone)
+		drone.set_physics_process(false)
+		drone.position = boss.position + Vector2.from_angle(index * TAU / 12.0) * 19.0
+		crowd.append(drone)
+	for frame in 60:
+		for drone in crowd:
+			drone.combat_ai.set_target(boss)
+			drone._physics_process(1.0 / 60.0)
+		boss._physics_process(1.0 / 60.0)
+		var before: Vector2 = boss.position
+		world.drone_collisions.resolve()
+		assert(boss.position.is_equal_approx(before))
+		assert(boss.combat_target == null)
+	assert(is_equal_approx(boss.position.x, 500.0 - boss.speed))
+	assert(is_zero_approx(boss.position.y))
+	for index in range(1, crowd.size()):
+		crowd[index].dead = true
+		crowd[index].queue_free()
+	defender.position = Vector2.ZERO
+
+
 func _run() -> void:
 	root.get_node("MetaStats").persistence_enabled = false
 	assert(change_scene_to_file("res://scenes/main.tscn") == OK)
@@ -41,6 +71,7 @@ func _run() -> void:
 	mid._physics_process(1.0)
 	assert(mid.position.is_equal_approx(Vector2(250, 0)))
 	assert(defender.health == 30)
+	_check_push_through(world, mid, defender)
 	mid.take_damage(1000)
 	assert(world.cleared_waves == 10 and world.wave_alive[10] == 0)
 	await _settle()
@@ -52,6 +83,9 @@ func _run() -> void:
 	var boss = enemies[0]
 	boss.set_physics_process(false)
 	assert(boss.name == "FinalBoss" and boss.health == 350)
+	boss.take_damage(1, defender)
+	assert(boss.combat_target == null)
+	_check_push_through(world, boss, defender)
 	assert(boss.swarmer_timer.wait_time == 5.0 and not boss.swarmer_timer.one_shot)
 	boss.position = Vector2(500, 200)
 	boss.swarmer_timer.timeout.emit()
