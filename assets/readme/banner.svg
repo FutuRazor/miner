@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="320" viewBox="0 0 1200 320" role="img" aria-labelledby="title description">
+  <title id="title">Miner — Mine. Automate. Defend.</title>
+  <desc id="description">A mining grid with a central base, resource blocks, drones, and defensive towers.</desc>
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#263b48" stroke-width="1"/>
+    </pattern>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#151e28"/>
+      <stop offset="1" stop-color="#203744"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="320" rx="18" fill="url(#background)"/>
+  <rect x="24" y="24" width="368" height="272" rx="12" fill="url(#grid)"/>
+  <g fill="#79644f" stroke="#a38b70" stroke-width="2">
+    <rect x="44" y="44" width="34" height="34"/><rect x="84" y="44" width="34" height="34"/>
+    <rect x="124" y="44" width="34" height="34"/><rect x="44" y="84" width="34" height="34"/>
+    <rect x="44" y="124" width="34" height="34"/><rect x="324" y="204" width="34" height="34"/>
+    <rect x="284" y="244" width="34" height="34"/><rect x="324" y="244" width="34" height="34"/>
+  </g>
+  <rect x="154" y="108" width="100" height="100" rx="5" fill="#365665" stroke="#66e5db" stroke-width="3"/>
+  <path d="M179 158h50m-25-25v50" stroke="#66e5db" stroke-width="8"/>
+  <g fill="#4d7fa9" stroke="#7eb7ff" stroke-width="3">
+    <rect x="94" y="204" width="42" height="42"/><rect x="274" y="68" width="42" height="42"/>
+    <path d="m115 225-12-20m192-116 16-18" stroke-width="8"/>
+  </g>
+  <g fill="#f4c86b" stroke="#172332" stroke-width="3">
+    <circle cx="109" cy="131" r="11"/><circle cx="132" cy="104" r="11"/>
+  </g>
+  <g fill="#9e94ed" stroke="#172332" stroke-width="3">
+    <circle cx="278" cy="161" r="11"/><circle cx="293" cy="186" r="11"/>
+  </g>
+  <circle cx="170" cy="237" r="11" fill="#8de6a4"/>
+  <path d="M164 237h12m-6-6v12" stroke="#203744" stroke-width="3"/>
+  <path d="m341 127-8 15h16zm17 27-8 15h16z" fill="#ff7373"/>
+  <text x="444" y="132" fill="#eef8f7" font-family="Segoe UI,Arial,sans-serif" font-size="78" font-weight="800" letter-spacing="8">MINER</text>
+  <text x="448" y="184" fill="#66e5db" font-family="Segoe UI,Arial,sans-serif" font-size="29" font-weight="600">Mine. Automate. Defend.</text>
+  <text x="448" y="232" fill="#adbdc8" font-family="Segoe UI,Arial,sans-serif" font-size="19">A 2D mining, automation, and wave-defense prototype.</text>
+</svg>

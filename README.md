@@ -1,0 +1,102 @@
+<div align="center">
+
+![Miner — Mine. Automate. Defend.](assets/readme/banner.svg)
+
+![Engine: Godot 4.7](https://img.shields.io/badge/Godot-4.7-478CBF?logo=godotengine&logoColor=white)
+![Language: GDScript](https://img.shields.io/badge/Language-GDScript-66e5db)
+![Status: Playable prototype](https://img.shields.io/badge/Status-Playable%20prototype-f4c86b)
+
+**Build an automated mining operation. Keep your base alive against increasingly powerful enemy waves.**
+
+[Gameplay](#gameplay) · [Buildings](#buildings) · [Tutorial](#tutorial) · [Controls](#controls) · [Getting started](#getting-started)
+
+</div>
+
+## Gameplay
+
+**Miner** combines resource gathering, base building, automation, and wave defense. Start with your character, mine nearby blocks, and return the resources to your base to earn money. Invest in mining drones, transport, defenses, and repairs as enemy waves grow stronger.
+
+```text
+MINE → SELL → AUTOMATE → FORTIFY → SURVIVE
+                 ↑                    │
+                 └──── UPGRADE ────────┘
+```
+
+The main map contains **2,000 resource blocks** around a central base. Each block yields resources in four mining steps. Harder layers require higher mining levels, and limited carrying capacity makes delivery routes important. Resources are finite, so economic expansion and defense compete for the same budget.
+
+## Buildings
+
+| Building | Role |
+| :--- | :--- |
+| ⛏️ **Collector** | Deploys mining drones and stores their earnings. Collect the money yourself or use cash-collection drones to automate delivery. |
+| 🛡️ **Barracks** | Produces melee combat drones that intercept enemies. Lost drones are replaced through a production queue. |
+| 🎯 **Tower** | Fires projectiles at nearby enemies. Upgrade its health, simultaneous shots, and firing rate. |
+| 🔧 **Workshop** | Deploys mechanics to repair the base, towers, and stationary combat drones on their barracks grounds. Only one workshop can exist at a time. |
+
+Buildings occupy **2 × 2 grid cells** and take time to construct. Right-click a building to inspect its drones, upgrades, and statistics. Demolition requires confirmation and refunds **75% of the actual construction price**, rounded down. Stored earnings and carried mining resources are recovered, and global upgrades remain unlocked.
+
+## Progression & simulation
+
+- **Global skill tree:** Improve mining levels, drone counts, movement speed, carrying capacity, health, damage, tower firepower, and repair performance.
+- **Progress-based limits:** Building caps and upgrade availability expand as waves are defeated.
+- **Growing enemy waves:** Enemy numbers and health increase. The run ends when the base is destroyed.
+- **Repair priorities:** Mechanics prioritize the base, then towers, then eligible combat drones. Towers and combat drones are reserved for one mechanic at a time; multiple mechanics can repair the base together.
+- **Drone traffic:** Hard circular collisions allow drones to push one another. Drones navigate around obstacles and find parking space without fixed slots. Mining jobs and cash pickups are reserved to reduce duplicate assignments.
+- **Simulation controls:** Pause or cycle through **1×, 1.5×, 2×, and 3×** speed. Zoom and pan the map within its camera bounds.
+- **Persistent statistics:** Track gathered resources, fully mined blocks by hardness, and defeated enemies across runs.
+
+## Tutorial
+
+Choose **Tutorial** from the start menu for a guided introduction on a smaller map with **264 blocks**, six resource rings, and hardness levels **1–3**.
+
+The tutorial starts with **20 money**, no active wave timer, and no building or skill menus. Income milestones gradually introduce collectors, economic upgrades, base skills, harder resources, and defenses. Messages pause the simulation, while blinking buttons highlight newly available actions.
+
+After one barracks and two towers are finished, a **10-second preparation period** leads into the **100-second countdown** to the first wave. Defeating that wave introduces the workshop and repairs.
+
+## Controls
+
+| Input | Action |
+| :--- | :--- |
+| **WASD / Arrow keys** | Move the character; select entries while a menu is open |
+| **Left-click / Hold** | Navigate or direct the character toward resources |
+| **Near a mineable block** | Automatically mine until carrying capacity is reached |
+| **B** | Toggle the building menu |
+| **J** | Toggle the skill tree |
+| **Enter / E** | Confirm the selected menu entry or keyboard placement |
+| **Right-click a building** | Open its information and demolition menu |
+| **Hold right mouse button + Drag** | Pan the camera |
+| **Mouse wheel** | Zoom the map; scroll menus when hovered |
+| **Escape / Right-click while placing** | Cancel placement or close the current menu |
+| **Top-left buttons** | Resume, pause, or change simulation speed |
+
+## Getting started
+
+1. Install **Godot 4.7**. The project is developed and tested with **Godot 4.7.2**.
+2. Clone or download this repository.
+3. Import **`project.godot`** into Godot.
+4. Press **F6** with the start-menu scene open, or **F5** to run the project.
+5. Choose the main game or the tutorial.
+
+> **Prototype status:** Mechanics and balance are actively evolving. The in-game interface is currently in German; this README uses English names for the main systems.
+
+<details>
+<summary><strong>Project structure & tests</strong></summary>
+
+| Path | Contents |
+| :--- | :--- |
+| `scenes/` | Start menu, main world, tutorial, and interface scenes |
+| `scripts/world.gd` | Shared world, economy, construction, and wave logic |
+| `scripts/balance.gd` | Prices, caps, and upgrade unlock schedules |
+| `scripts/tutorial_world.gd` | Tutorial milestones and restricted progression |
+| `scripts/drone*.gd` | Drone behavior, navigation, and collision handling |
+| `tests/` | Headless gameplay and interface regression tests |
+
+Run an individual test from the repository root:
+
+```sh
+godot --headless --path . --script tests/tutorial_test.gd
+```
+
+Replace `godot` with the path to your Godot executable if it is not on your system's `PATH`.
+
+</details>
