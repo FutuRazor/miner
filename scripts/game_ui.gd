@@ -61,7 +61,7 @@ func _create_return_dialog() -> void:
 	badge_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	pause_badge.add_child(badge_panel)
 	var badge_label := Label.new()
-	badge_label.text = "Pause"
+	badge_label.text = tr("Pause")
 	badge_label.custom_minimum_size = Vector2(120, 48)
 	badge_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	badge_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -89,7 +89,7 @@ func _create_return_dialog() -> void:
 	content.add_theme_constant_override("separation", 16)
 	margin.add_child(content)
 	var question := Label.new()
-	question.text = "Soll das laufende Spiel beendet werden?"
+	question.text = tr("Soll das laufende Spiel beendet werden?")
 	question.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(question)
 	var buttons := HBoxContainer.new()
@@ -97,12 +97,12 @@ func _create_return_dialog() -> void:
 	buttons.add_theme_constant_override("separation", 12)
 	content.add_child(buttons)
 	exit_button = Button.new()
-	exit_button.text = "Beenden"
+	exit_button.text = tr("Beenden")
 	exit_button.custom_minimum_size = Vector2(130, 42)
 	buttons.add_child(exit_button)
 	exit_button.pressed.connect(confirm_return)
 	continue_button = Button.new()
-	continue_button.text = "Weiterspielen"
+	continue_button.text = tr("Weiterspielen")
 	continue_button.custom_minimum_size = Vector2(150, 42)
 	buttons.add_child(continue_button)
 	continue_button.pressed.connect(cancel_return)
@@ -148,4 +148,4 @@ func _return_to_start() -> void:
 		tree.paused = false
 	else:
 		changing_scene = false
-		push_error("Hauptmenü konnte nicht geladen werden: %s" % error_string(error))
+		push_error(tr("Hauptmenü konnte nicht geladen werden: %s") % error_string(error))

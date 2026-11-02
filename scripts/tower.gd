@@ -71,7 +71,7 @@ func _physics_process(delta: float) -> void:
 
 
 func update_health() -> void:
-	health_label.text = "Lebenspunkte\n%d/%d" % [health, max_health]
+	health_label.text = tr("Lebenspunkte\n%d/%d") % [health, max_health]
 
 
 func take_damage(amount: int, _attacker: Node2D = null) -> void:

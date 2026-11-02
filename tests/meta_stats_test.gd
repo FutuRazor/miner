@@ -14,6 +14,8 @@ func _store(path: String) -> Node:
 
 
 func _run() -> void:
+	# Keep existing German UI expectations independent of the default language.
+	TranslationServer.set_locale("de")
 	var meta := root.get_node("MetaStats")
 	meta.persistence_enabled = false
 	meta.collected_by_hardness.clear()

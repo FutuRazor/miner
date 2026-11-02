@@ -40,8 +40,8 @@ func configure(title: String, items: Array, selected: int, money: int, help: Str
 	current_items = items
 	selected_index = selected
 	available_money = money
-	heading.text = title
-	hint.text = help
+	heading.text = tr(title)
+	hint.text = tr(help)
 	while rows.size() > items.size():
 		var old: Dictionary = rows.pop_back()
 		entries.remove_child(old.wrapper)
@@ -52,14 +52,15 @@ func configure(title: String, items: Array, selected: int, money: int, help: Str
 	for index in items.size():
 		var row := rows[index]
 		var group: String = items[index].get("group", "")
-		row.group_label.text = group
+		row.group_label.text = tr(group)
 		row.group_label.visible = not group.is_empty() and (index == 0 or group != items[index - 1].get("group", ""))
 		if row.group_label.visible:
 			group_count += 1
-		row.name_label.text = items[index].name
+		row.name_label.text = tr(items[index].name)
 		var placeholder: bool = items[index].get("placeholder", false)
 		var locked: String = items[index].get("lock_reason", "")
-		row.cost_label.text = "Später" if placeholder else (("Maximum" if locked.contains("Maximum") or locked.contains("limit") else "Gesperrt") if not locked.is_empty() else "%d Geld" % items[index].cost)
+		var reached_limit := locked in [tr("Maximum erreicht"), tr("Gebäudelimit erreicht")]
+		row.cost_label.text = tr("Später") if placeholder else ((tr("Maximum") if reached_limit else tr("Gesperrt")) if not locked.is_empty() else tr("%d Geld") % items[index].cost)
 		row.cost_label.add_theme_color_override("font_color", Color("adbdc8") if placeholder else (COST_UNAFFORDABLE if money < items[index].cost else COST_NORMAL))
 		row.button.button_pressed = index == selected
 		row.icon.texture = load(items[index].icon)

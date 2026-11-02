@@ -30,13 +30,13 @@ func _ready() -> void:
 	content.add_theme_constant_override("separation", 12)
 	margin.add_child(content)
 	var title := Label.new()
-	title.text = "GESAMTSTATISTIK"
+	title.text = tr("GESAMTSTATISTIK")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 28)
 	title.add_theme_color_override("font_color", Color("66e5db"))
 	content.add_child(title)
 	var subtitle := Label.new()
-	subtitle.text = "Alle Partien · dauerhaft gespeichert"
+	subtitle.text = tr("Alle Partien · dauerhaft gespeichert")
 	subtitle.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	content.add_child(subtitle)
 	summary = Label.new()
@@ -53,7 +53,7 @@ func _ready() -> void:
 	grid.add_theme_constant_override("v_separation", 8)
 	scroll.add_child(grid)
 	var explanation := Label.new()
-	explanation.text = "Jeder Abbauschritt zählt als eine gesammelte Einheit.\nNach dem vierten Schritt zählt der Block zusätzlich als vollständig abgebaut."
+	explanation.text = tr("Jeder Abbauschritt zählt als eine gesammelte Einheit.\nNach dem vierten Schritt zählt der Block zusätzlich als vollständig abgebaut.")
 	explanation.add_theme_font_size_override("font_size", 13)
 	content.add_child(explanation)
 	notice = Label.new()
@@ -61,7 +61,7 @@ func _ready() -> void:
 	notice.add_theme_font_size_override("font_size", 13)
 	content.add_child(notice)
 	back_button = Button.new()
-	back_button.text = "Zurück zum Hauptmenü"
+	back_button.text = tr("Zurück zum Hauptmenü")
 	back_button.custom_minimum_size.y = 44
 	content.add_child(back_button)
 	back_button.pressed.connect(_back)
@@ -71,11 +71,11 @@ func _ready() -> void:
 
 
 func _refresh() -> void:
-	summary.text = "Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d" % [stats.total_collected(), stats.total_destroyed(), stats.enemy_drones_defeated]
+	summary.text = tr("Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d") % [stats.total_collected(), stats.total_destroyed(), stats.enemy_drones_defeated]
 	for child in grid.get_children():
 		grid.remove_child(child)
 		child.queue_free()
-	for text in ["Härtegrad", "Gesammelt", "Vollständig abgebaut"]:
+	for text in [tr("Härtegrad"), "Gesammelt", tr("Vollständig abgebaut")]:
 		_add_cell(text, true)
 	var highest := 10
 	for key in stats.collected_by_hardness:
@@ -91,7 +91,7 @@ func _refresh() -> void:
 
 func _add_cell(text: String, header: bool = false) -> void:
 	var cell := Label.new()
-	cell.text = text
+	cell.text = tr(text)
 	cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if header:
 		cell.add_theme_color_override("font_color", Color("66e5db"))
@@ -111,4 +111,4 @@ func _back() -> void:
 	var error := get_tree().change_scene_to_file("res://scenes/start_menu.tscn")
 	if error != OK:
 		changing_scene = false
-		push_error("Hauptmenü konnte nicht geladen werden: %s" % error_string(error))
+		push_error(tr("Hauptmenü konnte nicht geladen werden: %s") % error_string(error))

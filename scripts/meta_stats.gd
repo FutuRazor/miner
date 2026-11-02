@@ -109,10 +109,10 @@ func load_stats() -> void:
 	if snapshot.is_empty() and FileAccess.file_exists(storage_path + ".bak"):
 		snapshot = _read_snapshot(storage_path + ".bak")
 		if not snapshot.is_empty():
-			load_warning = "Die Statistik wurde aus der letzten Sicherung wiederhergestellt."
+			load_warning = tr("Die Statistik wurde aus der letzten Sicherung wiederhergestellt.")
 	if snapshot.is_empty():
 		if FileAccess.file_exists(storage_path) or FileAccess.file_exists(storage_path + ".bak"):
-			load_warning = "Die gespeicherte Statistik konnte nicht gelesen werden. Beschädigte Dateien bleiben zur Wiederherstellung erhalten."
+			load_warning = tr("Die gespeicherte Statistik konnte nicht gelesen werden. Beschädigte Dateien bleiben zur Wiederherstellung erhalten.")
 		return
 	for key in snapshot.collected_by_hardness:
 		collected_by_hardness[key] = int(snapshot.collected_by_hardness[key])
@@ -158,7 +158,7 @@ func save_now() -> bool:
 
 
 func _save_failed(error: int) -> bool:
-	save_error = "Die Gesamtstatistik konnte nicht gespeichert werden: " + error_string(error)
+	save_error = tr("Die Gesamtstatistik konnte nicht gespeichert werden: ") + error_string(error)
 	push_warning(save_error)
 	return false
 

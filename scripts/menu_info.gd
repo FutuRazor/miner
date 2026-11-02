@@ -33,7 +33,7 @@ func _ready() -> void:
 	current_effect.add_theme_color_override("font_color", Color.WHITE)
 	upgrade_details.add_child(current_effect)
 	var arrow := Label.new()
-	arrow.text = "↓"
+	arrow.text = tr("↓")
 	arrow.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	arrow.add_theme_font_size_override("font_size", 22)
 	arrow.add_theme_color_override("font_color", Color("65e994"))
@@ -48,20 +48,20 @@ func _ready() -> void:
 
 
 func show_item(item: Dictionary, money: int) -> void:
-	title.text = item.name
+	title.text = tr(item.name)
 	if item.has("level"):
-		title.text += " (lvl. %d)" % item.level
-	description.text = item.get("description", "Noch keine Beschreibung verfügbar.")
+		title.text += tr(" (lvl. %d)") % item.level
+	description.text = tr(item.get("description", tr("Noch keine Beschreibung verfügbar.")))
 	upgrade_details.visible = item.has("current_effect") and item.has("next_effect")
 	if upgrade_details.visible:
 		current_effect.text = item.current_effect
 		next_effect.text = item.next_effect
 	if item.get("placeholder", false):
-		cost.text = "Platzhalter · Noch nicht upgradebar"
+		cost.text = tr("Platzhalter · Noch nicht upgradebar")
 		cost.add_theme_color_override("font_color", Color("adbdc8"))
 		show()
 		return
 	var locked: String = item.get("lock_reason", "")
-	cost.text = locked if not locked.is_empty() else "Kosten: %d Geld" % item.cost
+	cost.text = locked if not locked.is_empty() else tr("Kosten: %d Geld") % item.cost
 	cost.add_theme_color_override("font_color", Color("ff7777") if money < item.cost else Color("e9f6f5"))
 	show()

@@ -44,6 +44,7 @@ Buildings occupy **2 × 2 grid cells** and take time to construct. Right-click a
 - **Drone traffic:** Hard circular collisions allow drones to push one another. Drones navigate around obstacles and find parking space without fixed slots. Mining jobs and cash pickups are reserved to reduce duplicate assignments.
 - **Simulation controls:** Pause or cycle through **1×, 1.5×, 2×, and 3×** speed. Zoom and pan the map within its camera bounds.
 - **Persistent statistics:** Track gathered resources, fully mined blocks by hardness, and defeated enemies across runs.
+- **Options & language:** English is the default language. Switch between English and German from the start menu; your preference is saved automatically.
 
 ## Tutorial
 
@@ -87,7 +88,7 @@ After one barracks and two towers are finished, a **10-second preparation period
 3. Import **`project.godot`** into Godot.
 4. Press **F5** to run the project.
 
-> **Prototype status:** Mechanics and balance are actively evolving. The in-game interface is currently in German; this README uses English names for the main systems.
+> **Prototype status:** Mechanics and balance are actively evolving. The game is available in English and German.
 
 <details>
 <summary><strong>Project structure & tests</strong></summary>

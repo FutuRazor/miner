@@ -23,6 +23,8 @@ func _click(point: Vector2) -> void:
 	root.push_input(event, true)
 
 func _run() -> void:
+	# Keep existing German UI expectations independent of the default language.
+	TranslationServer.set_locale("de")
 	root.size = Vector2i(1152, 720)
 	root.get_node("MetaStats").persistence_enabled = false
 	assert(change_scene_to_file("res://scenes/start_menu.tscn") == OK)

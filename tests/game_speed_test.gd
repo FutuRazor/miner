@@ -4,6 +4,8 @@ func _initialize() -> void:
 	call_deferred("_run")
 
 func _run() -> void:
+	# Keep existing German UI expectations independent of the default language.
+	TranslationServer.set_locale("de")
 	root.get_node("MetaStats").persistence_enabled = false
 	var initial_rate := Engine.physics_ticks_per_second
 	var world = load("res://scenes/main.tscn").instantiate()

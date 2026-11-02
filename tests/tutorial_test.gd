@@ -18,6 +18,8 @@ func _buy_id(world: Node, id: String) -> void:
 	assert(false, "Unknown tutorial skill")
 
 func _run() -> void:
+	# Keep existing German UI expectations independent of the default language.
+	TranslationServer.set_locale("de")
 	root.get_node("MetaStats").persistence_enabled = false
 	var world = load("res://scenes/tutorial.tscn").instantiate()
 	root.add_child(world)

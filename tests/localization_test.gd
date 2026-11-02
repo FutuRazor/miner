@@ -1,0 +1,76 @@
+extends SceneTree
+
+func _initialize() -> void:
+	call_deferred("_run")
+
+func _run() -> void:
+	root.get_node("MetaStats").persistence_enabled = false
+	var localization := root.get_node("Localization")
+	localization.persistence_enabled = false
+	localization.storage_path = "res://.godot/localization_tests/missing-%d.cfg" % OS.get_process_id()
+	localization.load_settings()
+	assert(localization.SUPPORTED_LANGUAGES == ["en", "de"])
+	assert(localization.language == "en" and TranslationServer.get_locale() == "en")
+	assert(not localization.set_language("not-supported"))
+	assert(TranslationServer.get_loaded_locales().has("de"))
+	var german = load("res://localization/de.po")
+	assert(german.get_message("Basis: %d Geld") == "Basis: %d Geld")
+	# Persist to isolated workspace files, never to the user's real preferences.
+	var path := "res://.godot/localization_tests/%d/settings.cfg" % OS.get_process_id()
+	assert(DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(path).get_base_dir()) == OK)
+	var settings = load("res://scripts/localization.gd").new()
+	settings.storage_path = path
+	root.add_child(settings)
+	assert(settings.set_language("de") and FileAccess.file_exists(path))
+	var config := ConfigFile.new()
+	assert(config.load(path) == OK)
+	assert(config.get_value("interface", "language") == "de")
+	config.set_value("future", "volume", 42)
+	config.save(path)
+	assert(settings.set_language("de"))
+	config.load(path)
+	assert(config.get_value("future", "volume") == 42)
+	config.set_value("interface", "language", "not-supported")
+	config.save(path)
+	settings.load_settings()
+	assert(settings.language == "en")
+	assert(settings.set_language("de"))
+	settings.load_settings()
+	assert(settings.language == "de", "A saved German choice overrides the English default")
+	assert(localization.set_language("en"))
+	var english = load("res://localization/en.po")
+	for message in german.get_message_list():
+		assert(not english.get_message(message).is_empty(), "Missing English message: " + message)
+	assert(english.get_message("Spiel starten") == "Start game")
+	var world = load("res://scenes/main.tscn").instantiate()
+	root.add_child(world)
+	world.set_physics_process(false)
+	world.get_node("Player").set_physics_process(false)
+	world.wave_timer.set_physics_process(false)
+	assert(world.money_label.text == "Base: 40 credits")
+	assert(world.base_health_label.text == "Health\n100/100")
+	world._on_build_button_pressed()
+	assert(world.build_options.current_items[0].name == "Collector (0/2)")
+	world.skill_levels.base_health = 5
+	world._on_skills_button_pressed()
+	assert(world.build_options.heading.text == "SKILL TREE")
+	assert(world.build_options.current_items[0].group == "Base")
+	assert(world.build_options.current_items[0].name == "Health")
+	assert(world.build_options.current_items[0].lock_reason == "Maximum reached")
+	assert(world.build_options.rows[0].cost_label.text == "Max")
+	world.queue_free()
+	await process_frame
+	var tutorial = load("res://scenes/tutorial.tscn").instantiate()
+	root.add_child(tutorial)
+	tutorial.set_physics_process(false)
+	tutorial.get_node("Player").set_physics_process(false)
+	tutorial.collected_count = 10
+	tutorial._check_progress()
+	assert(tutorial.dialog.heading.text == "Carrying capacity reached")
+	tutorial.acknowledge_message()
+	tutorial.queue_free()
+	settings.queue_free()
+	assert(localization.set_language("de"))
+	await process_frame
+	print("PASS: English default, both catalogs complete, saved German preference, fallback, formatted English HUD/metadata/upgrade logic and tutorial translation")
+	quit()

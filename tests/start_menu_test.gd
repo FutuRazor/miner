@@ -6,6 +6,8 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	# Keep existing German UI expectations independent of the default language.
+	TranslationServer.set_locale("de")
 	root.get_node("MetaStats").persistence_enabled = false
 	assert(ProjectSettings.get_setting("application/run/main_scene") == "res://scenes/start_menu.tscn")
 	assert(change_scene_to_file("res://scenes/start_menu.tscn") == OK)

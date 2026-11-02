@@ -12,7 +12,7 @@ func _toggle_expanded() -> void:
 	$Margin/Rows/BuildRow/Title.visible = expanded
 	$Margin/Rows/SkillsRow/Title.visible = expanded
 	$Margin/Rows/ToggleRow/Toggle.text = "<" if expanded else ">"
-	$Margin/Rows/ToggleRow/Toggle.tooltip_text = "Menü einklappen" if expanded else "Menü ausklappen"
+	$Margin/Rows/ToggleRow/Toggle.tooltip_text = tr("Menü einklappen") if expanded else tr("Menü ausklappen")
 	reset_size()
 
 

@@ -32,15 +32,15 @@ func _ready() -> void:
 	description.custom_minimum_size.x = 420
 	description.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rows.add_child(description)
-	ok.text = "OK"
+	ok.text = tr("OK")
 	ok.custom_minimum_size = Vector2(120, 42)
 	rows.add_child(ok)
 	ok.pressed.connect(func() -> void: tutorial.acknowledge_message())
 	screen.hide()
 
 func show_message(title: String, detail: String) -> void:
-	heading.text = title
-	description.text = detail
+	heading.text = tr(title)
+	description.text = tr(detail)
 	screen.show()
 	ok.grab_focus()
 

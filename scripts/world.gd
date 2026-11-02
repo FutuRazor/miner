@@ -651,9 +651,9 @@ func _update_drone_count() -> void:
 	for child in get_children():
 		if child.get_script() == Drone and not child.hostile and child.is_inside_tree() and not child.is_queued_for_deletion():
 			count += 1
-	drone_count_label.text = "Drohnen: %d" % count
+	drone_count_label.text = tr("Drohnen: %d") % count
 	if is_instance_valid(enemy_count_label):
-		enemy_count_label.text = "Gegner: %d" % _live_combat_drones("enemy_drones").size()
+		enemy_count_label.text = tr("Gegner: %d") % _live_combat_drones("enemy_drones").size()
 
 
 func _live_combat_drones(group: String) -> Array[Node2D]:
@@ -890,7 +890,7 @@ func sell_building(index: int) -> void:
 
 func update_collector_label(index: int) -> void:
 	var building := buildings[index]
-	building.label.text = "Sammler: %d Geld" % building.money
+	building.label.text = tr("Sammler: %d Geld") % building.money
 
 
 func deposit_drone_blocks(index: int, amount: int) -> void:
@@ -959,17 +959,17 @@ func _skill_cost(id: String) -> int:
 
 func _skill_block_reason(id: String) -> String:
 	if not Balance.PRICES.has(id):
-		return "Noch nicht verfügbar"
+		return tr("Noch nicht verfügbar")
 	var bought := _skill_purchases(id)
 	if bought >= Balance.PRICES[id].size():
-		return "Maximum erreicht"
+		return tr("Maximum erreicht")
 	var defense := Balance.is_defense_skill(id)
 	var tier := Balance.stage(cleared_waves, defense)
 	if bought >= Balance.upgrade_limit(id, tier):
 		for future_tier in range(tier + 1, 4):
 			if bought < Balance.upgrade_limit(id, future_tier):
-				return "Freischaltung nach Welle %d" % Balance.unlock_waves(defense)[future_tier - 1]
-		return "Maximum erreicht"
+				return tr("Freischaltung nach Welle %d") % Balance.unlock_waves(defense)[future_tier - 1]
+		return tr("Maximum erreicht")
 	var kind := -1
 	if id.begins_with("collector_") or id == "cash_drone":
 		kind = 0
@@ -985,7 +985,7 @@ func _skill_block_reason(id: String) -> String:
 			if building.kind == kind and not building.get("destroyed", false) and building.construction <= 0.0:
 				ready_building = true
 		if not ready_building:
-			return "%s fertigstellen" % BUILDINGS[kind]
+			return tr("%s fertigstellen") % tr(BUILDINGS[kind])
 	return ""
 
 
@@ -1029,7 +1029,7 @@ func _tick_production(delta: float) -> void:
 				_spawn_collector_drone(index)
 			if building.pending_drones == 0:
 				building.production = 0.0
-		building.status.text = "Bau: %d s" % ceili(building.construction) if building.construction > 0.0 else ("Drohnen: %d · %d s" % [building.pending_drones, ceili((20.0 if building.kind in [1, 3] else 8.0) - building.production)] if building.pending_drones > 0 else "")
+		building.status.text = tr("Bau: %d s") % ceili(building.construction) if building.construction > 0.0 else (tr("Drohnen: %d · %d s") % [building.pending_drones, ceili((20.0 if building.kind in [1, 3] else 8.0) - building.production)] if building.pending_drones > 0 else "")
 
 
 func _update_build_ui() -> void:
@@ -1042,91 +1042,94 @@ func _update_build_ui() -> void:
 	if build_mode == BuildMode.SKILLS:
 		var skills: Array = SKILLS.duplicate(true)
 		for skill in skills:
+			skill.name = tr(skill.name)
+			skill.group = tr(skill.group)
+			skill.description = tr(skill.description)
 			skill.level = int(skill_levels.get(skill.get("id", ""), 1))
 			var id: String = skill.get("id", "")
 			if Balance.PRICES.has(id):
 				skill.cost = _skill_cost(id)
 				skill.lock_reason = _skill_block_reason(id)
 			if skill.get("id", "") == "base_health":
-				skill.current_effect = "%d maximale Lebenspunkte" % base_max_health
-				skill.next_effect = "%d maximale Lebenspunkte" % (base_max_health + 25)
+				skill.current_effect = tr("%d maximale Lebenspunkte") % base_max_health
+				skill.next_effect = tr("%d maximale Lebenspunkte") % (base_max_health + 25)
 			elif skill.get("id", "") == "cash_drone":
-				skill.description = "-sammelt Geld ein-"
+				skill.description = tr("-sammelt Geld ein-")
 				var count: int = skill_levels.get("cash_drone", 0)
-				skill.current_effect = "%d %s" % [count, "Geld-Sammeldrohne" if count == 1 else "Geld-Sammeldrohnen"]
-				skill.next_effect = "%d %s" % [count + 1, "Geld-Sammeldrohne" if count == 0 else "Geld-Sammeldrohnen"]
+				skill.current_effect = tr("%d %s") % [count, tr("Geld-Sammeldrohne") if count == 1 else tr("Geld-Sammeldrohnen")]
+				skill.next_effect = tr("%d %s") % [count + 1, tr("Geld-Sammeldrohne") if count == 0 else tr("Geld-Sammeldrohnen")]
 			elif skill.get("id", "") == "collector_drones":
-				skill.description = "-baut Blöcke ab-"
-				skill.current_effect = "%d %s je Sammler" % [collector_drone_count, "Drohne" if collector_drone_count == 1 else "Drohnen"]
-				skill.next_effect = "%d Drohnen je Sammler" % (collector_drone_count + 1)
+				skill.description = tr("-baut Blöcke ab-")
+				skill.current_effect = tr("%d %s je Sammler") % [collector_drone_count, tr("Drohne") if collector_drone_count == 1 else tr("Drohnen")]
+				skill.next_effect = tr("%d Drohnen je Sammler") % (collector_drone_count + 1)
 			elif skill.get("id", "") == "barracks_drones":
-				skill.current_effect = "%d %s je Kaserne" % [barracks_drone_count, "Drohne" if barracks_drone_count == 1 else "Drohnen"]
-				skill.next_effect = "%d Drohnen je Kaserne" % (barracks_drone_count + 1)
+				skill.current_effect = tr("%d %s je Kaserne") % [barracks_drone_count, tr("Drohne") if barracks_drone_count == 1 else tr("Drohnen")]
+				skill.next_effect = tr("%d Drohnen je Kaserne") % (barracks_drone_count + 1)
 			elif skill.get("id", "") == "mining_level":
-				skill.current_effect = "Abbaustufe %d" % mining_level
-				skill.next_effect = "Abbaustufe %d" % (mining_level + 1)
+				skill.current_effect = tr("Abbaustufe %d") % mining_level
+				skill.next_effect = tr("Abbaustufe %d") % (mining_level + 1)
 			elif skill.get("id", "") == "collector_speed":
-				skill.current_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed, collector_mining_speed]
-				skill.next_effect = "Bewegung: %d Pixel/s\nAbbau: %d %%" % [collector_move_speed + 10, collector_mining_speed + 5]
+				skill.current_effect = tr("Bewegung: %d Pixel/s\nAbbau: %d %%") % [collector_move_speed, collector_mining_speed]
+				skill.next_effect = tr("Bewegung: %d Pixel/s\nAbbau: %d %%") % [collector_move_speed + 10, collector_mining_speed + 5]
 			elif skill.get("id", "") == "collector_capacity":
-				skill.current_effect = "%d Einheiten Tragkapazität" % collector_capacity
-				skill.next_effect = "%d Einheiten Tragkapazität" % (collector_capacity + 5)
+				skill.current_effect = tr("%d Einheiten Tragkapazität") % collector_capacity
+				skill.next_effect = tr("%d Einheiten Tragkapazität") % (collector_capacity + 5)
 			elif skill.get("id", "") == "barracks_health":
-				skill.current_effect = "%d maximale Lebenspunkte" % barracks_drone_health
-				skill.next_effect = "%d maximale Lebenspunkte" % (barracks_drone_health + 10)
+				skill.current_effect = tr("%d maximale Lebenspunkte") % barracks_drone_health
+				skill.next_effect = tr("%d maximale Lebenspunkte") % (barracks_drone_health + 10)
 			elif id == "barracks_attack":
-				skill.current_effect = "%d Schaden je Treffer" % barracks_attack
-				skill.next_effect = "2 Schaden je Treffer"
+				skill.current_effect = tr("%d Schaden je Treffer") % barracks_attack
+				skill.next_effect = tr("2 Schaden je Treffer")
 			elif skill.get("id", "") == "tower_health":
-				skill.current_effect = "%d maximale Lebenspunkte" % tower_health
-				skill.next_effect = "%d maximale Lebenspunkte" % (tower_health + 20)
+				skill.current_effect = tr("%d maximale Lebenspunkte") % tower_health
+				skill.next_effect = tr("%d maximale Lebenspunkte") % (tower_health + 20)
 			elif skill.get("id", "") == "tower_shots":
-				skill.current_effect = "%d gleichzeitige Schüsse" % tower_shots
-				skill.next_effect = "%d gleichzeitige Schüsse" % (tower_shots + 1)
+				skill.current_effect = tr("%d gleichzeitige Schüsse") % tower_shots
+				skill.next_effect = tr("%d gleichzeitige Schüsse") % (tower_shots + 1)
 			elif skill.get("id", "") == "tower_rate":
-				skill.current_effect = "Schussintervall: %d ms" % tower_interval_ms
-				skill.next_effect = "Schussintervall: %d ms" % maxi(1, floori(tower_interval_ms * 0.9))
+				skill.current_effect = tr("Schussintervall: %d ms") % tower_interval_ms
+				skill.next_effect = tr("Schussintervall: %d ms") % maxi(1, floori(tower_interval_ms * 0.9))
 			elif id == "workshop_drones":
-				skill.current_effect = "%d Mechaniker-Drohnen" % workshop_drone_count
-				skill.next_effect = "%d Mechaniker-Drohnen" % (workshop_drone_count + 1)
+				skill.current_effect = tr("%d Mechaniker-Drohnen") % workshop_drone_count
+				skill.next_effect = tr("%d Mechaniker-Drohnen") % (workshop_drone_count + 1)
 			elif id == "workshop_repair":
-				skill.current_effect = "%d LP/s je Drohne" % workshop_repair
-				skill.next_effect = "%d LP/s je Drohne" % (workshop_repair + 1)
+				skill.current_effect = tr("%d LP/s je Drohne") % workshop_repair
+				skill.next_effect = tr("%d LP/s je Drohne") % (workshop_repair + 1)
 			elif id == "workshop_speed":
-				skill.current_effect = "%d Pixel/s" % workshop_speed
-				skill.next_effect = "%d Pixel/s" % (workshop_speed + 20)
+				skill.current_effect = tr("%d Pixel/s") % workshop_speed
+				skill.next_effect = tr("%d Pixel/s") % (workshop_speed + 20)
 		for skill in skills:
-			if skill.get("lock_reason", "") == "Maximum erreicht":
-				skill.next_effect = "Maximum erreicht"
+			if skill.get("lock_reason", "") == tr("Maximum erreicht"):
+				skill.next_effect = tr("Maximum erreicht")
 		var available := _available_skill_indices()
 		var visible_skills: Array = []
 		for index in available:
 			visible_skills.append(skills[index])
-		build_options.configure("SKILL-TREE", visible_skills, maxi(0, available.find(selected_skill)), money, "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen")
+		build_options.configure(tr("SKILL-TREE"), visible_skills, maxi(0, available.find(selected_skill)), money, tr("WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen"))
 		return
 	if build_mode == BuildMode.MENU:
 		var items: Array = []
 		var available := _available_building_indices()
 		for index in available:
-			var description := "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab." % collector_drone_count if index == 0 else "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner." % barracks_drone_count
+			var description := tr("Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab.") % collector_drone_count if index == 0 else tr("Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner.") % barracks_drone_count
 			if index == 2:
-				description = "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer." % [tower_health, tower_shots, tower_interval_ms]
+				description = tr("Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer.") % [tower_health, tower_shots, tower_interval_ms]
 			elif index == 3:
-				description = "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände." % [workshop_drone_count, workshop_repair]
-			description += "\nBauzeit: %d s" % int(Balance.BUILD_SECONDS[index])
-			items.append({"name": "%s (%d/%d)" % [BUILDINGS[index], _building_count(index), _building_limit(index)], "lock_reason": "Gebäudelimit erreicht" if _building_count(index) >= _building_limit(index) else "", "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg", "res://assets/icons/workshop.svg"][index], "description": description})
-		build_options.configure("BAUEN / 2 × 2", items, maxi(0, available.find(selected_building)), money, "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen")
+				description = tr("Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände.") % [workshop_drone_count, workshop_repair]
+			description += tr("\nBauzeit: %d s") % int(Balance.BUILD_SECONDS[index])
+			items.append({"name": tr("%s (%d/%d)") % [tr(BUILDINGS[index]), _building_count(index), _building_limit(index)], "lock_reason": tr("Gebäudelimit erreicht") if _building_count(index) >= _building_limit(index) else "", "cost": _building_cost(index), "icon": ["res://assets/icons/collector.svg", "res://assets/icons/barracks.svg", "res://assets/icons/tower.svg", "res://assets/icons/workshop.svg"][index], "description": description})
+		build_options.configure(tr("BAUEN / 2 × 2"), items, maxi(0, available.find(selected_building)), money, tr("WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen"))
 	if build_mode == BuildMode.PLACE:
 		var valid := _can_build(_build_anchor())
 		var cost := _building_cost(selected_building)
 		var affordable := money >= cost and _building_count(selected_building) < _building_limit(selected_building)
-		var status := "Fläche frei" if valid else "Fläche blockiert (Basis, Gebäude oder Blöcke)"
+		var status := tr("Fläche frei") if valid else tr("Fläche blockiert (Basis, Gebäude oder Blöcke)")
 		if _building_count(selected_building) >= _building_limit(selected_building):
-			status += " · Gebäudelimit erreicht"
+			status += tr(" · Gebäudelimit erreicht")
 		elif money < cost:
-			status += " · Zu wenig Geld"
-		var controls := "Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen" if mouse_placement else "Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
-		build_status.text = "%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s" % [BUILDINGS[selected_building], cost, money, controls, status]
+			status += tr(" · Zu wenig Geld")
+		var controls := tr("Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen") if mouse_placement else tr("Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen")
+		build_status.text = tr("%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s") % [tr(BUILDINGS[selected_building]), cost, money, controls, status]
 		build_status.modulate = Color("8ef0b0") if valid and affordable else Color("ff9393")
 
 
@@ -1161,23 +1164,23 @@ func _create_hud() -> void:
 	play_button = Button.new()
 	play_button.name = "Play"
 	play_button.icon = preload("res://assets/icons/play.svg")
-	play_button.tooltip_text = "Fortsetzen"
+	play_button.tooltip_text = tr("Fortsetzen")
 	play_button.custom_minimum_size = Vector2(44, 40)
 	play_button.focus_mode = Control.FOCUS_NONE
 	playback.add_child(play_button)
 	play_button.pressed.connect(_set_paused.bind(false))
 	pause_button = Button.new()
-	pause_button.name = "Pause"
+	pause_button.name = tr("Pause")
 	pause_button.icon = preload("res://assets/icons/pause.svg")
-	pause_button.tooltip_text = "Pausieren"
+	pause_button.tooltip_text = tr("Pausieren")
 	pause_button.custom_minimum_size = Vector2(44, 40)
 	pause_button.focus_mode = Control.FOCUS_NONE
 	playback.add_child(pause_button)
 	pause_button.pressed.connect(_set_paused.bind(true))
 	speed_button = Button.new()
 	speed_button.name = "Speed"
-	speed_button.text = "1×"
-	speed_button.tooltip_text = "Spieltempo wechseln: 1× → 1,5× → 2× → 3×"
+	speed_button.text = tr("1×")
+	speed_button.tooltip_text = tr("Spieltempo wechseln: 1× → 1,5× → 2× → 3×")
 	speed_button.custom_minimum_size = Vector2(60, 40)
 	speed_button.focus_mode = Control.FOCUS_NONE
 	playback.add_child(speed_button)
@@ -1207,7 +1210,7 @@ func _create_hud() -> void:
 	main_menu_button = Button.new()
 	main_menu_button.name = "MainMenuButton"
 	main_menu_button.icon = preload("res://assets/icons/home.svg")
-	main_menu_button.tooltip_text = "Zurück zum Hauptmenü"
+	main_menu_button.tooltip_text = tr("Zurück zum Hauptmenü")
 	main_menu_button.anchor_left = 1.0
 	main_menu_button.anchor_right = 1.0
 	main_menu_button.offset_left = -64.0
@@ -1220,7 +1223,7 @@ func _create_hud() -> void:
 	var info_button := Button.new()
 	info_button.name = "InfoButton"
 	info_button.text = "i"
-	info_button.tooltip_text = "Spielinformationen öffnen"
+	info_button.tooltip_text = tr("Spielinformationen öffnen")
 	info_button.custom_minimum_size = Vector2(44, 44)
 	info_button.anchor_left = 1.0
 	info_button.anchor_right = 1.0
@@ -1233,12 +1236,12 @@ func _create_hud() -> void:
 	layer.add_child(info_button)
 	info_button.toggled.connect(func(open: bool) -> void:
 		panel.visible = open
-		info_button.tooltip_text = "Spielinformationen schließen" if open else "Spielinformationen öffnen"
+		info_button.tooltip_text = tr("Spielinformationen schließen") if open else tr("Spielinformationen öffnen")
 	)
 	wave_pause_button = Button.new()
 	wave_pause_button.name = "WavePauseButton"
 	wave_pause_button.icon = preload("res://assets/icons/pause.svg")
-	wave_pause_button.tooltip_text = "Wellentimer anhalten"
+	wave_pause_button.tooltip_text = tr("Wellentimer anhalten")
 	wave_pause_button.toggle_mode = true
 	wave_pause_button.focus_mode = Control.FOCUS_NONE
 	wave_pause_button.anchor_left = 1.0
@@ -1257,7 +1260,7 @@ func _create_hud() -> void:
 	rows.add_theme_constant_override("separation", 6)
 	margin.add_child(rows)
 	var title := Label.new()
-	title.text = "MINER / PROTOTYP"
+	title.text = tr("MINER / PROTOTYP")
 	title.add_theme_color_override("font_color", Color("66e5db"))
 	rows.add_child(title)
 	drone_count_label = Label.new()
@@ -1287,13 +1290,13 @@ func _create_hud() -> void:
 	_update_base_health()
 	_update_counters()
 	var help := Label.new()
-	help.text = "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und halten.\nLoslassen oder Ziel wechseln setzt den Fortschritt zurück."
+	help.text = tr("WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und halten.\nLoslassen oder Ziel wechseln setzt den Fortschritt zurück.")
 	rows.add_child(help)
 	var deposit_help := Label.new()
-	deposit_help.text = "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
+	deposit_help.text = tr("Basis (3 × 3): Getragene Blöcke automatisch verkaufen.")
 	rows.add_child(deposit_help)
 	var build_help := Label.new()
-	build_help.text = "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nRechtsklick auf Gebäude: Infos / Abreißen\nMausrad: Karte zoomen"
+	build_help.text = tr("B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nRechtsklick auf Gebäude: Infos / Abreißen\nMausrad: Karte zoomen")
 	rows.add_child(build_help)
 	build_panel = PanelContainer.new()
 	layer.add_child(build_panel)
@@ -1385,7 +1388,7 @@ func _set_wave_timer_paused(value: bool) -> void:
 		return
 	wave_timer.set_timer_paused(value)
 	wave_pause_button.icon = preload("res://assets/icons/play.svg") if value else preload("res://assets/icons/pause.svg")
-	wave_pause_button.tooltip_text = "Wellentimer fortsetzen" if value else "Wellentimer anhalten"
+	wave_pause_button.tooltip_text = tr("Wellentimer fortsetzen") if value else tr("Wellentimer anhalten")
 
 
 func _cycle_game_speed() -> void:
@@ -1396,7 +1399,7 @@ func _cycle_game_speed() -> void:
 	Engine.time_scale = speed
 	# Keep simulation steps equally small at higher speed.
 	Engine.physics_ticks_per_second = roundi(normal_physics_rate * speed)
-	speed_button.text = ["1×", "1,5×", "2×", "3×"][game_speed_index]
+	speed_button.text = [tr("1×"), tr("1,5×"), tr("2×"), tr("3×")][game_speed_index]
 
 
 func _exit_tree() -> void:
@@ -1454,14 +1457,14 @@ func _end_game() -> void:
 
 
 func _update_base_health() -> void:
-	base_health_label.text = "Lebenspunkte\n%d/%d" % [base_health, base_max_health]
+	base_health_label.text = tr("Lebenspunkte\n%d/%d") % [base_health, base_max_health]
 
 
 func _update_counters() -> void:
 	$Player.update_load(collected_count)
-	money_label.text = "Basis: %d Geld" % money
+	money_label.text = tr("Basis: %d Geld") % money
 	if base_drone_settings.pending_drones > 0:
-		money_label.text += "\nGeld-Drohne: %d s" % ceili(8.0 - base_drone_settings.production)
+		money_label.text += tr("\nGeld-Drohne: %d s") % ceili(8.0 - base_drone_settings.production)
 
 
 func _draw() -> void:

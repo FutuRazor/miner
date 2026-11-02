@@ -38,4 +38,4 @@ func _switch_scene(path: String) -> void:
 		tree.paused = false
 	else:
 		switching = false
-		push_error("Szene konnte nicht geladen werden: %s" % error_string(error))
+		push_error(tr("Szene konnte nicht geladen werden: %s") % error_string(error))

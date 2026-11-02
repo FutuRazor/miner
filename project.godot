@@ -20,7 +20,13 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+Localization="*res://scripts/localization.gd"
 MetaStats="*res://scripts/meta_stats.gd"
+
+[internationalization]
+
+locale/translations=PackedStringArray("res://localization/en.po", "res://localization/de.po")
+locale/fallback="en"
 
 [display]
 

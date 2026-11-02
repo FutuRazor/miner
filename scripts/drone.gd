@@ -283,13 +283,13 @@ func _plan(go_home: bool) -> void:
 
 func _update_status() -> void:
 	if mechanic:
-		status.text = "Reparatur: %d LP/s" % world.workshop_repair if is_instance_valid(mechanic_ai.repair_target) else "Mechaniker: bereit"
+		status.text = tr("Reparatur: %d LP/s") % world.workshop_repair if is_instance_valid(mechanic_ai.repair_target) else tr("Mechaniker: bereit")
 	elif passive or hostile:
-		status.text = "Lebenspunkte\n%d/%d" % [health, max_health]
+		status.text = tr("Lebenspunkte\n%d/%d") % [health, max_health]
 	elif collects_money:
-		status.text = "%d Geld%s" % [cash_carried, " Abholen…" if cash_source >= 0 and path.is_empty() else ""]
+		status.text = tr("%d Geld%s") % [cash_carried, tr(" Abholen…") if cash_source >= 0 and path.is_empty() else ""]
 	else:
-		status.text = "%d/%d%s" % [carried, capacity, " Abgabe…" if returning and path.is_empty() else ""]
+		status.text = "%d/%d%s" % [carried, capacity, tr(" Abgabe…") if returning and path.is_empty() else ""]
 	queue_redraw()
 
 

@@ -27,18 +27,18 @@ func _ready() -> void:
 	rows.add_child(details)
 	rows.add_child(refund)
 	demolish.icon = preload("res://assets/icons/bulldozer.svg")
-	demolish.tooltip_text = "Gebäude verkaufen und abreißen"
+	demolish.tooltip_text = tr("Gebäude verkaufen und abreißen")
 	demolish.custom_minimum_size = Vector2(40, 36)
 	demolish.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	rows.add_child(demolish)
 	rows.add_child(confirmation)
 	var question := Label.new()
-	question.text = "Abreißen?"
+	question.text = tr("Abreißen?")
 	confirmation.add_child(question)
 	var buttons := HBoxContainer.new()
 	confirmation.add_child(buttons)
-	yes.text = "Ja"
-	no.text = "Nein"
+	yes.text = tr("Ja")
+	no.text = tr("Nein")
 	buttons.add_child(yes)
 	buttons.add_child(no)
 	demolish.pressed.connect(func() -> void:
@@ -94,36 +94,36 @@ func _process(_delta: float) -> void:
 
 func _refresh() -> void:
 	var building: Dictionary = world.buildings[building_index]
-	title.text = world.BUILDINGS[building.kind]
+	title.text = tr(world.BUILDINGS[building.kind])
 	var count := 0
 	for drone in world._live_combat_drones("friendly_drones"):
 		if drone.collector_index == building_index:
 			count += 1
-	var text := "Drohnen: %d" % count
+	var text := tr("Drohnen: %d") % count
 	if building.get("construction", 0.0) > 0.0:
-		text += "\nIm Bau: %d s" % ceili(building.construction)
+		text += tr("\nIm Bau: %d s") % ceili(building.construction)
 	if building.get("pending_drones", 0) > 0:
-		text += "\nIn Produktion: %d" % building.pending_drones
+		text += tr("\nIn Produktion: %d") % building.pending_drones
 	if building.kind == 0:
-		text += "\nGuthaben: %d Geld\nTempo: %d · Abbau: %d %%\nKapazität: %d · Abbaustufe: %d" % [building.money, world.collector_move_speed, world.collector_mining_speed, world.collector_capacity, world.mining_level]
+		text += tr("\nGuthaben: %d Geld\nTempo: %d · Abbau: %d %%\nKapazität: %d · Abbaustufe: %d") % [building.money, world.collector_move_speed, world.collector_mining_speed, world.collector_capacity, world.mining_level]
 	elif building.kind == 1:
-		text += "\nDrohnen-LP: %d\nSchaden je Treffer: %d" % [world.barracks_drone_health, world.barracks_attack]
+		text += tr("\nDrohnen-LP: %d\nSchaden je Treffer: %d") % [world.barracks_drone_health, world.barracks_attack]
 	elif building.kind == 3:
-		text += "\nReparatur: %d LP/s je Drohne\nTempo: %d\nPriorität: Basis → Türme → Kampfdrohnen" % [world.workshop_repair, world.workshop_speed]
+		text += tr("\nReparatur: %d LP/s je Drohne\nTempo: %d\nPriorität: Basis → Türme → Kampfdrohnen") % [world.workshop_repair, world.workshop_speed]
 	elif building.has("tower") and is_instance_valid(building.tower):
-		text += "\nLP: %d/%d\nSchüsse: %d · Intervall: %d ms" % [building.tower.health, building.tower.max_health, world.tower_shots, world.tower_interval_ms]
-	text += "\nVerstärkungen:"
+		text += tr("\nLP: %d/%d\nSchüsse: %d · Intervall: %d ms") % [building.tower.health, building.tower.max_health, world.tower_shots, world.tower_interval_ms]
+	text += tr("\nVerstärkungen:")
 	var upgrades := 0
 	for skill in world.SKILLS:
 		var id: String = skill.get("id", "")
 		var applies: bool = (building.kind == 0 and (id.begins_with("collector_") or id == "mining_level")) or (building.kind == 1 and id.begins_with("barracks_")) or (building.kind == 2 and id.begins_with("tower_")) or (building.kind == 3 and id.begins_with("workshop_"))
 		if applies and world._skill_purchases(id) > 0:
-			text += "\n%s: +%d" % [skill.name, world._skill_purchases(id)]
+			text += tr("\n%s: +%d") % [tr(skill.name), world._skill_purchases(id)]
 			upgrades += 1
 	if upgrades == 0:
-		text += " keine"
+		text += tr(" keine")
 	details.text = text
-	refund.text = "Rückzahlung: %d Geld (75 %% Baupreis)" % world.building_refund(building_index)
+	refund.text = tr("Rückzahlung: %d Geld (75 %% Baupreis)") % world.building_refund(building_index)
 
 func _reposition() -> void:
 	var rect: Rect2 = world.building_rect(building_index)

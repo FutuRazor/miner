@@ -44,4 +44,4 @@ func set_timer_paused(paused: bool) -> void:
 
 func _refresh() -> void:
 	value = remaining
-	caption.text = "Zeit bis Welle %d · %d s%s" % [next_wave, ceili(remaining), " · Pause" if timer_paused else ""]
+	caption.text = tr("Zeit bis Welle %d · %d s%s") % [next_wave, ceili(remaining), tr(" · Pause") if timer_paused else ""]

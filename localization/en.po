@@ -1,0 +1,795 @@
+# English translation of Miner. German messages remain the source keys.
+msgid ""
+msgstr "Project-Id-Version: Miner\nLanguage: en\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: scripts/building_context.gd:121
+msgid "\n%s: +%d"
+msgstr "\n%s: +%d"
+
+#: scripts/world.gd:1119
+msgid "\nBauzeit: %d s"
+msgstr "\nBuild time: %d s"
+
+#: scripts/tutorial_world.gd:254
+msgid "\nCountdown startet in %d Sekunden."
+msgstr "\nCountdown starts in %d seconds."
+
+#: scripts/building_context.gd:110
+msgid "\nDrohnen-LP: %d\nSchaden je Treffer: %d"
+msgstr "\nDrone health: %d\nDamage per hit: %d"
+
+#: scripts/tutorial_world.gd:252
+msgid "\nEinnahmen bis zum nächsten Schritt: %d"
+msgstr "\nIncome needed for the next step: %d"
+
+#: scripts/world.gd:1467
+msgid "\nGeld-Drohne: %d s"
+msgstr "\nCash drone: %d s"
+
+#: scripts/building_context.gd:108
+msgid "\nGuthaben: %d Geld\nTempo: %d · Abbau: %d %%\nKapazität: %d · Abbaustufe: %d"
+msgstr "\nStored: %d credits\nSpeed: %d · Mining: %d %%\nCapacity: %d · Mining level: %d"
+
+#: scripts/building_context.gd:104
+msgid "\nIm Bau: %d s"
+msgstr "\nUnder construction: %d s"
+
+#: scripts/building_context.gd:106
+msgid "\nIn Produktion: %d"
+msgstr "\nIn production: %d"
+
+#: scripts/building_context.gd:114
+msgid "\nLP: %d/%d\nSchüsse: %d · Intervall: %d ms"
+msgstr "\nHealth: %d/%d\nShots: %d · Interval: %d ms"
+
+#: scripts/building_context.gd:112
+msgid "\nReparatur: %d LP/s je Drohne\nTempo: %d\nPriorität: Basis → Türme → Kampfdrohnen"
+msgstr "\nRepair: %d HP/s per drone\nSpeed: %d\nPriority: Base → Towers → Combat drones"
+
+#: scripts/building_context.gd:115
+msgid "\nVerstärkungen:"
+msgstr "\nUpgrades:"
+
+#: scripts/tutorial_world.gd:256
+msgid "\nWeitere Einnahmen bis zum nächsten Schritt: %d"
+msgstr "\nAdditional income needed for the next step: %d"
+
+#: scripts/menu_info.gd:53
+msgid " (lvl. %d)"
+msgstr " (lvl. %d)"
+
+#: scripts/drone.gd:292
+msgid " Abgabe…"
+msgstr " Unloading…"
+
+#: scripts/drone.gd:290
+msgid " Abholen…"
+msgstr " Collecting…"
+
+#: scripts/player.gd:117
+msgid " Voll"
+msgstr " Full"
+
+#: scripts/building_context.gd:124
+msgid " keine"
+msgstr " none"
+
+#: scripts/world.gd:1128
+msgid " · Gebäudelimit erreicht"
+msgstr " · Building limit reached"
+
+#: scripts/wave_timer.gd:47
+msgid " · Pause"
+msgstr " · Paused"
+
+#: scripts/world.gd:1130
+msgid " · Zu wenig Geld"
+msgstr " · Not enough credits"
+
+#: scripts/world.gd:1059 scripts/world.gd:1060
+msgid "%d %s"
+msgstr "%d %s"
+
+#: scripts/world.gd:1066
+msgid "%d %s je Kaserne"
+msgstr "%d %s per barracks"
+
+#: scripts/world.gd:1063
+msgid "%d %s je Sammler"
+msgstr "%d %s per collector"
+
+#: scripts/world.gd:1067
+msgid "%d Drohnen je Kaserne"
+msgstr "%d drones per barracks"
+
+#: scripts/world.gd:1064
+msgid "%d Drohnen je Sammler"
+msgstr "%d drones per collector"
+
+#: scripts/world.gd:1075 scripts/world.gd:1076
+msgid "%d Einheiten Tragkapazität"
+msgstr "%d units of carrying capacity"
+
+#: scripts/option_menu.gd:63
+msgid "%d Geld"
+msgstr "%d credits"
+
+#: scripts/drone.gd:290
+msgid "%d Geld%s"
+msgstr "%d credits%s"
+
+#: scripts/world.gd:1096 scripts/world.gd:1097
+msgid "%d LP/s je Drohne"
+msgstr "%d HP/s per drone"
+
+#: scripts/world.gd:1093 scripts/world.gd:1094
+msgid "%d Mechaniker-Drohnen"
+msgstr "Mechanic drones: %d"
+
+#: scripts/world.gd:1099 scripts/world.gd:1100
+msgid "%d Pixel/s"
+msgstr "%d pixels/s"
+
+#: scripts/world.gd:1081
+msgid "%d Schaden je Treffer"
+msgstr "%d damage per hit"
+
+#: scripts/world.gd:1087 scripts/world.gd:1088
+msgid "%d gleichzeitige Schüsse"
+msgstr "Simultaneous shots: %d"
+
+#: scripts/world.gd:1054 scripts/world.gd:1055 scripts/world.gd:1078 scripts/world.gd:1079 scripts/world.gd:1084 scripts/world.gd:1085
+msgid "%d maximale Lebenspunkte"
+msgstr "%d maximum health"
+
+#: scripts/world.gd:1120
+msgid "%s (%d/%d)"
+msgstr "%s (%d/%d)"
+
+#: scripts/world.gd:1132
+msgid "%s / 2 × 2 / Kosten: %d / Geld: %d\n%s\n%s"
+msgstr "%s / 2 × 2 / Cost: %d / Credits: %d\n%s\n%s"
+
+#: scripts/tutorial_world.gd:120 scripts/world.gd:988
+msgid "%s fertigstellen"
+msgstr "Finish building: %s"
+
+#: scripts/world.gd:1062
+msgid "-baut Blöcke ab-"
+msgstr "-mines blocks-"
+
+#: scripts/world.gd:1057
+msgid "-sammelt Geld ein-"
+msgstr "-collects credits-"
+
+#: scripts/world.gd:1402
+msgid "1,5×"
+msgstr "1.5×"
+
+#: scripts/world.gd:1182 scripts/world.gd:1402
+msgid "1×"
+msgstr "1×"
+
+#: scripts/world.gd:1082
+msgid "2 Schaden je Treffer"
+msgstr "2 damage per hit"
+
+#: scripts/world.gd:1402
+msgid "2×"
+msgstr "2×"
+
+#: scripts/world.gd:1402
+msgid "3×"
+msgstr "3×"
+
+#: scenes/action_menu.tscn:38
+msgid ">"
+msgstr ">"
+
+#: scripts/world.gd:44
+msgid "Abbaustufe"
+msgstr "Mining level"
+
+#: scripts/world.gd:1069 scripts/world.gd:1070
+msgid "Abbaustufe %d"
+msgstr "Mining level %d"
+
+#: scripts/tutorial_world.gd:239
+msgid "Abbaustufe 3 ist verfügbar. Besiege die erste Welle."
+msgstr "Mining level 3 is available. Defeat the first wave."
+
+#: scripts/tutorial_world.gd:112
+msgid "Abbaustufe 3 später im Tutorial"
+msgstr "Mining level 3 unlocks later in the tutorial"
+
+#: scripts/building_context.gd:36
+msgid "Abreißen?"
+msgstr "Demolish?"
+
+#: scripts/meta_stats_screen.gd:39
+msgid "Alle Partien · dauerhaft gespeichert"
+msgstr "All runs · saved permanently"
+
+#: scripts/world.gd:51
+msgid "Angriff"
+msgstr "Attack"
+
+#: scripts/world.gd:53
+msgid "Anzahl Schüsse"
+msgstr "Shots per volley"
+
+#: scripts/world.gd:1299
+msgid "B: Bauen · J: Skill-Tree\nLinksklick: laufen · Rechte Maustaste ziehen: Karte verschieben\nRechtsklick auf Gebäude: Infos / Abreißen\nMausrad: Karte zoomen"
+msgstr "B: Build · J: Skill tree\nLeft-click: move · Right-drag: pan the map\nRight-click a building: info / demolish\nMouse wheel: zoom the map"
+
+#: scripts/world.gd:1121
+msgid "BAUEN / 2 × 2"
+msgstr "BUILD / 2 × 2"
+
+#: scripts/world.gd:43 scripts/world.gd:44 scripts/world.gd:45
+msgid "Basis"
+msgstr "Base"
+
+#: scripts/world.gd:1296
+msgid "Basis (3 × 3): Getragene Blöcke automatisch verkaufen."
+msgstr "Base (3 × 3): Automatically sell carried resources."
+
+#: scripts/tutorial_world.gd:158
+msgid "Basis-Skills verfügbar"
+msgstr "Base skills unlocked"
+
+#: scripts/world.gd:1465
+msgid "Basis: %d Geld"
+msgstr "Base: %d credits"
+
+#: scripts/world.gd:1032
+msgid "Bau: %d s"
+msgstr "Building: %d s"
+
+#: scripts/tutorial_world.gd:239
+msgid "Baue Rohstoffe ab und bringe sie zur Basis. Ziel: 40 Geld auf dem Konto."
+msgstr "Mine resources and bring them to the base. Goal: 40 credits in your account."
+
+#: scripts/tutorial_world.gd:239
+msgid "Baue eine Kaserne und zwei Türme, um die erste Welle vorzubereiten."
+msgstr "Build one barracks and two towers to prepare for the first wave."
+
+#: scripts/tutorial_world.gd:174
+msgid "Baue eine Kaserne und zwei Türme. Sobald alle drei fertig sind, beginnt nach 10 Sekunden der 100-Sekunden-Countdown zur ersten Welle."
+msgstr "Build one barracks and two towers. Once all three are complete, a 10-second preparation period leads into the 100-second countdown to the first wave."
+
+#: scripts/tutorial_world.gd:239
+msgid "Baue einen Sammler. Sammle danach weitere Einnahmen für den Skilltree."
+msgstr "Build a collector. Then earn more credits to unlock the skill tree."
+
+#: scenes/action_menu.tscn:61
+msgid "Bauen"
+msgstr "Build"
+
+#: scenes/action_menu.tscn:54
+msgid "Bauen (B)"
+msgstr "Build (B)"
+
+#: scripts/tutorial_world.gd:150
+msgid "Baumenü verfügbar"
+msgstr "Build menu unlocked"
+
+#: scripts/game_ui.gd:100
+msgid "Beenden"
+msgstr "Quit"
+
+#: scripts/world.gd:1131
+msgid "Bewegen: positionieren · Enter / E: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
+msgstr "Move: position building · Enter / E: build · Right-drag: pan\nRight-click / Esc: cancel"
+
+#: scripts/world.gd:1072 scripts/world.gd:1073
+msgid "Bewegung: %d Pixel/s\nAbbau: %d %%"
+msgstr "Movement: %d pixels/s\nMining: %d %%"
+
+#: scripts/world.gd:57
+msgid "Bewegungsgeschwindigkeit"
+msgstr "Movement speed"
+
+#: scripts/tutorial_world.gd:144
+msgid "Defekte Gebäude und Einheiten"
+msgstr "Damaged buildings and units"
+
+#: scripts/meta_stats.gd:161
+msgid "Die Gesamtstatistik konnte nicht gespeichert werden: "
+msgstr "Could not save lifetime statistics: "
+
+#: scripts/options_menu.gd:60
+msgid "Die Sprache konnte nicht gespeichert werden."
+msgstr "Could not save the language setting."
+
+#: scripts/meta_stats.gd:112
+msgid "Die Statistik wurde aus der letzten Sicherung wiederhergestellt."
+msgstr "Statistics were restored from the latest backup."
+
+#: scripts/tutorial_world.gd:144
+msgid "Die Werkstatt ist jetzt verfügbar. Ihre Mechaniker reparieren zuerst die Basis, dann Türme und zuletzt ruhende Kampfdrohnen auf dem Kasernengelände."
+msgstr "The workshop is now available. Its mechanics repair the base first, then towers, and finally stationary combat drones on their barracks grounds."
+
+#: scripts/meta_stats.gd:115
+msgid "Die gespeicherte Statistik konnte nicht gelesen werden. Beschädigte Dateien bleiben zur Wiederherstellung erhalten."
+msgstr "Could not read the saved statistics. Damaged files have been preserved for recovery."
+
+#: scripts/world.gd:1063 scripts/world.gd:1066 scripts/world.gd:46 scripts/world.gd:49
+msgid "Drohne"
+msgstr "Drone"
+
+#: scripts/world.gd:1063 scripts/world.gd:1066
+msgid "Drohnen"
+msgstr "Drones"
+
+#: scripts/building_context.gd:102 scripts/world.gd:654
+msgid "Drohnen: %d"
+msgstr "Drones: %d"
+
+#: scripts/world.gd:1032
+msgid "Drohnen: %d · %d s"
+msgstr "Drones: %d · %d s"
+
+#: scripts/world.gd:55
+msgid "Drohnenanzahl"
+msgstr "Drone count"
+
+#: scripts/tutorial_world.gd:158
+msgid "Du kannst jetzt die Lebenspunkte der Basis erhöhen und eine Geld-Sammeldrohne kaufen. Sie bringt das Guthaben deiner Sammler automatisch zur Basis oder zu dir."
+msgstr "You can now increase the base's health and buy a cash-collection drone. It automatically brings credits from your collectors to the base or to you."
+
+#: scripts/tutorial_world.gd:138
+msgid "Du trägst 10 Rohstoffeinheiten. Gehe in die Basis, um sie abzugeben. Für jede Einheit bekommst du Geld."
+msgstr "You are carrying 10 resource units. Return to the base to unload them. You earn credits for each unit."
+
+#: scripts/tutorial_world.gd:239
+msgid "Ein zweiter Sammler ist verfügbar. Erweitere deine Wirtschaft."
+msgstr "A second collector is available. Expand your economy."
+
+#: scripts/world.gd:46
+msgid "Eine zusätzliche Drohne für jeden bestehenden und zukünftigen Sammler."
+msgstr "Adds one drone to every existing and future collector."
+
+#: scripts/world.gd:49
+msgid "Eine zusätzliche Kampfdrohne für jede bestehende und zukünftige Kaserne. Verteidigt die Basis gegen Gegner."
+msgstr "Adds one combat drone to every existing and future barracks. Defends the base against enemies."
+
+#: scripts/world.gd:55
+msgid "Eine zusätzliche Mechaniker-Drohne. Produktion: 20 Sekunden. Maximal drei Drohnen."
+msgstr "Adds one mechanic drone. Production time: 20 seconds. Maximum: three drones."
+
+#: scripts/world.gd:57
+msgid "Erhöht das Bewegungstempo aller Mechaniker-Drohnen um 20. Maximal 160 Pixel/s."
+msgstr "Increases all mechanic drones' movement speed by 20. Maximum: 160 pixels/s."
+
+#: scripts/world.gd:51
+msgid "Erhöht den Schaden aller bestehenden, neuen und nachproduzierten Kasernen-Drohnen von 1 auf 2 je Treffer. Einmalig nach Welle 13 kaufbar."
+msgstr "Increases damage from 1 to 2 per hit for all existing, new, and replacement barracks drones. Can be purchased once after wave 13."
+
+#: scripts/world.gd:44
+msgid "Erhöht die Abbaustufe der Spielfigur und aller bestehenden und zukünftigen Abbaudrohnen."
+msgstr "Increases the mining level of your character and all existing and future mining drones."
+
+#: scripts/world.gd:53
+msgid "Erhöht die Anzahl gleichzeitiger Schüsse aller Türme um 1. Jeder Treffer verursacht 1 Schaden."
+msgstr "Increases every tower's simultaneous shots by 1. Each hit deals 1 damage."
+
+#: scripts/world.gd:47
+msgid "Erhöht die Bewegungsgeschwindigkeit um 10 Pixel/s und die Abbaugeschwindigkeit um 5 Prozentpunkte. Gilt für alle Sammlerdrohnen."
+msgstr "Increases movement speed by 10 pixels/s and mining speed by 5 percentage points. Applies to all collector drones."
+
+#: scripts/world.gd:56
+msgid "Erhöht die Reparatur jeder Mechaniker-Drohne um 1 LP pro Sekunde. Maximal 3 LP/s."
+msgstr "Increases each mechanic drone's repair rate by 1 HP per second. Maximum: 3 HP/s."
+
+#: scripts/world.gd:48
+msgid "Erhöht die Tragkapazität aller bestehenden und zukünftigen Sammlerdrohnen um 5."
+msgstr "Increases the carrying capacity of all existing and future collector drones by 5."
+
+#: scripts/world.gd:50
+msgid "Erhöht die aktuellen und maximalen Lebenspunkte aller Kasernendrohnen um 10. Gilt auch für neue und nachproduzierte Drohnen."
+msgstr "Increases current and maximum health of all barracks drones by 10. Also applies to new and replacement drones."
+
+#: scripts/world.gd:52
+msgid "Erhöht die aktuellen und maximalen Lebenspunkte aller bestehenden und zukünftigen Türme um 20."
+msgstr "Increases current and maximum health of all existing and future towers by 20."
+
+#: scripts/world.gd:43
+msgid "Erhöht die maximalen und aktuellen Lebenspunkte der Basis um 25."
+msgstr "Increases the base's maximum and current health by 25."
+
+#: scripts/tutorial_world.gd:168
+msgid "Erhöhung der Abbaustufe verfügbar"
+msgstr "Mining level upgrade unlocked"
+
+#: scripts/world.gd:1126
+msgid "Fläche blockiert (Basis, Gebäude oder Blöcke)"
+msgstr "Area blocked (base, buildings, or blocks)"
+
+#: scripts/world.gd:1126
+msgid "Fläche frei"
+msgstr "Area clear"
+
+#: scripts/world.gd:1167
+msgid "Fortsetzen"
+msgstr "Resume"
+
+#: scripts/world.gd:971
+msgid "Freischaltung nach Welle %d"
+msgstr "Unlocks after wave %d"
+
+#: scripts/meta_stats_screen.gd:33
+msgid "GESAMTSTATISTIK"
+msgstr "LIFETIME STATISTICS"
+
+#: scenes/game_over.tscn:34
+msgid "Game Over"
+msgstr "Game Over"
+
+#: scripts/building_context.gd:30
+msgid "Gebäude verkaufen und abreißen"
+msgstr "Sell and demolish building"
+
+#: scripts/option_menu.gd:62 scripts/world.gd:1120
+msgid "Gebäudelimit erreicht"
+msgstr "Building limit reached"
+
+#: scripts/world.gd:656
+msgid "Gegner: %d"
+msgstr "Enemies: %d"
+
+#: scripts/world.gd:1059 scripts/world.gd:1060 scripts/world.gd:45
+msgid "Geld-Sammeldrohne"
+msgstr "Cash-collection drone"
+
+#: scripts/world.gd:1059 scripts/world.gd:1060
+msgid "Geld-Sammeldrohnen"
+msgstr "Cash-collection drones"
+
+#: scripts/meta_stats_screen.gd:78
+msgid "Gesammelt"
+msgstr "Collected"
+
+#: scripts/meta_stats_screen.gd:74
+msgid "Gesammelte Blockeinheiten: %d\nVollständig abgebaute Blöcke: %d\nBesiegte Gegnerdrohnen: %d"
+msgstr "Resource units collected: %d\nBlocks fully mined: %d\nEnemy drones defeated: %d"
+
+#: scripts/option_menu.gd:63
+msgid "Gesperrt"
+msgstr "Locked"
+
+#: scripts/world.gd:1116
+msgid "Größe: 2 × 2 Felder\nReichweite: 5 Grid-Felder\n%d Lebenspunkte\n%d Schüsse je Salve · Intervall: %d ms\n1 Schaden je Treffer."
+msgstr "Size: 2 × 2 cells\nRange: 5 grid cells\n%d health\nShots per volley: %d · Interval: %d ms\n1 damage per hit."
+
+#: scripts/world.gd:1114
+msgid "Größe: 2 × 2 Felder\nStartet mit %d Kampfdrohnen.\nVerteidigt die Basis gegen Gegner."
+msgstr "Size: 2 × 2 cells\nStarts with %d combat drones.\nDefends the base against enemies."
+
+#: scripts/world.gd:1114
+msgid "Größe: 2 × 2 Felder\nStartet mit %d Sammeldrohnen.\nLagert das Geld der Drohnen.\nBerühren holt das Geld ab."
+msgstr "Size: 2 × 2 cells\nMining drones on completion: %d.\nStores credits earned by its drones.\nTouch it to collect the credits."
+
+#: scripts/world.gd:1118
+msgid "Größe: 2 × 2 Felder · Maximal eine Werkstatt\n%d Mechaniker-Drohnen · %d LP/s je Drohne\nPriorität: Basis, Türme, ruhende Kampfdrohnen auf dem Kasernengelände."
+msgstr "Size: 2 × 2 cells · Maximum: one workshop\n%d mechanic drones · %d HP/s per drone\nPriority: Base, towers, stationary combat drones on their barracks grounds."
+
+#: scenes/game_over.tscn:47
+msgid "Hauptmenü"
+msgstr "Main menu"
+
+#: scripts/game_ui.gd:151 scripts/meta_stats_screen.gd:114
+msgid "Hauptmenü konnte nicht geladen werden: %s"
+msgstr "Could not load the main menu: %s"
+
+#: scripts/world.gd:45
+msgid "Holt Geld beim Sammler mit dem höchsten Guthaben.\nAbholung: 0,6 Sekunden\nAbgabe an Spielfigur oder Basis: sofort."
+msgstr "Collects credits from the collector with the highest balance.\nPickup: 0.6 seconds\nDelivery to the character or base: instant."
+
+#: scripts/meta_stats_screen.gd:78
+msgid "Härtegrad"
+msgstr "Hardness"
+
+#: scripts/tutorial_world.gd:109
+msgid "Im Tutorial noch nicht verfügbar"
+msgstr "Not yet available in the tutorial"
+
+#: scripts/building_context.gd:40
+msgid "Ja"
+msgstr "Yes"
+
+#: scripts/meta_stats_screen.gd:56
+msgid "Jeder Abbauschritt zählt als eine gesammelte Einheit.\nNach dem vierten Schritt zählt der Block zusätzlich als vollständig abgebaut."
+msgstr "Each mining step counts as one collected resource unit.\nAfter the fourth step, the block also counts as fully mined."
+
+#: scripts/world.gd:48
+msgid "Kapazität erhöhen"
+msgstr "Increase capacity"
+
+#: scripts/world.gd:49 scripts/world.gd:50 scripts/world.gd:51 scripts/world.gd:79
+msgid "Kaserne"
+msgstr "Barracks"
+
+#: scripts/tutorial_world.gd:239
+msgid "Kaufe Abbaustufe 2 und erschließe härtere Blöcke."
+msgstr "Buy mining level 2 to access harder blocks."
+
+#: scripts/tutorial_world.gd:168
+msgid "Kaufe Abbaustufe 2, um die nächsten beiden Blockreihen abzubauen. Abbaustufe 3 wird später freigeschaltet."
+msgstr "Buy mining level 2 to mine the next two rings of blocks. Mining level 3 unlocks later."
+
+#: scripts/menu_info.gd:65
+msgid "Kosten: %d Geld"
+msgstr "Cost: %d credits"
+
+#: scripts/world.gd:43 scripts/world.gd:50 scripts/world.gd:52
+msgid "Lebenspunkte"
+msgstr "Health"
+
+#: scripts/drone.gd:288 scripts/tower.gd:74 scripts/world.gd:1460
+msgid "Lebenspunkte\n%d/%d"
+msgstr "Health\n%d/%d"
+
+#: scripts/world.gd:1263
+msgid "MINER / PROTOTYP"
+msgstr "MINER / PROTOTYPE"
+
+#: scripts/world.gd:1131
+msgid "Maus: positionieren · Linksklick: bauen · Rechts ziehen: Kamera\nRechtsklick / Esc: abbrechen"
+msgstr "Mouse: position building · Left-click: build · Right-drag: pan\nRight-click / Esc: cancel"
+
+#: scripts/tutorial_world.gd:138
+msgid "Maximale Tragkraft erreicht"
+msgstr "Carrying capacity reached"
+
+#: scripts/option_menu.gd:63
+msgid "Maximum"
+msgstr "Max"
+
+#: scripts/option_menu.gd:62 scripts/tutorial_world.gd:112 scripts/world.gd:1102 scripts/world.gd:1103 scripts/world.gd:965 scripts/world.gd:972
+msgid "Maximum erreicht"
+msgstr "Maximum reached"
+
+#: scripts/drone.gd:286
+msgid "Mechaniker: bereit"
+msgstr "Mechanic: ready"
+
+#: scenes/action_menu.tscn:44
+msgid "Menü"
+msgstr "Menu"
+
+#: scenes/action_menu.tscn:37 scripts/action_menu.gd:15
+msgid "Menü ausklappen"
+msgstr "Expand menu"
+
+#: scripts/action_menu.gd:15
+msgid "Menü einklappen"
+msgstr "Collapse menu"
+
+#: scripts/building_context.gd:41
+msgid "Nein"
+msgstr "No"
+
+#: scripts/menu_info.gd:54
+msgid "Noch keine Beschreibung verfügbar."
+msgstr "No description available yet."
+
+#: scenes/game_over.tscn:41
+msgid "Noch mal"
+msgstr "Try again"
+
+#: scripts/world.gd:962
+msgid "Noch nicht verfügbar"
+msgstr "Not yet available"
+
+#: scripts/tutorial_dialog.gd:35
+msgid "OK"
+msgstr "OK"
+
+#: scripts/options_menu.gd:47
+msgid "OPTIONEN"
+msgstr "OPTIONS"
+
+#: scenes/start_menu.tscn:58
+msgid "Optionen"
+msgstr "Options"
+
+#: scripts/game_ui.gd:64 scripts/world.gd:1173
+msgid "Pause"
+msgstr "Pause"
+
+#: scripts/world.gd:1175
+msgid "Pausieren"
+msgstr "Pause"
+
+#: scenes/start_menu.tscn:52
+msgid "Perks & Statistik"
+msgstr "Perks & Statistics"
+
+#: scripts/menu_info.gd:60
+msgid "Platzhalter · Noch nicht upgradebar"
+msgstr "Placeholder · Cannot be upgraded yet"
+
+#: scripts/world.gd:56
+msgid "Reparatur erhöhen"
+msgstr "Increase repair rate"
+
+#: scripts/drone.gd:286
+msgid "Reparatur: %d LP/s"
+msgstr "Repair: %d HP/s"
+
+#: scripts/building_context.gd:126
+msgid "Rückzahlung: %d Geld (75 %% Baupreis)"
+msgstr "Refund: %d credits (75 %% of build cost)"
+
+#: scripts/world.gd:1108
+msgid "SKILL-TREE"
+msgstr "SKILL TREE"
+
+#: scripts/world.gd:46 scripts/world.gd:47 scripts/world.gd:48 scripts/world.gd:79
+msgid "Sammler"
+msgstr "Collector"
+
+#: scripts/world.gd:893
+msgid "Sammler: %d Geld"
+msgstr "Collector: %d credits"
+
+#: scripts/world.gd:47
+msgid "Schneller sammeln"
+msgstr "Mine faster"
+
+#: scripts/world.gd:1090 scripts/world.gd:1091
+msgid "Schussintervall: %d ms"
+msgstr "Firing interval: %d ms"
+
+#: scripts/world.gd:54
+msgid "Schussrate"
+msgstr "Fire rate"
+
+#: scenes/action_menu.tscn:78
+msgid "Skill-Tree"
+msgstr "Skill tree"
+
+#: scenes/action_menu.tscn:71
+msgid "Skill-Tree (J)"
+msgstr "Skill tree (J)"
+
+#: scripts/tutorial_world.gd:154
+msgid "Skilltree verfügbar"
+msgstr "Skill tree unlocked"
+
+#: scripts/game_ui.gd:92
+msgid "Soll das laufende Spiel beendet werden?"
+msgstr "Quit the current game?"
+
+#: scripts/start_menu.gd:48
+msgid "Spiel konnte nicht gestartet werden: %s"
+msgstr "Could not start the game: %s"
+
+#: scenes/start_menu.tscn:40
+msgid "Spiel starten"
+msgstr "Start game"
+
+#: scripts/world.gd:1239
+msgid "Spielinformationen schließen"
+msgstr "Close game information"
+
+#: scripts/world.gd:1226 scripts/world.gd:1239
+msgid "Spielinformationen öffnen"
+msgstr "Open game information"
+
+#: scripts/world.gd:1183
+msgid "Spieltempo wechseln: 1× → 1,5× → 2× → 3×"
+msgstr "Change game speed: 1× → 1.5× → 2× → 3×"
+
+#: scripts/options_menu.gd:48
+msgid "Sprache"
+msgstr "Language"
+
+#: scripts/option_menu.gd:63
+msgid "Später"
+msgstr "Later"
+
+#: scripts/game_over.gd:41
+msgid "Szene konnte nicht geladen werden: %s"
+msgstr "Could not load the scene: %s"
+
+#: scripts/tutorial_world.gd:250
+msgid "TUTORIAL · "
+msgstr "TUTORIAL · "
+
+#: scripts/tutorial_world.gd:258
+msgid "TUTORIAL · Erste Welle besiegt! Baue eine Werkstatt und repariere deine Verteidigung."
+msgstr "TUTORIAL · First wave defeated! Build a workshop and repair your defenses."
+
+#: scripts/world.gd:52 scripts/world.gd:53 scripts/world.gd:54 scripts/world.gd:79
+msgid "Turm"
+msgstr "Tower"
+
+#: scenes/start_menu.tscn:46
+msgid "Tutorial"
+msgstr "Tutorial"
+
+#: scripts/tutorial_world.gd:239
+msgid "Verbessere Abbaugeschwindigkeit und Kapazität deines Sammlers."
+msgstr "Upgrade your collector's mining speed and carrying capacity."
+
+#: scripts/tutorial_world.gd:154
+msgid "Verbessere deinen Sammler mit »Schneller sammeln« und »Kapazität erhöhen«."
+msgstr "Upgrade your collector with ‘Mine faster’ and ‘Increase capacity’."
+
+#: scripts/tutorial_world.gd:239
+msgid "Verbessere die Basis und automatisiere den Geldtransport."
+msgstr "Upgrade the base and automate credit collection."
+
+#: scripts/tutorial_world.gd:178
+msgid "Verbessere die Lebenspunkte deiner Kasernen-Drohnen und Türme sowie die Schussrate der Türme."
+msgstr "Upgrade your barracks drones' health, your towers' health, and the towers' fire rate."
+
+#: scripts/tutorial_world.gd:239
+msgid "Verbessere die Verteidigung und bereite dich auf die erste Welle vor."
+msgstr "Upgrade your defenses and prepare for the first wave."
+
+#: scripts/world.gd:54
+msgid "Verkürzt die Zeit zwischen den Salven aller Türme um 10 %. Millisekunden werden auf ganze Zahlen abgerundet."
+msgstr "Reduces the time between volleys for all towers by 10%. Milliseconds are rounded down to whole numbers."
+
+#: scripts/tutorial_world.gd:174
+msgid "Verteidigung planen"
+msgstr "Plan your defenses"
+
+#: scripts/tutorial_world.gd:178
+msgid "Verteidigung upgraden"
+msgstr "Upgrade your defenses"
+
+#: scripts/meta_stats_screen.gd:78
+msgid "Vollständig abgebaut"
+msgstr "Fully mined"
+
+#: scripts/world.gd:1121
+msgid "WASD / Pfeile: Auswahl\nEnter / E / Klick: auswählen · B / Esc: schließen"
+msgstr "WASD / Arrows: select\nEnter / E / Click: confirm · B / Esc: close"
+
+#: scripts/world.gd:1108
+msgid "WASD / Pfeile: Auswahl · Enter / E / Klick: auswählen\nJ / Esc: schließen"
+msgstr "WASD / Arrows: select · Enter / E / Click: confirm\nJ / Esc: close"
+
+#: scripts/world.gd:1293
+msgid "WASD / Pfeiltasten: bewegen\nZum Abbauen gegen einen Block laufen und halten.\nLoslassen oder Ziel wechseln setzt den Fortschritt zurück."
+msgstr "WASD / Arrow keys: move\nMove toward a block and hold to mine it.\nReleasing or switching targets resets progress."
+
+#: scripts/options_menu.gd:55
+msgid "Die Sprachauswahl wird automatisch gespeichert."
+msgstr "Your language preference is saved automatically."
+
+#: scripts/game_ui.gd:105
+msgid "Weiterspielen"
+msgstr "Continue playing"
+
+#: scripts/world.gd:1244 scripts/world.gd:1391
+msgid "Wellentimer anhalten"
+msgstr "Pause wave timer"
+
+#: scripts/world.gd:1391
+msgid "Wellentimer fortsetzen"
+msgstr "Resume wave timer"
+
+#: scripts/world.gd:55 scripts/world.gd:56 scripts/world.gd:57 scripts/world.gd:79
+msgid "Werkstatt"
+msgstr "Workshop"
+
+#: scripts/wave_timer.gd:47
+msgid "Zeit bis Welle %d · %d s%s"
+msgstr "Next wave: %d · %d s%s"
+
+#: scripts/meta_stats_screen.gd:64 scripts/options_menu.gd:49 scripts/world.gd:1213
+msgid "Zurück zum Hauptmenü"
+msgstr "Back to main menu"
+
+#: scripts/tutorial_world.gd:150
+msgid "Öffne das blinkende Baumenü unten links und baue deinen ersten Sammler auf einer freien Fläche von 2 × 2 Feldern."
+msgstr "Open the blinking build menu in the bottom-left corner and build your first collector on a clear 2 × 2 area."
+
+#: scripts/menu_info.gd:36
+msgid "↓"
+msgstr "↓"

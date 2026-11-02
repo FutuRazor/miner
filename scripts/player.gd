@@ -114,7 +114,7 @@ func can_mine() -> bool:
 
 func update_load(amount: int) -> void:
 	carried = amount
-	load_label.text = "%d/%d%s" % [carried, capacity, " Voll" if carried >= capacity else ""]
+	load_label.text = "%d/%d%s" % [carried, capacity, tr(" Voll") if carried >= capacity else ""]
 	load_label.modulate = Color("f4c86b") if carried >= capacity else Color.WHITE
 
 

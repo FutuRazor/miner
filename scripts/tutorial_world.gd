@@ -106,10 +106,10 @@ func _skill_block_reason(id: String) -> String:
 		if SKILLS[index].id == id:
 			found = true
 	if not found:
-		return "Im Tutorial noch nicht verfügbar"
+		return tr("Im Tutorial noch nicht verfügbar")
 	var limit := (2 if phase >= 8 else 1) if id == "mining_level" else 1
 	if _skill_purchases(id) >= limit:
-		return "Maximum erreicht" if id != "mining_level" or phase >= 8 else "Abbaustufe 3 später im Tutorial"
+		return tr("Maximum erreicht") if id != "mining_level" or phase >= 8 else tr("Abbaustufe 3 später im Tutorial")
 	var kind := 0 if id.begins_with("collector_") or id == "cash_drone" else (1 if id.begins_with("barracks_") else (2 if id.begins_with("tower_") else -1))
 	if kind >= 0:
 		var ready_building := false
@@ -117,7 +117,7 @@ func _skill_block_reason(id: String) -> String:
 			if building.kind == kind and not building.get("destroyed", false) and building.construction <= 0.0:
 				ready_building = true
 		if not ready_building:
-			return "%s fertigstellen" % BUILDINGS[kind]
+			return tr("%s fertigstellen") % tr(BUILDINGS[kind])
 	return ""
 
 func _on_tutorial_income(amount: int) -> void:
@@ -135,27 +135,27 @@ func _check_progress() -> void:
 		return
 	if not capacity_message_seen and collected_count >= $Player.capacity:
 		capacity_message_seen = true
-		_show_message("Maximale Tragkraft erreicht", "Du trägst 10 Rohstoffeinheiten. Gehe in die Basis, um sie abzugeben. Für jede Einheit bekommst du Geld.")
+		_show_message(tr("Maximale Tragkraft erreicht"), tr("Du trägst 10 Rohstoffeinheiten. Gehe in die Basis, um sie abzugeben. Für jede Einheit bekommst du Geld."))
 		return
 	if first_wave_done and not workshop_unlocked:
 		workshop_unlocked = true
 		blink_build = true
 		new_buildings[3] = true
-		_show_message("Defekte Gebäude und Einheiten", "Die Werkstatt ist jetzt verfügbar. Ihre Mechaniker reparieren zuerst die Basis, dann Türme und zuletzt ruhende Kampfdrohnen auf dem Kasernengelände.")
+		_show_message(tr("Defekte Gebäude und Einheiten"), tr("Die Werkstatt ist jetzt verfügbar. Ihre Mechaniker reparieren zuerst die Basis, dann Türme und zuletzt ruhende Kampfdrohnen auf dem Kasernengelände."))
 		return
 	if phase == 0 and money >= 40:
 		phase = 1
 		blink_build = true
 		new_buildings[0] = true
-		_show_message("Baumenü verfügbar", "Öffne das blinkende Baumenü unten links und baue deinen ersten Sammler auf einer freien Fläche von 2 × 2 Feldern.")
+		_show_message(tr("Baumenü verfügbar"), tr("Öffne das blinkende Baumenü unten links und baue deinen ersten Sammler auf einer freien Fläche von 2 × 2 Feldern."))
 	elif phase == 1 and earned >= INCOME_STEPS[1]:
 		phase = 2
 		_unlock_skills(["collector_speed", "collector_capacity"])
-		_show_message("Skilltree verfügbar", "Verbessere deinen Sammler mit »Schneller sammeln« und »Kapazität erhöhen«.")
+		_show_message(tr("Skilltree verfügbar"), tr("Verbessere deinen Sammler mit »Schneller sammeln« und »Kapazität erhöhen«."))
 	elif phase == 2 and earned >= INCOME_STEPS[2]:
 		phase = 3
 		_unlock_skills(["base_health", "cash_drone"])
-		_show_message("Basis-Skills verfügbar", "Du kannst jetzt die Lebenspunkte der Basis erhöhen und eine Geld-Sammeldrohne kaufen. Sie bringt das Guthaben deiner Sammler automatisch zur Basis oder zu dir.")
+		_show_message(tr("Basis-Skills verfügbar"), tr("Du kannst jetzt die Lebenspunkte der Basis erhöhen und eine Geld-Sammeldrohne kaufen. Sie bringt das Guthaben deiner Sammler automatisch zur Basis oder zu dir."))
 	elif phase == 3 and earned >= INCOME_STEPS[3]:
 		phase = 4
 		blink_build = true
@@ -165,17 +165,17 @@ func _check_progress() -> void:
 	elif phase == 4 and earned >= INCOME_STEPS[4]:
 		phase = 5
 		_unlock_skills(["mining_level"])
-		_show_message("Erhöhung der Abbaustufe verfügbar", "Kaufe Abbaustufe 2, um die nächsten beiden Blockreihen abzubauen. Abbaustufe 3 wird später freigeschaltet.")
+		_show_message(tr("Erhöhung der Abbaustufe verfügbar"), tr("Kaufe Abbaustufe 2, um die nächsten beiden Blockreihen abzubauen. Abbaustufe 3 wird später freigeschaltet."))
 	elif phase == 5 and earned >= INCOME_STEPS[5]:
 		phase = 6
 		blink_build = true
 		new_buildings[1] = true
 		new_buildings[2] = true
-		_show_message("Verteidigung planen", "Baue eine Kaserne und zwei Türme. Sobald alle drei fertig sind, beginnt nach 10 Sekunden der 100-Sekunden-Countdown zur ersten Welle.")
+		_show_message(tr("Verteidigung planen"), tr("Baue eine Kaserne und zwei Türme. Sobald alle drei fertig sind, beginnt nach 10 Sekunden der 100-Sekunden-Countdown zur ersten Welle."))
 	elif phase == 6 and timer_started and earned >= timer_income + 95:
 		phase = 7
 		_unlock_skills(["barracks_health", "tower_health", "tower_rate"])
-		_show_message("Verteidigung upgraden", "Verbessere die Lebenspunkte deiner Kasernen-Drohnen und Türme sowie die Schussrate der Türme.")
+		_show_message(tr("Verteidigung upgraden"), tr("Verbessere die Lebenspunkte deiner Kasernen-Drohnen und Türme sowie die Schussrate der Türme."))
 	elif phase == 7 and earned >= timer_income + 125:
 		phase = 8
 		_unlock_skills(["mining_level"])
@@ -247,15 +247,15 @@ func _update_objective() -> void:
 		"Verbessere die Verteidigung und bereite dich auf die erste Welle vor.",
 		"Abbaustufe 3 ist verfügbar. Besiege die erste Welle.",
 	]
-	objective.text = "TUTORIAL · " + messages[phase]
+	objective.text = tr("TUTORIAL · ") + tr(messages[phase])
 	if phase > 0 and phase < 6:
-		objective.text += "\nEinnahmen bis zum nächsten Schritt: %d" % maxi(0, INCOME_STEPS[phase] - earned)
+		objective.text += tr("\nEinnahmen bis zum nächsten Schritt: %d") % maxi(0, INCOME_STEPS[phase] - earned)
 	elif phase == 6 and not timer_started and defense_wait >= 0.0:
-		objective.text += "\nCountdown startet in %d Sekunden." % ceili(defense_wait)
+		objective.text += tr("\nCountdown startet in %d Sekunden.") % ceili(defense_wait)
 	elif phase in [6, 7] and timer_started:
-		objective.text += "\nWeitere Einnahmen bis zum nächsten Schritt: %d" % maxi(0, timer_income + (95 if phase == 6 else 125) - earned)
+		objective.text += tr("\nWeitere Einnahmen bis zum nächsten Schritt: %d") % maxi(0, timer_income + (95 if phase == 6 else 125) - earned)
 	if workshop_unlocked:
-		objective.text = "TUTORIAL · Erste Welle besiegt! Baue eine Werkstatt und repariere deine Verteidigung."
+		objective.text = tr("TUTORIAL · Erste Welle besiegt! Baue eine Werkstatt und repariere deine Verteidigung.")
 
 func _defense_ready() -> bool:
 	var barracks := 0
