@@ -141,6 +141,15 @@ func confirm_return() -> void:
 
 
 func _return_to_start() -> void:
+	var save := get_node("/root/SessionSave")
+	if not save.save_world(world):
+		changing_scene = false
+		var dialog := AcceptDialog.new()
+		dialog.dialog_text = save.last_error
+		add_child(dialog)
+		dialog.confirmed.connect(dialog.queue_free)
+		dialog.popup_centered()
+		return
 	world.record_endless_result()
 	var tree := get_tree()
 	get_node("/root/MetaStats").save_now()

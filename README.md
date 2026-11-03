@@ -69,6 +69,14 @@ Open **Ranking** in the start menu and choose a category:
 
 Both categories include real play time, defeated enemies, fully mined blocks, and revenue. Endless statistics cover the full run, including the initial 20-wave mission. Rankings are stored locally; earlier runs cannot be reconstructed.
 
+## Save & continue
+
+Leaving an active **20-wave mission** through the confirmed return to the main menu saves it to a single local slot. Choose **Continue Game**, the second start-menu entry, to restore it with **pause active**. Resume from the in-game toolbar when ready. The slot survives closing and restarting the application.
+
+The save includes the map and mining progress, base and buildings, construction and production queues, upgrades, money, player, drones, enemies, bosses and Swarmers, combat and wave timers, camera, simulation speed, and run statistics. Real play time continues from the saved value and excludes time spent away.
+
+**New Game** asks for confirmation before discarding an existing save. **Continue Game** is disabled without a valid save. Victory or defeat clears the mission slot. Tutorial and Endless Freeplay do not use this slot; their existing statistics and ranking behavior remains unchanged. Loading or saving a mission does not create a ranking entry.
+
 ## Tutorial
 
 Choose **Tutorial** from the start menu for a guided introduction on a smaller map with **264 blocks**, six resource rings, and hardness levels **1–3**.
@@ -122,6 +130,7 @@ After one barracks and two towers are finished, a **10-second preparation period
 | `scripts/world.gd` | Shared world, economy, construction, and wave logic |
 | `scripts/spawn_manager.gd` | Normal waves, boss encounters, and Swarmer spawning |
 | `scripts/boss.gd` | Boss behavior, Swarmer timer, and boss-defeat signal |
+| `scripts/session_save.gd` | Local mission snapshots and paused restoration |
 | `scripts/meta_stats.gd` | Persistent statistics and victory rankings |
 | `scripts/balance.gd` | Prices, caps, and upgrade unlock schedules |
 | `scripts/tutorial_world.gd` | Tutorial milestones and restricted progression |

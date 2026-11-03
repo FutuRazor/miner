@@ -8,6 +8,7 @@ func _settle() -> void:
 		await process_frame
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/options_menu_test.dat" % OS.get_process_id()
 	root.get_node("MetaStats").persistence_enabled = false
 	var localization := root.get_node("Localization")
 	localization.persistence_enabled = false
@@ -16,15 +17,15 @@ func _run() -> void:
 	await _settle()
 	var menu := current_scene
 	var buttons := menu.get_node("Center/Menu")
-	assert(buttons.get_child(3).name == "OptionsButton")
-	assert(buttons.get_child(3).text == "Optionen")
-	buttons.get_child(2).grab_focus()
+	assert(buttons.get_child(5).name == "OptionsButton")
+	assert(buttons.get_child(5).text == "Optionen")
+	buttons.get_child(4).grab_focus()
 	var event := InputEventKey.new()
 	event.keycode = KEY_S
 	event.pressed = true
 	menu._unhandled_key_input(event)
-	assert(buttons.get_child(3).has_focus())
-	buttons.get_child(3).pressed.emit()
+	assert(buttons.get_child(5).has_focus())
+	buttons.get_child(5).pressed.emit()
 	await _settle()
 	assert(current_scene.name == "Options")
 	assert(current_scene.title.text == "OPTIONS")

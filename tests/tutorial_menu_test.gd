@@ -23,6 +23,7 @@ func _click(point: Vector2) -> void:
 	root.push_input(event, true)
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/tutorial_menu_test.dat" % OS.get_process_id()
 	# Keep existing German UI expectations independent of the default language.
 	TranslationServer.set_locale("de")
 	root.size = Vector2i(1152, 720)
@@ -32,16 +33,17 @@ func _run() -> void:
 	var menu := current_scene
 	var buttons := menu.get_node("Center/Menu")
 	assert(buttons.get_child(0).name == "StartButton")
-	assert(buttons.get_child(1).name == "TutorialButton")
-	assert(buttons.get_child(2).name == "StatsButton")
+	assert(buttons.get_child(1).name == "ContinueButton" and buttons.get_child(1).disabled)
+	assert(buttons.get_child(2).name == "TutorialButton")
+	assert(buttons.get_child(3).name == "StatsButton")
 	var event := InputEventKey.new()
 	event.pressed = true
 	event.keycode = KEY_S
 	menu._unhandled_key_input(event)
-	assert(buttons.get_child(1).has_focus())
-	menu._unhandled_key_input(event)
 	assert(buttons.get_child(2).has_focus())
-	buttons.get_child(1).pressed.emit()
+	menu._unhandled_key_input(event)
+	assert(buttons.get_child(3).has_focus())
+	buttons.get_child(2).pressed.emit()
 	await _settle()
 	var world = current_scene
 	world.set_physics_process(false)

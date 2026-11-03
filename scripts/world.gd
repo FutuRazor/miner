@@ -163,6 +163,7 @@ func _ready() -> void:
 	add_child(drone_collisions)
 	get_viewport().size_changed.connect(_update_camera_limits)
 	_update_camera_limits()
+	get_node("/root/SessionSave").restore_if_requested(self)
 
 
 func _physics_process(delta: float) -> void:
@@ -1492,6 +1493,8 @@ func _end_game(victory: bool = false) -> void:
 	if is_game_over:
 		return
 	is_game_over = true
+	if has_mission_limit():
+		get_node("/root/SessionSave").clear_save()
 	if victory and has_mission_limit() and cleared_waves >= 20 and not victory_recorded:
 		victory_recorded = true
 		get_node("/root/MetaStats").record_victory(round_duration, enemies_neutralized, sectors_mined, total_revenue)

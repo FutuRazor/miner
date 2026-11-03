@@ -41,6 +41,7 @@ func _check_push_through(world: Node2D, boss: Node2D, defender: Node2D) -> void:
 
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/boss_wave_test.dat" % OS.get_process_id()
 	root.get_node("MetaStats").persistence_enabled = false
 	assert(change_scene_to_file("res://scenes/main.tscn") == OK)
 	await _settle()

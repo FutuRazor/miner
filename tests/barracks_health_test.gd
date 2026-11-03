@@ -31,6 +31,7 @@ func _build(world: Node, anchor: Vector2i) -> void:
 
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/barracks_health_test.dat" % OS.get_process_id()
 	# Keep existing German UI expectations independent of the default language.
 	TranslationServer.set_locale("de")
 	root.get_node("MetaStats").persistence_enabled = false

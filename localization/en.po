@@ -660,9 +660,6 @@ msgstr "Quit the current game?"
 msgid "Spiel konnte nicht gestartet werden: %s"
 msgstr "Could not start the game: %s"
 
-#: scenes/start_menu.tscn:40
-msgid "Spiel starten"
-msgstr "Start game"
 
 #: scripts/world.gd:1239
 msgid "Spielinformationen schließen"
@@ -872,3 +869,21 @@ msgstr "Start the next wave immediately. Each full remaining second earns $1."
 
 msgid "Welle starten (+$%d)"
 msgstr "Start wave (+$%d)"
+
+msgid "Abbrechen"
+msgstr "Cancel"
+
+msgid "Der gespeicherte Spielstand konnte nicht entfernt werden."
+msgstr "The saved game could not be removed."
+
+msgid "Neues Spiel"
+msgstr "New Game"
+
+msgid "Neues Spiel starten? Der gespeicherte Spielstand wird verworfen."
+msgstr "Start a new game? The saved game will be discarded."
+
+msgid "Spiel fortsetzen"
+msgstr "Continue Game"
+
+msgid "Spielstand konnte nicht gespeichert werden: %s"
+msgstr "Could not save the game: %s"

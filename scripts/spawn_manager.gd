@@ -25,6 +25,7 @@ func _edge_position() -> Vector2:
 
 func _configure(enemy: Node2D, number: int, point: Vector2) -> void:
 	enemy.world = world
+	enemy.wave_number = number
 	enemy.collector_index = -2
 	enemy.hostile = true
 	enemy.max_health = normal_health(number)
@@ -63,6 +64,7 @@ func spawn_swarmer(boss: Node2D) -> Node2D:
 	var enemy := Drone.new()
 	_configure(enemy, boss.wave_number, boss.position)
 	enemy.name = "Swarmer"
+	enemy.is_swarmer = true
 	enemy.destroyed.connect(world._on_swarmer_destroyed)
 	world.add_child(enemy)
 	world._update_drone_count()

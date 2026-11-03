@@ -22,6 +22,7 @@ config/icon="res://icon.svg"
 
 Localization="*res://scripts/localization.gd"
 MetaStats="*res://scripts/meta_stats.gd"
+SessionSave="*res://scripts/session_save.gd"
 
 [display]
 

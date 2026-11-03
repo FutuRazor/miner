@@ -11,6 +11,7 @@ func _settle() -> void:
 
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/ranking_test.dat" % OS.get_process_id()
 	TranslationServer.set_locale("de")
 	var stats = root.get_node("MetaStats")
 	stats.persistence_enabled = false

@@ -41,7 +41,7 @@ func _run() -> void:
 	var english = load("res://localization/en.po")
 	for message in german.get_message_list():
 		assert(not english.get_message(message).is_empty(), "Missing English message: " + message)
-	assert(english.get_message("Spiel starten") == "Start game")
+	assert(english.get_message("Neues Spiel") == "New Game")
 	var world = load("res://scenes/main.tscn").instantiate()
 	root.add_child(world)
 	world.set_physics_process(false)

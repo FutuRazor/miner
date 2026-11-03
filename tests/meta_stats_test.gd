@@ -14,6 +14,7 @@ func _store(path: String) -> Node:
 
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/meta_stats_test.dat" % OS.get_process_id()
 	# Keep existing German UI expectations independent of the default language.
 	TranslationServer.set_locale("de")
 	var meta := root.get_node("MetaStats")

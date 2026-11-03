@@ -11,6 +11,7 @@ func _settle() -> void:
 
 
 func _run() -> void:
+	root.get_node("SessionSave").storage_path = "res://.godot/session_tests/%d/victory_test.dat" % OS.get_process_id()
 	TranslationServer.set_locale("en")
 	root.get_node("MetaStats").persistence_enabled = false
 	assert(change_scene_to_file("res://scenes/main.tscn") == OK)

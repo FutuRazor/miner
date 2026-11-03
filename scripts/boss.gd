@@ -1,9 +1,8 @@
 extends "res://scripts/drone.gd"
 
-signal boss_defeated(wave_number: int)
+signal boss_defeated(number: int)
 
 var final_boss := false
-var wave_number := 10
 var swarmer_timer: Timer
 var swarmers: Array[Node2D] = []
 
