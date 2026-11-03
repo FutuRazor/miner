@@ -42,6 +42,7 @@ Buildings occupy **2 × 2 grid cells** and take time to construct. Right-click a
 - **Growing enemy waves:** Normal waves increase in numbers and health. Boss encounters replace the normal enemies in waves **10** and **20** of the main mission.
 - **Repair priorities:** Mechanics prioritize the base, then towers, then eligible combat drones. Towers and combat drones are reserved for one mechanic at a time; multiple mechanics can repair the base together.
 - **Drone traffic:** Hard circular collisions allow drones to push one another. Drones navigate around obstacles and find parking space without fixed slots. Mining jobs and cash pickups are reserved to reduce duplicate assignments. Bosses push smaller drones aside without being displaced, so barracks drones cannot pin them in place.
+- **Early wave bonus:** Start the next wave immediately with the button beside the countdown. Each full remaining simulation second awards **$1**, counted as revenue, and the next countdown resets. Existing enemies stay in play. The button is disabled while the game or wave timer is paused and returns after wave 20 only when entering Endless Freeplay.
 - **Simulation controls:** Pause or cycle through **1×, 1.5×, 2×, and 3×** speed. Zoom and pan the map within its camera bounds.
 - **Persistent statistics:** Track gathered resources, fully mined blocks by hardness, and defeated enemies across runs.
 - **Options & language:** English is the default language. Switch between English and German from the start menu; your preference is saved automatically.

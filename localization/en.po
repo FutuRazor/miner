@@ -866,3 +866,9 @@ msgstr "Highest Defeated Wave"
 
 msgid "Noch keine Endless-Partien mit besiegter Welle 21."
 msgstr "No Endless games with wave 21 defeated yet."
+
+msgid "Nächste Welle sofort starten. Jede volle Restsekunde bringt $1."
+msgstr "Start the next wave immediately. Each full remaining second earns $1."
+
+msgid "Welle starten (+$%d)"
+msgstr "Start wave (+$%d)"

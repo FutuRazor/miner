@@ -47,6 +47,7 @@ var drone_count_label: Label
 var enemy_count_label: Label
 var wave_timer: ProgressBar
 var wave_pause_button: Button
+var wave_start_button: Button
 var combat_assignment_time := 0.0
 var combat_reassign_pending := false
 var was_in_base := true
@@ -1204,6 +1205,18 @@ func _create_hud() -> void:
 	wave_timer.offset_bottom = 60.0
 	layer.add_child(wave_timer)
 	wave_timer.wave_due.connect(func(_number: int) -> void: spawn_enemy_wave())
+	wave_start_button = Button.new()
+	wave_start_button.name = "WaveStartButton"
+	wave_start_button.anchor_left = 0.5
+	wave_start_button.anchor_right = 0.5
+	wave_start_button.offset_left = 188.0
+	wave_start_button.offset_right = 388.0
+	wave_start_button.offset_top = 20.0
+	wave_start_button.offset_bottom = 60.0
+	wave_start_button.focus_mode = Control.FOCUS_NONE
+	wave_start_button.pressed.connect(_start_wave_early)
+	layer.add_child(wave_start_button)
+	_update_wave_start_button()
 	var panel := PanelContainer.new()
 	panel.name = "MinerInfo"
 	panel.anchor_left = 1.0
@@ -1391,6 +1404,34 @@ func has_mining_job(power: int) -> bool:
 	return mining_job_cache[power]
 
 
+func _can_start_wave_early() -> bool:
+	return scene_file_path == "res://scenes/main.tscn" and not is_game_over and not return_dialog_open and not get_tree().paused and not wave_timer.timer_paused and wave_timer.is_visible_in_tree() and wave_timer.remaining > 0.0 and not (has_mission_limit() and spawned_waves >= 20)
+
+
+func _update_wave_start_button() -> void:
+	if not is_instance_valid(wave_start_button):
+		return
+	wave_start_button.visible = scene_file_path == "res://scenes/main.tscn" and wave_timer.is_visible_in_tree() and not (has_mission_limit() and spawned_waves >= 20)
+	wave_start_button.disabled = not _can_start_wave_early()
+	var bonus := maxi(0, floori(wave_timer.remaining))
+	wave_start_button.text = tr("Welle starten (+$%d)") % bonus
+	wave_start_button.tooltip_text = tr("Nächste Welle sofort starten. Jede volle Restsekunde bringt $1.")
+
+
+func _start_wave_early() -> void:
+	if not _can_start_wave_early():
+		return
+	var bonus := floori(wave_timer.remaining)
+	wave_timer.next_wave += 1
+	wave_timer.remaining = wave_timer.INTERVAL
+	wave_timer.max_value = wave_timer.INTERVAL
+	spawn_enemy_wave()
+	receive_income(bonus)
+	_update_counters()
+	_update_build_ui()
+	wave_timer._refresh()
+
+
 func _set_wave_timer_paused(value: bool) -> void:
 	if is_game_over:
 		return
@@ -1428,6 +1469,7 @@ func _set_paused(value: bool) -> void:
 
 
 func _update_pause_controls() -> void:
+	_update_wave_start_button()
 	play_button.disabled = is_game_over or return_dialog_open or not get_tree().paused
 	pause_button.disabled = is_game_over or return_dialog_open or get_tree().paused
 	speed_button.disabled = is_game_over or return_dialog_open
