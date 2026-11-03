@@ -51,7 +51,9 @@ func request_resume() -> bool:
 
 func _encode(value: Variant, ids: Dictionary) -> Variant:
 	if typeof(value) == TYPE_OBJECT:
-		return {"$node": ids[value]} if is_instance_valid(value) and ids.has(value) else null
+		if is_instance_valid(value) and ids.has(value):
+			return {"$node": ids[value]}
+		return null
 	if value is Dictionary:
 		var result := {}
 		for key in value:
